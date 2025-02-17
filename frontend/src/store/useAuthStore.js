@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import instance from "../pages/lib/axios";
 import toast from "react-hot-toast";
+import instance from "../libs/axios";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -17,7 +17,7 @@ export const useAuthStore = create((set) => ({
       console.log("authUser", res.user);
       toast.success("Signup successful");
     } catch (error) {
-      console.error("Signup failed:", error.message);
+      console.error("Signup failed:", error.response ? error.response.data : error.message);
       toast.error("Signup failed");
     } finally {
       set({ isSigningUp: false });
@@ -32,8 +32,8 @@ export const useAuthStore = create((set) => ({
       set({ authUser: res.data });
       toast.success("Login successful");
     } catch (error) {
-      console.error("Login failed:", error.message);
-      toast.error("Login failed");
+      console.error("Login failed:", error.response);
+      toast.error(error?.response?.data);
     } finally {
       set({ isLoggingIn: false });
     }
