@@ -3,10 +3,12 @@ import toast from "react-hot-toast";
 import instance from "../libs/axios";
 
 export const useAuthStore = create((set) => ({
-  authUser: null,
-  isSigningUp: false, 
-  isLoggingIn: false,
-  isCheckingAuth: true,
+    authUser: null,
+    isSigningUp: false,
+    isLoggingIn: false,
+    isCheckingAuth: true,
+    accessToken: null,
+    refreshToken: null,
 
   signup: async (formData) => {
     set({ isSigningUp: true });
@@ -24,26 +26,36 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  login: async (formData) => {
-    set({ isLoggingIn: true });
-    try {
-      const res = await instance.post("v1/auth/login", formData);
-      console.log("login res:", res);
-      set({ authUser: res.data });
-      toast.success("Login successful");
-    } catch (error) {
-      console.error("Login failed:", error.response);
-      toast.error(error?.response?.data);
-    } finally {
-      set({ isLoggingIn: false });
-    }
-  },
+    login: async(formData) => {
+        try {
+            const response = await axios.post("/api/auth/login", formData);
+            set({
+                user: response.data.user,
+                accessToken: response.data.accessToken,
+                refreshToken: response.data.refreshToken,
+            });
+        } catch (error) {
+            console.error("Login error:", error);
+        }
+    },
 
-  logout: async () => {},
+    updateAccessToken: (newToken) => set({ accessToken: newToken }),
 
-  updateProfile: async (formData) => {},
+    refreshAccessToken: async() => {
+        try {
+            const refreshToken = get().refreshToken;
+            const response = await axios.post("/api/auth/refresh-token", { refreshToken });
+            set({ accessToken: response.data.accessToken });
+        } catch (error) {
+            console.error("Failed to refresh token:", error);
+        }
+    },
 
-  connectSocket: async () => {},
+    logout: () => set({ user: null, accessToken: null, refreshToken: null }),
 
-  disconnectSocket: async () => {},
+    updateProfile: async(formData) => {},
+
+    connectSocket: async() => {},
+
+    disconnectSocket: async() => {},
 }));
