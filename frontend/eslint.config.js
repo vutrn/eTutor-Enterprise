@@ -37,6 +37,7 @@ export default [
       'prop-types': 'off',
       "react/no-children-prop": "off",
       "react/prop-types": "off",
+      "no-unused-vars": "warn",
       
     },
   },
