@@ -32,14 +32,14 @@ instance.interceptors.response.use(
     nProgress.done();
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    console.log("axios response data:", response);
+    console.log("axios response.data:", response.data);
     return response && response.data ? response.data : response;
   },
   function (error) {
     nProgress.done();
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    console.log("axios response error:", error.response);
+    console.log("axios error.response:", error.response);
     return Promise.reject(error);
   }
 );
