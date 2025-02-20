@@ -8,9 +8,9 @@ const AdminLayout = () => {
       <Navbar />
       {/* Add additional admin layout components here */}
       {/* Consider adding a main content area or sidebar if necessary */}
-      <main>
+    
         <Outlet /> {/* Render child routes here */}
-      </main>
+    
     </div>
   );
 }

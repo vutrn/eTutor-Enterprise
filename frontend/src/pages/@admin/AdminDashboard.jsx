@@ -6,8 +6,14 @@ import { LogOut, User } from "lucide-react";
 const AdminDashboard = () => {
   const { authUser, logout } = useAuthStore();
   return (
-    <div className="flex justify-center items-center">
+    <div className="">
       <h1>Admin Dashboard</h1>
+      <h1>Admin Dashboard</h1>
+      <h1>Admin Dashboard</h1>
+      <h1>Admin Dashboard</h1>
+      <h1>Admin Dashboard</h1>
+      <h1>Admin Dashboard</h1>
+
       NAME: {authUser.username}
       {/* Additional dashboard components or functionality can be added here */}
    
