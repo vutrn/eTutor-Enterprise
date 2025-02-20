@@ -1,8 +1,8 @@
 import { LogOut, Mail, User } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router";
+import { useAuthStore } from "../../store/useAuthStore";
 
-const HomePage = () => {
+const StudentDashboard = () => {
   const { authUser, logout } = useAuthStore();
   return (
     <div>
@@ -42,4 +42,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default StudentDashboard;

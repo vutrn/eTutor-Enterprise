@@ -1,38 +1,76 @@
 import { Toaster } from "react-hot-toast";
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
+import AdminDashboard from "./pages/@admin/AdminDashboard";
+import AdminLayout from "./pages/@admin/AdminLayout";
+import StudentDashboard from "./pages/@student/StudentDashboard";
+import TutorDashboard from "./pages/@tutor/TutorDashboard";
 import LoginPage from "./pages/Auth/LoginPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
-import HomePage from "./pages/HomePage";
-import ProfilePage from "./pages/ProfilePage";
-import SettingPage from "./pages/SettingPage";
+import NotFound from "./pages/Other/NotFound";
 import { useAuthStore } from "./store/useAuthStore";
+import { useCallback, useEffect } from "react";
 
 function App() {
   const { authUser } = useAuthStore();
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   checkAuth();
-  //   console.log("Checking auth", checkAuth);
-  // }, [checkAuth]);
+  const getDefaultRoute = () => {
+    if (!authUser) return "/";
+    switch (authUser.role) {
+      case "admin":
+        return "/admin";
+      case "tutor":
+        return "/tutor";
+      case "student":
+        return "/student";
+      default:
+        return "/";
+    }
+  };
+
+  useEffect(() => {
+    // Check if user is authenticated
+    // If not, redirect to login page
+    if (authUser === null) {
+      navigate("/");
+    }
+  }, [authUser, navigate]);
 
   console.log("Auth user:", authUser);
-
-  //  if (isCheckingAuth && !authUser)
-  //   return (
-  //     console.log("isCheckingAuth", isCheckingAuth, "authUser", authUser),
-  //     <div className="flex h-screen items-center justify-center">
-  //       <Loader className="size-10 animate-spin" />
-  //     </div>
-  //   );
 
   return (
     <>
       <Routes>
-        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        {/* AUTH */}
+        <Route path="/" element={!authUser ? <LoginPage /> : <Navigate to={getDefaultRoute()} />} />
         <Route path="/register" element={!authUser ? <RegisterPage /> : <Navigate to="/" />} />
-        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
-        <Route path="/settings" element={<SettingPage />} />
-        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={authUser && authUser.role === "admin" ? <AdminLayout /> : <Navigate to="/" />}
+        >
+          <Route path="dashboard" index element={<AdminDashboard />} />
+        </Route>
+
+        {/* TUTOR */}
+        <Route
+          path="/tutor"
+          element={authUser && authUser.role === "tutor" ? <TutorDashboard /> : <Navigate to="/" />}
+        />
+
+        {/* STUDENT */}
+        <Route
+          path="/student"
+          element={
+            authUser && authUser.role === "student" ? <StudentDashboard /> : <Navigate to="/" />
+          }
+        />
+
+        {/* <Route path="/settings" element={<SettingPage />} /> */}
+        {/* <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} /> */}
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <Toaster />

@@ -42,9 +42,7 @@ export const useAuthStore = create(
         set({ isSigningUp: true });
         try {
           const res = await axiosInstance.post("v1/auth/register", formData);
-          console.log("res", res);
           set({ authUser: res.data });
-          console.log("authUser", res.data);
           toast.success("Signup successful");
         } catch (error) {
           console.error("Signup failed:", error.response.data.message);
@@ -58,7 +56,6 @@ export const useAuthStore = create(
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("/v1/auth/login", formData);
-
           set({ authUser: res.data });
           toast.success("Login successful");
         } catch (error) {
@@ -74,9 +71,7 @@ export const useAuthStore = create(
           await axiosInstance.post("v1/auth/logout");
           // Clear localStorage
           localStorage.removeItem("authUser");
-          set({
-            authUser: null,
-          });
+          set({authUser: null});
           toast.success("Logged out successfully.");
         } catch (error) {
           console.log(error.response?.data?.message);
