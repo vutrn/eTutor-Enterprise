@@ -11,6 +11,7 @@ const RegisterPage = () => {
     username: "",
     email: "",
     password: "",
+    role: "student", // Default role
   });
   const { signup, isSigningUp } = useAuthStore();
   const navigate = useNavigate();
@@ -118,6 +119,21 @@ const RegisterPage = () => {
                 </button>
               </div>
             </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Role</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              >
+                <option value="student">Student</option>
+                <option value="tutor">Tutor</option>
+              </select>
+            </div>
+
             <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
               {isSigningUp ? (
                 <>

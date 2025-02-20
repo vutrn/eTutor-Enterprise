@@ -1,8 +1,9 @@
-import { Mail, User } from "lucide-react";
+import { LogOut, Mail, User } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { Link } from "react-router";
 
 const HomePage = () => {
-  const { authUser } = useAuthStore();
+  const { authUser, logout } = useAuthStore();
   return (
     <div>
       {/* PROFILE DETAILS */}
@@ -23,6 +24,20 @@ const HomePage = () => {
           <p className="bg-base-200 rounded-lg border px-4 py-2.5">{authUser?.email}</p>
         </div>
       </div>
+
+      {authUser && (
+        <>
+          <Link to={"/profile"} className={`btn btn-sm gap-2`}>
+            <User className="size-5" />
+            <span className="hidden sm:inline">Profile</span>
+          </Link>
+
+          <button className="flex items-center gap-2" onClick={logout}>
+            <LogOut className="size-5" />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes } from "react-router";
 import LoginPage from "./pages/Auth/LoginPage";
@@ -7,24 +6,24 @@ import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingPage from "./pages/SettingPage";
 import { useAuthStore } from "./store/useAuthStore";
-import { Loader } from "lucide-react";
 
 function App() {
-  const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
+  const { authUser } = useAuthStore();
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  // useEffect(() => {
+  //   checkAuth();
+  //   console.log("Checking auth", checkAuth);
+  // }, [checkAuth]);
 
   console.log("Auth user:", authUser);
 
-   if (isCheckingAuth && !authUser)
-    return (
-      console.log("isCheckingAuth", isCheckingAuth, "authUser", authUser),
-      <div className="flex h-screen items-center justify-center">
-        <Loader className="size-10 animate-spin" />
-      </div>
-    );
+  //  if (isCheckingAuth && !authUser)
+  //   return (
+  //     console.log("isCheckingAuth", isCheckingAuth, "authUser", authUser),
+  //     <div className="flex h-screen items-center justify-center">
+  //       <Loader className="size-10 animate-spin" />
+  //     </div>
+  //   );
 
   return (
     <>
