@@ -28,7 +28,7 @@ const LoginPage = () => {
 
     try {
       await login(formData);
-      navigate("/");
+      // navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       // Error handling is now done in the useAuthStore

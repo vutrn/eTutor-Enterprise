@@ -1,25 +1,38 @@
-
-import { Link } from "react-router";
+import { useEffect } from "react";
+import { useAdminStore } from "../../store/useAdminStore";
 import { useAuthStore } from "../../store/useAuthStore";
-import { LogOut, User } from "lucide-react";
 
 const AdminDashboard = () => {
-  const { authUser, logout } = useAuthStore();
+  const { authUser } = useAuthStore();
+  const { users, isUsersLoading, getAllUsers } = useAdminStore();
+
+  useEffect(() => {
+    getAllUsers();
+  }, [getAllUsers]);
+
+  console.log("users", users);
+
   return (
     <div className="">
       <h1>Admin Dashboard</h1>
-      <h1>Admin Dashboard</h1>
-      <h1>Admin Dashboard</h1>
-      <h1>Admin Dashboard</h1>
-      <h1>Admin Dashboard</h1>
-      <h1>Admin Dashboard</h1>
-
-      NAME: {authUser.username}
-      {/* Additional dashboard components or functionality can be added here */}
-   
-      {/* Placeholder for student list */}
+      <div>NAME: {authUser.username}</div>
       <div className="student-list-placeholder">
-        {/* Future implementation for student list goes here */}
+      {isUsersLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <div>
+            {users && users.length > 0 ? (
+              users.map((user) => (
+                <div key={user.id}>
+                  <div>{user.username}</div>
+                  <div>{user.email}</div>
+                </div>
+              ))
+            ) : (
+              <div>No users found</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

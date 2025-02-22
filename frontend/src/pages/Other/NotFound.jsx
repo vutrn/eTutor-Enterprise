@@ -7,16 +7,14 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   // Display toast message
-  
+
   useEffect(() => {
     toast.error("Page not found. Redirecting back...");
     const timeoutId = setTimeout(() => {
       navigate(-1);
     }, 3000);
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    return () => clearTimeout(timeoutId);
   }, [navigate]);
 
   return (

@@ -3,11 +3,12 @@ import { BrowserRouter } from "react-router";
 import App from "./App.jsx";
 import "./index.css";
 import "nprogress/nprogress.css";
+import { StrictMode } from "react";
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
-  // </StrictMode>,
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  // </StrictMode> 
 );

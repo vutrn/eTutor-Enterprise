@@ -6,43 +6,18 @@ import { persist } from "zustand/middleware";
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       authUser: null,
-      // accessToken: null,
+      accessToken: null,
       isSigningUp: false,
       isLoggingIn: false,
       isCheckingAuth: true,
-
-      checkAuth: async () => {
-        const token = get().accessToken;
-        if (!token) {
-          set({ isCheckingAuth: false });
-          return;
-        }
-
-        try {
-          const res = await axiosInstance.get("/auth/check", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          set({ authUser: res.data });
-          localStorage.setItem("authUser", JSON.stringify(res.data));
-        } catch (error) {
-          console.log("Error in user checkAuth:", error.message);
-          set({ authUser: null });
-          localStorage.removeItem("authUser");
-          localStorage.removeItem("accessToken");
-        } finally {
-          set({ isCheckingAuth: false });
-        }
-      },
 
       signup: async (formData) => {
         set({ isSigningUp: true });
         try {
           const res = await axiosInstance.post("v1/auth/register", formData);
-          set({ authUser: res.data });
+          set({ authUser: res });
           toast.success("Signup successful");
         } catch (error) {
           console.error("Signup failed:", error.response.data.message);
@@ -56,7 +31,8 @@ export const useAuthStore = create(
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("/v1/auth/login", formData);
-          set({ authUser: res.data });
+          localStorage.setItem("accessToken", res.accessToken);
+          set({ authUser: res, accessToken: res.accessToken });
           toast.success("Login successful");
         } catch (error) {
           console.error("Login error:", error.response?.data?.message);
@@ -71,7 +47,8 @@ export const useAuthStore = create(
           await axiosInstance.post("v1/auth/logout");
           // Clear localStorage
           localStorage.removeItem("authUser");
-          set({authUser: null});
+          localStorage.removeItem("accessToken");
+          set({ authUser: null, accessToken: null });
           toast.success("Logged out successfully.");
         } catch (error) {
           console.log(error.response?.data?.message);

@@ -32,9 +32,8 @@ axiosInstance.interceptors.response.use(
     nProgress.done();
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    console.log("axios response", response);
-    // return response && response.data ? response.data : response;
-    return response;
+    console.log("axios response.data", response.data);
+    return response ? response.data : response; // Returning only the data for easier access in components
   },
   function (error) {
     nProgress.done();

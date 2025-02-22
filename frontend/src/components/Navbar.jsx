@@ -14,7 +14,7 @@ const Navbar = () => {
               <div className="bg-primary/10 group-hover:bg-primary/20 flex size-12 items-center justify-center rounded-xl transition-colors">
                 <GraduationCap strokeWidth={1.25} size="24" />
               </div>
-              <h1 className="text-lg font-bold">Chatty</h1>
+              <h1 className="text-lg font-bold">eTutor System</h1>
             </Link>
           </div>
 
@@ -27,17 +27,16 @@ const Navbar = () => {
               <span className="hidden sm:inline">Settings</span>
             </Link> */}
 
-           {authUser.username}
-                <Link to={"/profile"} className={`btn btn-sm gap-2`}>
-                  <User className="size-5" />
-                  <span className="hidden sm:inline">Profile</span>
-                </Link>
+            <span>{authUser.username}</span>
+            <Link to={"/profile"} className={`btn btn-sm gap-2`}>
+              <User className="size-5" />
+              <span className="hidden sm:inline">Profile</span>
+            </Link>
 
-                <button className="flex items-center gap-2" onClick={logout}>
-                  <LogOut className="size-5" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-             
+            <button className="flex btn items-center gap-2" onClick={logout}>
+              <LogOut className="size-5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
           </div>
         </div>
       </div>
