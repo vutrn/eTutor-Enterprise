@@ -11,7 +11,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useCallback, useEffect } from "react";
 
 function App() {
-  const { authUser } = useAuthStore();
+  const { authUser, accessToken, isCheckingAuth } = useAuthStore();
   const navigate = useNavigate();
 
   const getDefaultRoute = () => {
@@ -31,10 +31,10 @@ function App() {
   useEffect(() => {
     // Check if user is authenticated
     // If not, redirect to login page
-    if (authUser === null) {
+    if (!isCheckingAuth && (!authUser || !accessToken)) {
       navigate("/");
     }
-  }, [authUser, navigate]);
+  }, [authUser, accessToken, isCheckingAuth, navigate]);
 
   console.log("Auth user:", authUser);
 
