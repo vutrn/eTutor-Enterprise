@@ -8,35 +8,10 @@ export const useAuthStore = create(
   persist(
     (set, get) => ({
       authUser: null,
-      // accessToken: null,
+      accessToken: null,
       isSigningUp: false,
       isLoggingIn: false,
       isCheckingAuth: true,
-
-      checkAuth: async () => {
-        const token = get().accessToken;
-        if (!token) {
-          set({ isCheckingAuth: false });
-          return;
-        }
-
-        try {
-          const res = await axiosInstance.get("/auth/check", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          set({ authUser: res.data });
-          localStorage.setItem("authUser", JSON.stringify(res.data));
-        } catch (error) {
-          console.log("Error in user checkAuth:", error.message);
-          set({ authUser: null });
-          localStorage.removeItem("authUser");
-          localStorage.removeItem("accessToken");
-        } finally {
-          set({ isCheckingAuth: false });
-        }
-      },
 
       signup: async (formData) => {
         set({ isSigningUp: true });
@@ -56,7 +31,7 @@ export const useAuthStore = create(
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("/v1/auth/login", formData);
-          set({ authUser: res.data });
+          set({ authUser: res.data , accessToken: res.data.accessToken});
           toast.success("Login successful");
         } catch (error) {
           console.error("Login error:", error.response?.data?.message);
@@ -69,10 +44,10 @@ export const useAuthStore = create(
       logout: async () => {
         try {
           await axiosInstance.post("v1/auth/logout");
-          // Clear localStorage
           localStorage.removeItem("authUser");
-          set({authUser: null});
+          set({authUser: null, accessToken: null});
           toast.success("Logged out successfully.");
+          window.location.reload();
         } catch (error) {
           console.log(error.response?.data?.message);
         }
@@ -83,10 +58,43 @@ export const useAuthStore = create(
       connectSocket: async () => {},
 
       disconnectSocket: async () => {},
+
+      setAccessToken: (token) => {
+        set({ accessToken: token });
+        localStorage.setItem("accessToken", token);
+      },
     }),
     {
       name: "auth-storage", // name of the item in the storage (must be unique)
-      partialize: (state) => ({ authUser: state.authUser }),
+      partialize: (state) => ({ authUser: state.authUser, accessToken: state.accessToken }),
     }
   )
+);
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().accessToken;
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const res = await axiosInstance.post("/v1/auth/refresh", {}, { withCredentials: true });
+        useAuthStore.getState().setAccessToken(res.data.accessToken);
+        originalRequest.headers["Authorization"] = `Bearer ${res.data.accessToken}`;
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        console.error("Refresh token failed, logging out", err);
+        useAuthStore.getState().logout();
+      }
+    }
+    return Promise.reject(error);
+  }
 );
