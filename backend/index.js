@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const classRoute = require("./routes/personalclass");
+const messageRoute = require("./routes/message");
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use("/v1/auth", authRoute);
 app.use("/v1/user", userRoute);
 app.use("/v1/class", classRoute);
+app.use("/v1/message", messageRoute);
 
 app.listen(8000, () => {
     console.log("Server Running on port 8000");
