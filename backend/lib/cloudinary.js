@@ -1,12 +1,12 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { config } from 'dotenv';
+const dotenv = require("dotenv");
+const cloudinary = require("cloudinary").v2;
 
-config(); // Load biến môi trường từ file .env
+dotenv.config(); // Load biến môi trường từ file .env
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export default cloudinary;
+module.exports = cloudinary;

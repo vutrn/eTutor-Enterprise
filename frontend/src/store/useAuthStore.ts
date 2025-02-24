@@ -2,13 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import axiosInstance from "../utils/axios";
+import Toast from "react-native-toast-message";
 
 interface AuthStore {
   user: any;
   isSigningUp: boolean;
   isLoggingIn: boolean;
-  signup: (formData: any) => void;
-  login: (formData: any) => void;
+  accessToken: string | null;
+  signup: (formData: any) => Promise<boolean>;
+  login: (formData: any) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -18,6 +20,7 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
       user: null,
       isSigningUp: false,
       isLoggingIn: false,
+      accessToken: null,
 
       signup: async (formData) => {
         set({ isSigningUp: true });
@@ -25,19 +28,60 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
           const res = await axiosInstance.post("v1/auth/register", formData);
           set({ user: res.data });
           console.log("Signup successful:", res.data);
-        } catch (error) {
-          console.error("Signup failed:", (error as any).message);
+          Toast.show({ type: "success", text1: "Signup successful", text2: "Welcome!" });
+          return true;
+        } catch (error: any) {
+          console.log("Signup failed:", error.response?.data?.message);
+          Toast.show({
+            type: "error",
+            text1: "Signup failed",
+            text2: error.response?.data?.message,
+          });
+          return false;
         } finally {
           set({ isSigningUp: false });
         }
       },
 
-      login: async () => {},
+      login: async (formData) => {
+        set({ isLoggingIn: true });
+        try {
+          const res = await axiosInstance.post("v1/auth/login", formData);
+          set({ user: res.data });
 
-      logout: () => {},
+          axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.accessToken}`;
+          await AsyncStorage.setItem("access-token", res.data.accessToken);
+
+          return true;
+        } catch (error: any) {
+          console.log("🚀 ~ login: ~ error:", error.response?.data?.message);
+          Toast.show({
+            type: "error",
+            text1: "Login failed",
+            text2: error.response?.data?.message,
+          });
+          return false;
+        } finally {
+          set({ isLoggingIn: false });
+        }
+      },
+
+      logout: async () => {
+        try {
+          await axiosInstance.post("v1/auth/logout");
+          // Clear localStorage
+          await AsyncStorage.removeItem("authUser");
+          await AsyncStorage.removeItem("accessToken");
+          set({ user: null, accessToken: null });
+          Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
+        } catch (error: any) {
+          console.log(error.response?.data?.message);
+        }
+      },
     }),
     {
       name: "user-store",
+      partialize: (state) => ({ user: state.user }),
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

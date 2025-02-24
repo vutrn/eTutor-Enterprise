@@ -7,12 +7,9 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-import Home from "./src/screens/Blog/home";
-import Detail from "./src/screens/Blog/detail";
+import Toast from "react-native-toast-message";
 import AppNavigation from "./src/navigation/app.navigation";
 
 SplashScreen.preventAutoHideAsync();
@@ -36,13 +33,13 @@ export const App = () => {
     return null;
   }
 
-
-
-
   return (
-    <NavigationContainer>
-      <AppNavigation />
-    </NavigationContainer>
+    <>
+      <NavigationContainer>
+        <AppNavigation />
+      </NavigationContainer>
+
+      <Toast />
+    </>
   );
 };
-

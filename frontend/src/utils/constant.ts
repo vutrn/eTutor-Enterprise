@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import Toast, { BaseToast, BaseToastProps, ErrorToast } from "react-native-toast-message";
 
 export const fonts = {
   thin: "Inter_100Thin",
@@ -12,8 +13,10 @@ export const fonts = {
   black: "Inter_900Black",
 };
 
-export const globalStyles = StyleSheet.create({
+export default StyleSheet.create({
   globalFont: {
     fontFamily: fonts.regular,
+    fontSize: 30,
   },
 });
+

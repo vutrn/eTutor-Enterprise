@@ -1,5 +1,7 @@
 type RootStackParamList = {
   login: undefined;
   signup: undefined;
-  // Feed: { sort: "latest" | "top" } | undefined;
+  home_admin: undefined;
+  home_student: undefined;
+  home_tutor: undefined;
 };
