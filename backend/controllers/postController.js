@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require("uuid");
 const Post = require("../models/Post");
 const { fileRemover } = require("../utils/fileRemover");
 
@@ -9,7 +8,6 @@ const postController = {
             const post = new Post({
                 title: "sample",
                 caption: "sample",
-                slug: uuidv4(),
                 body: {
                     type: "doc",
                     content: [],
@@ -28,7 +26,7 @@ const postController = {
     // Update a Post
     updatePost: async (req, res, next) => {
         try {
-            const post = await Post.findOne({ slug: req.params.slug });
+            const post = await Post.findById(req.params.id);
 
             if (!post) {
                 return next(new Error("Post not found"));
@@ -37,10 +35,9 @@ const postController = {
             const upload = uploadPicture.single("postPicture");
 
             const handleUpdatePostData = async (data) => {
-                const { title, caption, slug, body } = JSON.parse(data);
+                const { title, caption, body } = JSON.parse(data);
                 post.title = title || post.title;
                 post.caption = caption || post.caption;
-                post.slug = slug || post.slug;
                 post.body = body || post.body;
                 const updatedPost = await post.save();
                 return res.json(updatedPost);
@@ -69,7 +66,7 @@ const postController = {
     // Delete a Post
     deletePost: async (req, res, next) => {
         try {
-            const post = await Post.findOneAndDelete({ slug: req.params.slug });
+            const post = await Post.findByIdAndDelete(req.params.id);
 
             if (!post) {
                 return next(new Error("Post not found"));
@@ -88,7 +85,7 @@ const postController = {
     // Get a Single Post
     getPost: async (req, res, next) => {
         try {
-            const post = await Post.findOne({ slug: req.params.slug }).populate([
+            const post = await Post.findById(req.params.id).populate([
                 {
                     path: "user",
                     select: ["avatar", "name"],

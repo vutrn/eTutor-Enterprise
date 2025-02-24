@@ -7,10 +7,10 @@ router.post("/", middlewareController.veriryToken, postController.createPost);
 
 router.get("/", postController.getAllPosts);
 
-router.get("/:slug", postController.getPost);
+router.get("/:id", postController.getPost);
 
-router.put("/:slug", middlewareController.veriryToken, postController.updatePost);
+router.put("/:id", middlewareController.veriryToken, postController.updatePost);
 
-router.delete("/:slug", middlewareController.veriryToken, postController.deletePost);
+router.delete("/:id", middlewareController.veriryToken, postController.deletePost);
 
 module.exports = router;
