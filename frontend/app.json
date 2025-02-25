@@ -28,6 +28,7 @@
     },
     "plugins": [
       "expo-font"
+      
     ],
     "jsEngine": "hermes"
   }

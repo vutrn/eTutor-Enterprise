@@ -4,8 +4,8 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import axiosInstance from "../utils/axios";
 import Toast from "react-native-toast-message";
 
-interface AuthStore {
-  user: any;
+interface AuthState {
+  authUser: any;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   accessToken: string | null;
@@ -14,10 +14,10 @@ interface AuthStore {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
+export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
   persist(
     (set) => ({
-      user: null,
+      authUser: null,
       isSigningUp: false,
       isLoggingIn: false,
       accessToken: null,
@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
         set({ isSigningUp: true });
         try {
           const res = await axiosInstance.post("v1/auth/register", formData);
-          set({ user: res.data });
+          set({ authUser: res.data });
           console.log("Signup successful:", res.data);
           Toast.show({ type: "success", text1: "Signup successful", text2: "Welcome!" });
           return true;
@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("v1/auth/login", formData);
-          set({ user: res.data });
+          set({ authUser: res.data });
 
           axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.accessToken}`;
           await AsyncStorage.setItem("access-token", res.data.accessToken);
@@ -72,7 +72,7 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
           // Clear localStorage
           await AsyncStorage.removeItem("authUser");
           await AsyncStorage.removeItem("accessToken");
-          set({ user: null, accessToken: null });
+          set({ authUser: null, accessToken: null });
           Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
         } catch (error: any) {
           console.log(error.response?.data?.message);
@@ -81,7 +81,7 @@ export const useAuthStore = create<AuthStore, [["zustand/persist", unknown]]>(
     }),
     {
       name: "user-store",
-      partialize: (state) => ({ user: state.user }),
+      partialize: (state) => ({ authUser: state.authUser }),
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

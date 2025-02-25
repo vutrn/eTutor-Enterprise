@@ -1,18 +1,10 @@
 import { Picker } from "@react-native-picker/picker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import {
-  Alert,
-  Button,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import { useAuthStore } from "../../store/useAuthStore";
+import { Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import { useAuthStore } from "../../store/useAuthStore";
 import { fonts } from "../../utils/constant";
 
 const SignUpScreen = () => {
@@ -66,8 +58,9 @@ const SignUpScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <ScrollView>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior="padding">
+        <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
         <View>
           {/* Username Input */}
           <Text style={styles.label}>Username</Text>
@@ -114,19 +107,21 @@ const SignUpScreen = () => {
           <View>
             <Text style={{ textAlign: "center", marginTop: 20 }}>
               Already have an account?{" "}
-              <Text style={{ color: "blue" }} onPress={() => navigation.navigate("login")}>
+              <Text style={{ color: "blue" }} onPress={() => navigation.goBack()}>
                 Login
               </Text>
             </Text>
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    // borderColor: "gray",
+    // borderWidth: 3,
     flex: 1,
     justifyContent: "center",
     padding: 20,
@@ -147,6 +142,9 @@ const styles = StyleSheet.create({
     height: 50,
     width: "100%",
     marginBottom: 10,
+    // borderColor: "red",
+    // borderWidth: 2,
+    backgroundColor: "lightblue",
   },
 });
 
