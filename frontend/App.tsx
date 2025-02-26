@@ -10,20 +10,14 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Text } from "react-native";
 import "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
-import AuthNavigation from "./src/navigation/auth.navigator";
-import Loading from "./src/screens/other/loading";
-import AdminNavigation from "./src/navigation/admin.navigator";
-import TutorNavigation from "./src/navigation/tutor.navigator";
-import StudentNavigation from "./src/navigation/student.navigator";
-import { useAuthStore } from "./src/store/useAuthStore";
+import AdminNavigator from "./src/navigation/admin.navigator";
 import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
-import AdminNavigator from "./src/navigation/admin.navigator";
-import { Text } from "react-native";
+import { useAuthStore } from "./src/store/useAuthStore";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,8 +31,8 @@ export const App = () => {
     Inter_700Bold,
   });
 
-  const Tab = createBottomTabNavigator();
-  const Stack = createNativeStackNavigator<RootStackParamList>();
+  // const Tab = createBottomTabNavigator();
+  // const Stack = createNativeStackNavigator<RootStackParamList>();
 
   useEffect(() => {
     if (loaded || error) {
@@ -81,25 +75,25 @@ export const App = () => {
       return <Text>Invalid role</Text>;
   }
 
-  return (
-    <>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
-          screenOptions={{
-            presentation: "card",
-            animation: "slide_from_right",
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="auth" component={AuthNavigation} />
-          <Stack.Screen name="admin_dashboard" component={AdminNavigation} />
-          <Stack.Screen name="tutor_dashboard" component={TutorNavigation} />
-          <Stack.Screen name="student_dashboard" component={StudentNavigation} />
-        </Stack.Navigator>
-      </NavigationContainer>
+  // return (
+  //   <>
+  //     <NavigationContainer>
+  //       <Stack.Navigator
+  //         screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
+  //         screenOptions={{
+  //           presentation: "card",
+  //           animation: "slide_from_right",
+  //           headerShown: false,
+  //         }}
+  //       >
+  //         <Stack.Screen name="auth" component={AuthNavigation} />
+  //         <Stack.Screen name="admin_dashboard" component={AdminNavigation} />
+  //         <Stack.Screen name="tutor_dashboard" component={TutorNavigation} />
+  //         <Stack.Screen name="student_dashboard" component={StudentNavigation} />
+  //       </Stack.Navigator>
+  //     </NavigationContainer>
 
-      <Toast />
-    </>
-  );
+  //     <Toast />
+  //   </>
+  // );
 };

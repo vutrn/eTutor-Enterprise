@@ -7,6 +7,7 @@ type RootStackParamList = {
   // Admin navigator
   admin_dashboard: undefined;
   create_class: undefined;
+  view_class: undefined;
   admin_profile: undefined;
 
   // Tutor navigator

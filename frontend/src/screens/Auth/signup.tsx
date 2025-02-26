@@ -6,10 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
 import { fonts } from "../../utils/constant";
+import { Feather } from "@expo/vector-icons";
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const { signup } = useAuthStore();
+  const { signup, isSigningUp } = useAuthStore();
 
   // State to manage form data
   const [formData, setFormData] = useState({
@@ -102,7 +103,17 @@ const SignUpScreen = () => {
             placeholder="Enter password"
           />
 
-          <Button title="Sign Up" onPress={handleSignUp} />
+          {/* Sign Up Button */}
+          {isSigningUp ? (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Feather name="loader" size={24} color="black" />
+              <Button title="Signing up..." disabled={true} />
+            </View>
+          ) : (
+            <Button title="Sign Up" onPress={handleSignUp} />
+          )}
+
+          {/* Login Link */}
 
           <View>
             <Text style={{ textAlign: "center", marginTop: 20 }}>
