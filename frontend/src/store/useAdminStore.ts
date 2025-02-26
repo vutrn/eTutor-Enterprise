@@ -25,15 +25,18 @@ export const useAdminStore = create<AdminState>()(
     fetchUsers: async () => {
       set({ loading: true });
       try {
-        const res = await axiosInstance.get("v1/admin/users", {
+        const res = await axiosInstance.get("v1/user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const students = res.data.filter((user: any) => user.role === "student");
+        console.log("🚀 ~ fetchUsers: ~ students:", students)
         const tutors = res.data.filter((user: any) => user.role === "tutor");
+        console.log("🚀 ~ fetchUsers: ~ tutors:", tutors)
         set({ students, tutors, loading: false });
       } catch (error: any) {
+        set({ loading: false });
         console.log("🚀 ~ fetchUsers: ~ error:", error.response?.data?.message);
         Toast.show({
           type: "error",

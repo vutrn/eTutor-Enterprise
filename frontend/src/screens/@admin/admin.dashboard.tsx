@@ -13,10 +13,12 @@ const AdminDashboard = () => {
 
   React.useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+  }, []);
 
-  const token = AsyncStorage.getItem("accessToken");
-  console.log("🚀 ~ token:", token);
+  console.log("🚀 ~ token:", AsyncStorage.getItem("accessToken"));
+
+  console.log("🚀 ~ students", students);
+  console.log("🚀 ~ tutors", tutors);
 
   if (loading) return (
     <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -28,13 +30,13 @@ const AdminDashboard = () => {
     <SafeAreaView>
       <Text>Students:</Text>
       {students.map((student) => (
-        <View key={student._id}>
+        <View key={student.id}>
           <Text>{student.username}</Text>
         </View>
       ))}
       <Text>Tutors:</Text>
       {tutors.map((tutor) => (
-        <View key={tutor._id}>
+        <View key={tutor.id}>
           <Text>{tutor.username}</Text>
         </View>
       ))}

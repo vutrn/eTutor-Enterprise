@@ -15,6 +15,7 @@ const AdminProfile = () => {
       <Text>Your role: {authUser?.role ? authUser?.role : "{ROLE}"}</Text>
 
       <Text>Your email: {authUser?.email || "{EMAIL}"}</Text>
+      <Text>Your ID: {authUser?._id || "{ID}"}</Text>
       <Text>Access token: {authUser?.accessToken || "{ACCESS_TOKEN}"}</Text>
       <Text>Refresh token: {authUser?.refreshToken || "{REFRESH_TOKEN}"}</Text>
 

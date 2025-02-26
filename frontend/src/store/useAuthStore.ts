@@ -70,8 +70,7 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
         try {
           await axiosInstance.post("v1/auth/logout");
           // Clear localStorage
-          await AsyncStorage.removeItem("authUser");
-          await AsyncStorage.removeItem("accessToken");
+          await AsyncStorage.removeItem("access-token");
           set({ authUser: null, accessToken: null });
           Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
         } catch (error: any) {
