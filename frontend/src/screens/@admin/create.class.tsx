@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const HomeAdmin = () => {
+const CreateClass = () => {
   return (
     <View>
-      <Text>HomeAdmin</Text>
+      <Text>Create Class</Text>
     </View>
   )
 }
 
-export default HomeAdmin
+export default CreateClass
