@@ -1,31 +1,30 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { lazy, Suspense } from "react";
-import HomeAdmin from "../screens/@admin/admin.dashboard";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginScreen from "../screens/Auth/login";
-import SignUpScreen from "../screens/Auth/signup";
+import React, { lazy, Suspense, useEffect } from "react";
 import Loading from "../screens/other/loading";
+import { useAuthStore } from "../store/useAuthStore";
 
 const AdminDashboard = lazy(() => import("../screens/@admin/admin.dashboard"));
 const CreateClass = lazy(() => import("../screens/@admin/create.class"));
 const ViewClass = lazy(() => import("../screens/@admin/view.class"));
 const AdminProfile = lazy(() => import("../screens/@admin/admin.profile"));
 
-const AuthNavigator = () => {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-
-  return (
-    <Stack.Navigator
-      screenOptions={{ presentation: "card", animation: "slide_from_right", headerShown: false }}
-    >
-      <Stack.Screen name="login" component={LoginScreen} />
-      <Stack.Screen name="signup" component={SignUpScreen} />
-    </Stack.Navigator>
-  );
-};
-
 const AdminNavigator = () => {
+  const { logout, verifyToken } = useAuthStore();
   const Tab = createBottomTabNavigator();
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const isTokenValid = await verifyToken();
+      if (!isTokenValid) {
+        console.log("Token is invalid, logging out...");
+        logout();
+      }
+    };
+    checkToken();
+    
+    const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
+    return () => clearInterval(tokenCheckInterval);
+  }, [logout]);
 
   return (
     <Tab.Navigator
@@ -33,7 +32,6 @@ const AdminNavigator = () => {
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
       <Tab.Screen name="admin_dashboard" component={AdminDashboard} />
-      {/* <Tab.Screen name="create_class" component={AuthNavigator} /> */}
       <Tab.Screen name="create_class" component={CreateClass} />
       <Tab.Screen name="view_class" component={ViewClass} />
       <Tab.Screen

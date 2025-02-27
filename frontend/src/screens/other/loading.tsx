@@ -5,7 +5,7 @@ const Loading = () => {
   return (
     <View style={styles.container}>
       <Text>
-        Loading...
+        LOADING.....
       </Text>
     </View>
   )

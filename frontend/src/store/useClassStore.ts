@@ -27,20 +27,17 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return;
       }
 
-      const response = await axiosInstance.get("v1/class", {
+      const res = await axiosInstance.get("v1/class", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       set({
-        classes: response.data.personalClasses,
+        classes: res.data.personalClasses,
         loading: false,
       });
     } catch (error: any) {
       console.error("Failed to fetch classes:", error);
-      set({
-        loading: false,
-      });
-
+      set({ loading: false });
       Toast.show({
         type: "error",
         text1: "Error",
@@ -99,7 +96,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return false;
       }
 
-      await axiosInstance.delete(`v1/personalclass/${classId}`, {
+      await axiosInstance.delete(`v1/class/${classId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -115,9 +112,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
       return true;
     } catch (error: any) {
       console.error("Failed to delete class:", error);
-      set({
-        loading: false,
-      });
+      set({ loading: false });
 
       Toast.show({
         type: "error",
@@ -195,7 +190,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
       return true;
     } catch (error: any) {
       console.error("Failed to remove student:", error);
-      set({loading: false});
+      set({ loading: false });
 
       Toast.show({
         type: "error",

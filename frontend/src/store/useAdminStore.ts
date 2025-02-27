@@ -4,12 +4,12 @@ import axiosInstance from "../utils/axios";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import { useAuthStore } from "./useAuthStore";
 
 type AdminState = {
   students: any[];
   tutors: any[];
   loading: boolean;
-  isTokenExpired: boolean;
   fetchUsers: () => Promise<void>;
 };
 
@@ -21,10 +21,8 @@ export const useAdminStore = create<AdminState>()(
     students: [],
     tutors: [],
     loading: false,
-    isTokenExpired: false,
 
     fetchUsers: async () => {
-      set({ loading: true });
       try {
         const token = await AsyncStorage.getItem("access-token");
         if (!token) {
@@ -39,7 +37,7 @@ export const useAdminStore = create<AdminState>()(
             text1: "Token expired",
             text2: "Please log in again",
           });
-          set({ loading: false, isTokenExpired: true });
+          useAuthStore.setState({ isTokenExpired: true });
           return;
         }
         const res = await axiosInstance.get("v1/user", {

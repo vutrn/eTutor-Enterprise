@@ -11,12 +11,12 @@ interface AuthState {
   isSigningUp: boolean;
   isLoggingIn: boolean;
   accessToken: string | null;
-  isAuthenticated: boolean;
   isTokenExpired: boolean;
 
   signup: (formData: any) => Promise<boolean>;
   login: (formData: any) => Promise<boolean>;
   logout: () => void;
+  verifyToken: () => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
@@ -26,14 +26,13 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
       isSigningUp: false,
       isLoggingIn: false,
       accessToken: null,
-      isAuthenticated: false,
       isTokenExpired: false,
 
       signup: async (formData) => {
         set({ isSigningUp: true });
         try {
           const res = await axiosInstance.post("v1/auth/register", formData);
-          set({ authUser: res.data });
+
           console.log("Signup successful:", res.data);
           Toast.show({ type: "success", text1: "Signup successful", text2: "Welcome!" });
           return true;
@@ -52,13 +51,11 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
 
       login: async (formData) => {
         set({ isLoggingIn: true });
-        // TODO: FIX LOGIC
-        useAdminStore.setState({ isTokenExpired: false }); 
         try {
           const res = await axiosInstance.post("v1/auth/login", formData);
           await AsyncStorage.setItem("access-token", res.data.accessToken);
 
-          set({ authUser: res.data, isAuthenticated: true, isTokenExpired: false });
+          set({ authUser: res.data, isTokenExpired: false });
 
           return true;
         } catch (error: any) {
@@ -78,10 +75,45 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
         try {
           await axiosInstance.post("v1/auth/logout");
           await AsyncStorage.removeItem("access-token");
-          set({ authUser: null, accessToken: null, isAuthenticated: false, isTokenExpired: false });
+          set({ authUser: null, accessToken: null, isTokenExpired: false });
           Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
         } catch (error: any) {
           console.log(error.response?.data?.message);
+        }
+      },
+
+      verifyToken: async () => {
+        try {
+          const token = await AsyncStorage.getItem("access-token");
+          if (!token) {
+            Toast.show({
+              type: "error",
+              text1: "No token found",
+              text2: "Please log in again",
+            });
+            return false;
+          }
+
+          // Decode token and check expiration
+          const decoded: any = jwtDecode(token);
+          if (decoded.exp * 1000 < Date.now()) {
+            Toast.show({
+              type: "error",
+              text1: "Session expired",
+              text2: "Please log in again",
+            });
+            set({ isTokenExpired: true });
+            return false;
+          }
+          return true;
+        } catch (error: any) {
+          console.log("🚀 ~ login: ~ error:", error.response?.data?.message);
+          Toast.show({
+            type: "error",
+            text1: "Login failed",
+            text2: error.response?.data?.message,
+          });
+          return false;
         }
       },
     }),

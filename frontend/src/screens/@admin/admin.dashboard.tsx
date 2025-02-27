@@ -8,8 +8,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CommonActions } from "@react-navigation/native";
 
 const AdminDashboard = () => {
-  const { logout } = useAuthStore();
-  const { fetchUsers, students, tutors, loading, isTokenExpired } = useAdminStore();
+  const { logout, isTokenExpired } = useAuthStore();
+  const { fetchUsers, students, tutors } = useAdminStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
