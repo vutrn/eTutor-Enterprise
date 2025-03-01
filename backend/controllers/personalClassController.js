@@ -36,7 +36,10 @@ const personalClassController = {
 
                 sendEmail(student.email, subject, text);
             });
-
+            const tutorSubject = "Bạn đã được phân công làm gia sư";
+            const tutorText = `Chào ${tutor.username},\n\nBạn đã được chỉ định làm gia sư cho lớp "${personalClass.name}".\n\nHãy chuẩn bị hướng dẫn các học sinh nhé!\n\nTrân trọng,\nAdmin`;
+    
+            sendEmail(tutor.email, tutorSubject, tutorText);
 
             res.status(201).json({ message: "Lớp học đã được tạo", personalClass });
         } catch (error) {
@@ -131,7 +134,36 @@ const personalClassController = {
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
-    }
+    },
+
+    changeTutorClass: async (req, res) => {
+        try {
+            const { personalClassId } = req.params;
+            const { newTutorId } = req.body;
+    
+            const personalClass = await PersonalClass.findById(personalClassId);
+            if (!personalClass) return res.status(404).json({ message: "Lớp học không tồn tại" });
+            const newTutor = await User.findById(newTutorId);
+            if (!newTutor || newTutor.role !== "tutor") {
+                return res.status(400).json({ message: "Gia sư không hợp lệ" });
+            }
+    
+            personalClass.tutor = newTutorId;
+            await personalClass.save();
+    
+            // Gửi email thông báo cho tutor mới
+            const subject = "Bạn đã được phân công làm gia sư";
+            const text = `Chào ${newTutor.username},\n\nBạn đã được chỉ định làm gia sư cho lớp "${personalClass.name}".\n\nHãy chuẩn bị hướng dẫn các học sinh nhé!\n\nTrân trọng,\nAdmin`;
+    
+            sendEmail(newTutor.email, subject, text);
+    
+            res.status(200).json({ message: "Gia sư đã được cập nhật", personalClass });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+
 }
 
 
