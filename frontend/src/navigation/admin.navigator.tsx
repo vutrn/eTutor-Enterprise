@@ -1,27 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { lazy, Suspense } from "react";
-import CreateClass from "../screens/@admin/create.class";
-import HomeAdmin from "../screens/@admin/admin.dashboard";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginScreen from "../screens/Auth/login";
-import SignUpScreen from "../screens/Auth/signup";
+import React, { lazy, Suspense, useEffect } from "react";
 import Loading from "../screens/other/loading";
+import { useAuthStore } from "../store/useAuthStore";
 
-const AdminDashboard = lazy(() => import('../screens/@admin/admin.dashboard'));
-const AdminProfile = lazy(() => import('../screens/@admin/admin.profile'));
-
-const AuthNavigator = () => {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-
-  return (
-    <Stack.Navigator
-      screenOptions={{ presentation: "card", animation: "slide_from_right", headerShown: false }}
-    >
-      <Stack.Screen name="login" component={LoginScreen} />
-      <Stack.Screen name="signup" component={SignUpScreen} />
-    </Stack.Navigator>
-  );
-};
+const AdminDashboard = lazy(() => import("../screens/@admin/admin.dashboard"));
+const AdminClass = lazy(() => import("../screens/@admin/admin.class"));
+const ViewClass = lazy(() => import("../screens/@admin/view.class"));
+const AdminProfile = lazy(() => import("../screens/@admin/admin.profile"));
 
 const AdminNavigator = () => {
   const Tab = createBottomTabNavigator();
@@ -31,10 +16,9 @@ const AdminNavigator = () => {
       screenOptions={{}}
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
-      <Tab.Screen name="admin_dashboard" component={AdminDashboard} />
-      {/* <Tab.Screen name="create_class" component={AuthNavigator} /> */}
-      <Tab.Screen name="create_class1" component={CreateClass} />
-      <Tab.Screen name="create_class2" component={CreateClass} />
+      <Tab.Screen name="Dashboard" component={AdminDashboard} />
+      <Tab.Screen name="Manage Class" component={AdminClass} />
+      <Tab.Screen name="Classes" component={ViewClass} />
       <Tab.Screen
         name="admin_profile"
         options={{ tabBarLabel: "Profile" }}

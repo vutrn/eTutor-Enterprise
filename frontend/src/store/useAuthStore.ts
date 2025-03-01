@@ -3,30 +3,36 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import axiosInstance from "../utils/axios";
 import Toast from "react-native-toast-message";
+import { jwtDecode } from "jwt-decode";
+import { useAdminStore } from "./useAdminStore";
 
 interface AuthState {
   authUser: any;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   accessToken: string | null;
+  isTokenExpired: boolean;
+
   signup: (formData: any) => Promise<boolean>;
   login: (formData: any) => Promise<boolean>;
   logout: () => void;
+  verifyToken: () => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
   persist(
-    (set) => ({
+    (set, get) => ({
       authUser: null,
       isSigningUp: false,
       isLoggingIn: false,
       accessToken: null,
+      isTokenExpired: false,
 
       signup: async (formData) => {
         set({ isSigningUp: true });
         try {
           const res = await axiosInstance.post("v1/auth/register", formData);
-          set({ authUser: res.data });
+
           console.log("Signup successful:", res.data);
           Toast.show({ type: "success", text1: "Signup successful", text2: "Welcome!" });
           return true;
@@ -47,10 +53,9 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
         set({ isLoggingIn: true });
         try {
           const res = await axiosInstance.post("v1/auth/login", formData);
-          set({ authUser: res.data });
-
-          axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.accessToken}`;
           await AsyncStorage.setItem("access-token", res.data.accessToken);
+
+          set({ authUser: res.data, isTokenExpired: false });
 
           return true;
         } catch (error: any) {
@@ -69,83 +74,53 @@ export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
       logout: async () => {
         try {
           await axiosInstance.post("v1/auth/logout");
-          // Clear localStorage
           await AsyncStorage.removeItem("access-token");
-          set({ authUser: null, accessToken: null });
+          set({ authUser: null, accessToken: null, isTokenExpired: false });
           Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
         } catch (error: any) {
           console.log(error.response?.data?.message);
         }
       },
+
+      verifyToken: async () => {
+        try {
+          const token = await AsyncStorage.getItem("access-token");
+          if (!token) {
+            Toast.show({
+              type: "error",
+              text1: "No token found",
+              text2: "Please log in again",
+            });
+            return false;
+          }
+
+          // Decode token and check expiration
+          const decoded: any = jwtDecode(token);
+          if (decoded.exp * 1000 < Date.now()) {
+            Toast.show({
+              type: "error",
+              text1: "Session expired",
+              text2: "Please log in again",
+            });
+            set({ isTokenExpired: true });
+            return false;
+          }
+          return true;
+        } catch (error: any) {
+          console.log("🚀 ~ login: ~ error:", error.response?.data?.message);
+          Toast.show({
+            type: "error",
+            text1: "Login failed",
+            text2: error.response?.data?.message,
+          });
+          return false;
+        }
+      },
     }),
     {
-      name: "user-store",
+      name: "auth-store",
       partialize: (state) => ({ authUser: state.authUser }),
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );
-
-// export const useAuthStore = create(
-//   persist(
-//     (set) => ({
-//       authUser: null,
-//       accessToken: null,
-//       isSigningUp: false,
-//       isLoggingIn: false,
-//       isCheckingAuth: true,
-
-//       signup: async (formData) => {
-//         set({ isSigningUp: true });
-//         try {
-//           const res = await axiosInstance.post("v1/auth/register", formData);
-//           set({ authUser: res });
-//           toast.success("Signup successful");
-//         } catch (error) {
-//           console.error("Signup failed:", error.response.data.message);
-//           toast.error(error.response.data.message);
-//         } finally {
-//           set({ isSigningUp: false });
-//         }
-//       },
-
-//       login: async (formData) => {
-//         set({ isLoggingIn: true });
-//         try {
-//           const res = await axiosInstance.post("/v1/auth/login", formData);
-//           localStorage.setItem("accessToken", res.accessToken);
-//           set({ authUser: res, accessToken: res.accessToken });
-//           toast.success("Login successful");
-//         } catch (error) {
-//           console.error("Login error:", error.response?.data?.message);
-//           toast.error(error.response?.data?.message);
-//         } finally {
-//           set({ isLoggingIn: false });
-//         }
-//       },
-
-//       logout: async () => {
-//         try {
-//           await axiosInstance.post("v1/auth/logout");
-//           // Clear localStorage
-//           localStorage.removeItem("authUser");
-//           localStorage.removeItem("accessToken");
-//           set({ authUser: null, accessToken: null });
-//           toast.success("Logged out successfully.");
-//         } catch (error) {
-//           console.log(error.response?.data?.message);
-//         }
-//       },
-
-//       updateProfile: async (formData) => {},
-
-//       connectSocket: async () => {},
-
-//       disconnectSocket: async () => {},
-//     }),
-//     {
-//       name: "auth-storage", // name of the item in the storage (must be unique)
-//       partialize: (state) => ({ authUser: state.authUser }),
-//     }
-//   )
-// );

@@ -10,25 +10,23 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Text } from "react-native";
 import "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
-import AuthNavigation from "./src/navigation/auth.navigator";
-import Loading from "./src/screens/other/loading";
-import AdminNavigation from "./src/navigation/admin.navigator";
-import TutorNavigation from "./src/navigation/tutor.navigator";
-import StudentNavigation from "./src/navigation/student.navigator";
-import { useAuthStore } from "./src/store/useAuthStore";
+import AdminNavigator from "./src/navigation/admin.navigator";
 import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
-import AdminNavigator from "./src/navigation/admin.navigator";
-import { Text } from "react-native";
+import { useAuthStore } from "./src/store/useAuthStore";
+import Toast from "react-native-toast-message";
+import jwt_decode from "jwt-decode";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PaperProvider } from "react-native-paper";
 
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
-  const { authUser } = useAuthStore();
+  const { authUser, verifyToken, logout } = useAuthStore();
   const [loaded, error] = useFonts({
     Inter_300Light,
     Inter_400Regular,
@@ -37,68 +35,57 @@ export const App = () => {
     Inter_700Bold,
   });
 
-  const Tab = createBottomTabNavigator();
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync(); // Hide the splash screen
     }
+
+    const checkToken = async () => {
+      const isTokenValid = await verifyToken();
+      if (!isTokenValid) {
+        console.log("Token is invalid, logging out...");
+        logout();
+      }
+    };
+    checkToken();
+
+    // const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
+    // return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
   if (!loaded && !error) {
     return null;
   }
 
-  if (!authUser) {
-    return (
-      <NavigationContainer>
-        <AuthNavigator />
-      </NavigationContainer>
-    );
-  }
+  const renderAppContent = () => {
+    // If no user is authenticated, show auth navigator
+    if (!authUser) {
+      return <AuthNavigator />;
+    }
 
-  switch (authUser.role) {
-    case "student":
-      return (
-        <NavigationContainer>
-          <StudentNavigator />
-        </NavigationContainer>
-      );
-    case "tutor":
-      return (
-        <NavigationContainer>
-          <TutorNavigator />
-        </NavigationContainer>
-      );
-    case "admin":
-      return (
-        <NavigationContainer>
-          <AdminNavigator />
-        </NavigationContainer>
-      );
-    default:
-      return <Text>Invalid role</Text>;
-  }
+    // Select navigator based on user role
+    switch (authUser.role) {
+      case "student":
+        return <StudentNavigator />;
+      case "tutor":
+        return <TutorNavigator />;
+      case "admin":
+        return <AdminNavigator />;
+      default:
+        // Return a component outside NavigationContainer for invalid role
+        return (
+          <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>
+            Invalid role: {authUser.role}
+          </Text>
+        );
+    }
+  };
 
   return (
     <>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
-          screenOptions={{
-            presentation: "card",
-            animation: "slide_from_right",
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="auth" component={AuthNavigation} />
-          <Stack.Screen name="admin_dashboard" component={AdminNavigation} />
-          <Stack.Screen name="tutor_dashboard" component={TutorNavigation} />
-          <Stack.Screen name="student_dashboard" component={StudentNavigation} />
-        </Stack.Navigator>
-      </NavigationContainer>
-
+      <PaperProvider>
+        <NavigationContainer>{renderAppContent()}</NavigationContainer>
+      </PaperProvider>
       <Toast />
     </>
   );
