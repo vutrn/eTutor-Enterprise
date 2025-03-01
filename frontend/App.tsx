@@ -21,11 +21,12 @@ import { useAuthStore } from "./src/store/useAuthStore";
 import Toast from "react-native-toast-message";
 import jwt_decode from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PaperProvider } from "react-native-paper";
 
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
-  const { authUser } = useAuthStore();
+  const { authUser, verifyToken, logout } = useAuthStore();
   const [loaded, error] = useFonts({
     Inter_300Light,
     Inter_400Regular,
@@ -39,17 +40,17 @@ export const App = () => {
       SplashScreen.hideAsync(); // Hide the splash screen
     }
 
-    // const token = await AsyncStorage.getItem("access-token");
-    // const decodedToken = jwt_decode(token);
-    // if (decodedToken.exp * 1000 < Date.now()) {
-    //   Toast.show({
-    //     type: "error",
-    //     text1: "Token expired",
-    //     text2: "Please log in again",
-    //   });
-    //   set({ isTokenExpired: true });
-    //   return;
-    // }
+    const checkToken = async () => {
+      const isTokenValid = await verifyToken();
+      if (!isTokenValid) {
+        console.log("Token is invalid, logging out...");
+        logout();
+      }
+    };
+    checkToken();
+
+    // const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
+    // return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
   if (!loaded && !error) {
@@ -82,7 +83,9 @@ export const App = () => {
 
   return (
     <>
-      <NavigationContainer>{renderAppContent()}</NavigationContainer>
+      <PaperProvider>
+        <NavigationContainer>{renderAppContent()}</NavigationContainer>
+      </PaperProvider>
       <Toast />
     </>
   );

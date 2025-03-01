@@ -11,6 +11,7 @@ type AdminState = {
   tutors: any[];
   loading: boolean;
   fetchUsers: () => Promise<void>;
+  deleteUser: (userId: string) => Promise<void>;
 };
 
 // Create the admin store with persist and devtools middleware
@@ -60,6 +61,13 @@ export const useAdminStore = create<AdminState>()(
         });
       }
     },
+
+    deleteUser: async (userId: string) => {
+      
+    }
+
+
+
   })
   //     { name: "admin-store" }
   //   )

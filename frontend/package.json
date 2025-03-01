@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start --clear",
-    "avd": "emulator -avd Pixel_8_API_31",
+    "avd": "emulator -avd Pixel_8_Pro_API_31",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"

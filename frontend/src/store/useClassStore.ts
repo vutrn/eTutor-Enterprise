@@ -100,14 +100,10 @@ export const useClassStore = create<ClassState>((set, get) => ({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Refresh classes after deletion
+      // Refresh classes after creation
       await get().fetchClasses();
 
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Class deleted successfully",
-      });
+      Toast.show({ type: "success", text1: "Success", text2: "Class deleted successfully" });
 
       return true;
     } catch (error: any) {

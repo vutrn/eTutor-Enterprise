@@ -20,7 +20,6 @@ const AdminDashboard = () => {
   if (isTokenExpired) {
     logout();
   }
-  // console.log("🚀 ~ token:", AsyncStorage.getItem("access-token"));
 
   // if (isTokenExpired) {
   //   return (

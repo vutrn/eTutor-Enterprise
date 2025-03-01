@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { lazy, Suspense } from "react";
-import CreateClass from "../screens/@admin/create.class";
 import Loading from "../screens/other/loading";
 
 const StudentDashboard = lazy(() => import("../screens/@student/student.dashboard"));
