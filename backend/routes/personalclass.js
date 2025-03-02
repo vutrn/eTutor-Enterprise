@@ -10,15 +10,11 @@ router.post("/createclass", middlewareController.verifyTokenAndAdmin ,personalCl
 
 router.get("/", personalClassController.getPersonalClass);
 
-router.put("/:personalClassId/addstudent", middlewareController.verifyTokenAndAdmin, personalClassController.addStudentsToClass);
-
 router.delete("/:personalClassId", middlewareController.verifyTokenAndAdmin, personalClassController.deletePersonalClass);
 
 router.delete("/:personalClassId/deletestudent/:studentId", middlewareController.verifyTokenAndAdmin, personalClassController.removeStudentFromClass);
 
-router.put("/:personalClassId/changetutor", middlewareController.verifyTokenAndAdmin, personalClassController.changeTutorClass);
-
-router.put("/:personalClassId/updatename", middlewareController.verifyTokenAndAdmin, personalClassController.updateClassName);
+router.put("/:personalClassId/update", middlewareController.verifyTokenAndAdmin, personalClassController.updateClass);
 
 module.exports = router;
 
