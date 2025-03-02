@@ -98,7 +98,7 @@ const personalClassController = {
     updateClass: async (req, res) => {
         try {
             const { personalClassId } = req.params;
-            const { action, newTutorId, newName, studentIds } = req.body;
+            const { newTutorId, newName, studentIds } = req.body;
             const adminId = req.user.id;
     
             const personalClass = await PersonalClass.findById(personalClassId);
@@ -106,29 +106,36 @@ const personalClassController = {
                 return res.status(404).json({ message: "Lớp học không tồn tại" });
             }
     
-            if (action === "changeTutor") {
+            let updatedFields = [];
+    
+            // Thay đổi gia sư nếu có newTutorId
+            if (newTutorId) {
                 const newTutor = await User.findById(newTutorId);
                 if (!newTutor || newTutor.role !== "tutor") {
                     return res.status(400).json({ message: "Gia sư không hợp lệ" });
                 }
     
                 personalClass.tutor = newTutorId;
-                await personalClass.save();
+                updatedFields.push("tutor");
     
                 const subject = "Bạn đã được phân công làm gia sư";
                 const text = `Chào ${newTutor.username},\n\nBạn đã được chỉ định làm gia sư cho lớp "${personalClass.name}".\n\nHãy chuẩn bị hướng dẫn các học sinh nhé!\n\nTrân trọng,\nAdmin`;
     
                 sendEmail(newTutor.email, subject, text);
-            } 
-            else if (action === "updateClassName") {
-                if (!newName || newName.trim() === "") {
+            }
+    
+            // Cập nhật tên lớp nếu có newName
+            if (newName) {
+                if (newName.trim() === "") {
                     return res.status(400).json({ message: "Tên lớp mới không hợp lệ" });
                 }
     
                 personalClass.name = newName.trim();
-                await personalClass.save();
-            } 
-            else if (action === "addStudents") {
+                updatedFields.push("name");
+            }
+    
+            // Thêm học sinh nếu có studentIds
+            if (studentIds && studentIds.length > 0) {
                 const students = await User.find({ _id: { $in: studentIds }, role: "student" });
                 if (students.length !== studentIds.length) {
                     return res.status(400).json({ message: "Một số học sinh không hợp lệ" });
@@ -142,7 +149,7 @@ const personalClassController = {
                 }
     
                 personalClass.students.push(...newStudents.map(student => student._id));
-                await personalClass.save();
+                updatedFields.push("students");
     
                 newStudents.forEach(student => {
                     const subject = "Bạn đã được thêm vào lớp học";
@@ -150,17 +157,18 @@ const personalClassController = {
     
                     sendEmail(student.email, subject, text);
                 });
-            } 
-            else {
-                return res.status(400).json({ message: "Hành động không hợp lệ" });
             }
     
-            res.status(200).json({ message: "Cập nhật lớp học thành công", personalClass });
+            if (updatedFields.length === 0) {
+                return res.status(400).json({ message: "Không có thay đổi nào được thực hiện" });
+            }
+    
+            await personalClass.save();
+            res.status(200).json({ message: "Cập nhật lớp học thành công", updatedFields, personalClass });
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     }
-
 
 }
 
