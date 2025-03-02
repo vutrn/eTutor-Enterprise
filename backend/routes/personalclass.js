@@ -18,5 +18,7 @@ router.delete("/:personalClassId/deletestudent/:studentId", middlewareController
 
 router.put("/:personalClassId/changetutor", middlewareController.verifyTokenAndAdmin, personalClassController.changeTutorClass);
 
+router.put("/:personalClassId/updatename", middlewareController.verifyTokenAndAdmin, personalClassController.updateClassName);
+
 module.exports = router;
 

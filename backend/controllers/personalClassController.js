@@ -163,6 +163,29 @@ const personalClassController = {
         }
     },
 
+    updateClassName: async (req, res) => {
+        try {
+            const { personalClassId } = req.params;
+            const { newName } = req.body;
+    
+            if (!newName || newName.trim() === "") {
+                return res.status(400).json({ message: "Tên lớp mới không hợp lệ" });
+            }
+    
+            const personalClass = await PersonalClass.findById(personalClassId);
+            if (!personalClass) {
+                return res.status(404).json({ message: "Lớp học không tồn tại" });
+            }
+
+            personalClass.name = newName.trim();
+            await personalClass.save();
+    
+            res.status(200).json({ message: "Tên lớp đã được cập nhật", personalClass });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
 
 }
 
