@@ -33,4 +33,4 @@ io.on("connection", (socket) => {
   });
 });
 
-module.export= { app, getReceiverSocketId, io, server };
+module.exports= { app, getReceiverSocketId, io, server };
