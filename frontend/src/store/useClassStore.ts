@@ -102,34 +102,47 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return false;
       }
 
+      // Update class name
       await axiosInstance.put(
-        `v1/class/${classId}`,
-        { name, tutorId, studentIds },
+        `v1/class/${classId}/updatename`,
+        { newName: name },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      // Update tutor if provided
+      if (tutorId) {
+        await axiosInstance.put(
+          `v1/class/${classId}/changetutor`,
+          { tutorId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
+      // Add students if provided
+      if (studentIds && studentIds.length > 0) {
+        await axiosInstance.put(
+          `v1/class/${classId}/addstudent`,
+          { studentIds },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+
       // Refresh classes after update
       await get().fetchClasses();
-
       Toast.show({
         type: "success",
         text1: "Success",
         text2: "Class updated successfully",
       });
-
       return true;
     } catch (error: any) {
       console.error("Failed to update class:", error);
-      set({
-        loading: false,
-      });
-
+      set({ loading: false });
       Toast.show({
         type: "error",
         text1: "Error",
         text2: error.response?.data?.message || "Failed to update class",
       });
-
       return false;
     }
   },
