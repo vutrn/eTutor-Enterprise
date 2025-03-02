@@ -6,9 +6,12 @@ import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useClassStore } from "../../store/useClassStore";
 import CreateModal from "./create.modal";
+import UpdateModal from "./update.modal";
 
 const AdminClass = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [updateModalVisible, setUpdateModalVisible] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<any>(null);
   const { classes, loading, fetchClasses, deleteClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,55 +43,57 @@ const AdminClass = () => {
     ]);
   };
 
+  const handleEditClass = (classData: any) => {
+    setSelectedClass(classData);
+    setUpdateModalVisible(true);
+  };
+
   const renderClassItem = ({ item }: { item: any }) => (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.className}>{item.name}</Text>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              
-            >
-              <Feather name="edit" size={25} color="#1890ff" />
-            </TouchableOpacity>
-  
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleDeleteClass(item._id, item.name)}
-            >
-              <Feather name="trash-2" size={25} color="#ff4d4f" />
-            </TouchableOpacity>
-          </View>
-        </View>
-  
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Tutor:</Text>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName}>{item.tutor?.username || "Unknown"}</Text>
-            <Text style={styles.userEmail}>{item.tutor?.email || "No email"}</Text>
-          </View>
-        </View>
-  
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Students ({item.students?.length || 0}):</Text>
-          {item.students && item.students.length > 0 ? (
-            <FlatList
-              data={item.students}
-              keyExtractor={(student) => student._id}
-              scrollEnabled={false}
-              renderItem={({ item: student }) => (
-                <View style={styles.studentItem}>
-                  <Text style={styles.userName}>{student.username}</Text>
-                  <Text style={styles.userEmail}>{student.email}</Text>
-                </View>
-              )}
-            />
-          ) : (
-            <Text style={styles.emptyText}>No students enrolled yet</Text>
-          )}
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.className}>{item.name}</Text>
+        <View style={styles.actionButtons}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => handleEditClass(item)}>
+            <Feather name="edit" size={25} color="#1890ff" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => handleDeleteClass(item._id, item.name)}
+          >
+            <Feather name="trash-2" size={25} color="#ff4d4f" />
+          </TouchableOpacity>
         </View>
       </View>
-    );
+
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Tutor:</Text>
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>{item.tutor?.username || "Unknown"}</Text>
+          <Text style={styles.userEmail}>{item.tutor?.email || "No email"}</Text>
+        </View>
+      </View>
+
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Students ({item.students?.length || 0}):</Text>
+        {item.students && item.students.length > 0 ? (
+          <FlatList
+            data={item.students}
+            keyExtractor={(student) => student._id}
+            scrollEnabled={false}
+            renderItem={({ item: student }) => (
+              <View style={styles.studentItem}>
+                <Text style={styles.userName}>{student.username}</Text>
+                <Text style={styles.userEmail}>{student.email}</Text>
+              </View>
+            )}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No students enrolled yet</Text>
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -97,9 +102,16 @@ const AdminClass = () => {
         size={50}
         icon="plus"
         mode="contained"
-        onPress={() => setModalVisible(true)}
+        onPress={() => setCreateModalVisible(true)}
       />
-      <CreateModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <CreateModal modalVisible={createModalVisible} setModalVisible={setCreateModalVisible} />
+      {selectedClass && (
+        <UpdateModal
+          modalVisible={updateModalVisible}
+          setModalVisible={setUpdateModalVisible}
+          classData={selectedClass}
+        />
+      )}
 
       {classes.length > 0 ? (
         <FlatList

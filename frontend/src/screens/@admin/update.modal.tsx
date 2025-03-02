@@ -14,17 +14,27 @@ import { useClassStore } from "../../store/useClassStore";
 interface IProps {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
+  classData: any; // The class to update
 }
 
-const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
+const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   // Get data from stores
   const { tutors, students, fetchUsers, loading: loadingUsers } = useAdminStore();
-  const { createClass, loading: loadingClassCreation } = useClassStore();
+  const { updateClass, loading: loadingClassUpdate } = useClassStore();
 
   const [className, setClassName] = useState("");
   const [selectedTutor, setSelectedTutor] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize form with class data when modal becomes visible
+  useEffect(() => {
+    if (modalVisible && classData) {
+      setClassName(classData.name || "");
+      setSelectedTutor(classData.tutor?._id || "");
+      setSelectedStudents(classData.students?.map((student: any) => student._id) || []);
+    }
+  }, [modalVisible, classData]);
 
   // Fetch users when component mounts or when modal becomes visible
   useEffect(() => {
@@ -43,26 +53,23 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   };
 
   // Handle form submission
-  const handleCreateClass = async () => {
+  const handleUpdateClass = async () => {
     if (!className || !selectedTutor || selectedStudents.length === 0) {
       alert("Please fill in all fields and select at least one student");
       return;
     }
 
     setIsSubmitting(true);
-    const success = await createClass(className, selectedTutor, selectedStudents);
+    const success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
     setIsSubmitting(false);
 
     if (success) {
-      // Reset form
+      // Reset form and close modal
       handleCloseModal();
     }
   };
 
   const handleCloseModal = () => {
-    setClassName("");
-    setSelectedTutor("");
-    setSelectedStudents([]);
     setModalVisible(false);
   };
 
@@ -75,11 +82,10 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
     );
   }
 
-  const onChangeText = useCallback((text: any) => {
+  const onChangeText = useCallback((text: string) => {
     setClassName(text);
   }, []);
 
-  // The key fix is here - wrapping Portal with Provider
   return (
     <Portal>
       <Modal
@@ -89,7 +95,7 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
         contentContainerStyle={styles.container}
       >
         <ScrollView>
-          <Text style={styles.title}>Create New Class</Text>
+          <Text style={styles.title}>Update Class</Text>
           {/* CLASS NAME INPUT */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Class Name</Text>
@@ -153,13 +159,13 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={handleCreateClass}
+            onPress={handleUpdateClass}
             disabled={isSubmitting}
           >
-            {isSubmitting || loadingClassCreation ? (
+            {isSubmitting || loadingClassUpdate ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Create Class</Text>
+              <Text style={styles.buttonText}>Update Class</Text>
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
@@ -291,4 +297,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateModal;
+export default UpdateModal;
