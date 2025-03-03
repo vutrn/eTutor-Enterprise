@@ -97,10 +97,8 @@ const personalClassController = {
         const currentStudentIds = personalClass.students.map((id) => id.toString());
         const newStudentIds = studentIds.map((id) => id.toString());
 
-        // Find removed students (in current but not in new)
         const removedStudentIds = currentStudentIds.filter((id) => !newStudentIds.includes(id));
 
-        // Find added students (in new but not in current)
         const addedStudentIds = newStudentIds.filter((id) => !currentStudentIds.includes(id));
 
         if (removedStudentIds.length > 0 || addedStudentIds.length > 0) {
