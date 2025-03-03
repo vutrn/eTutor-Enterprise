@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
+import { Checkbox, Modal, Portal, Provider, TextInput } from "react-native-paper";
 import { useAdminStore } from "../../store/useAdminStore";
 import { useClassStore } from "../../store/useClassStore";
 
@@ -55,7 +55,10 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
 
     if (success) {
       // Reset form
-      handleCloseModal();
+      setClassName("");
+      setSelectedTutor("");
+      setSelectedStudents([]);
+      setModalVisible(false);
     }
   };
 
@@ -75,109 +78,110 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
     );
   }
 
-  const onChangeText = useCallback((text: any) => {
-    setClassName(text);
-  }, []);
-
   // The key fix is here - wrapping Portal with Provider
   return (
-    <Portal>
-      <Modal
-        visible={modalVisible}
-        onDismiss={handleCloseModal}
-        dismissable={true}
-        contentContainerStyle={styles.container}
-      >
-        <ScrollView>
-          <Text style={styles.title}>Create New Class</Text>
-          {/* CLASS NAME INPUT */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Class Name</Text>
-            <TextInput
-              label="Class Name"
-              style={styles.input}
-              value={className}
-              onChangeText={onChangeText}
-              mode="outlined"
-            />
-          </View>
-          {/* TUTOR SELECTION */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Select Tutor</Text>
-            {tutors.length > 0 ? (
-              tutors.map((tutor) => (
-                <TouchableOpacity
-                  key={tutor._id}
-                  style={[styles.selectionItem, selectedTutor === tutor._id && styles.selectedItem]}
-                  onPress={() => setSelectedTutor(tutor._id)}
-                >
-                  <Text style={styles.itemText}>{tutor.username}</Text>
-                  <Text style={styles.emailText}>{tutor.email}</Text>
-                  {selectedTutor === tutor._id && <Text style={styles.selectedText}>✓</Text>}
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text style={styles.emptyText}>No tutors available</Text>
-            )}
-          </View>
+    <Provider>
+      <Portal>
+        <Modal
+          visible={modalVisible}
+          onDismiss={handleCloseModal}
+          dismissable={true}
+          contentContainerStyle={styles.container}
+        >
+          <ScrollView>
+            <Text style={styles.title}>Create New Class</Text>
+            {/* CLASS NAME INPUT */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Class Name</Text>
+              <TextInput
+                label="Class Name"
+                style={styles.input}
+                value={className}
+                onChangeText={setClassName}
+                mode="outlined"
+              />
+            </View>
+            {/* TUTOR SELECTION */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Select Tutor</Text>
+              {tutors.length > 0 ? (
+                tutors.map((tutor) => (
+                  <TouchableOpacity
+                    key={tutor._id}
+                    style={[
+                      styles.selectionItem,
+                      selectedTutor === tutor._id && styles.selectedItem,
+                    ]}
+                    onPress={() => setSelectedTutor(tutor._id)}
+                  >
+                    <Text style={styles.itemText}>{tutor.username}</Text>
+                    <Text style={styles.emailText}>{tutor.email}</Text>
+                    {selectedTutor === tutor._id && <Text style={styles.selectedText}>✓</Text>}
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>No tutors available</Text>
+              )}
+            </View>
 
-          {/* STUDENT SELECTION */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Select Students ({selectedStudents.length})</Text>
-            {students.length > 0 ? (
-              students.map((student) => (
-                <TouchableOpacity
-                  key={student._id}
-                  style={[
-                    styles.selectionItem,
-                    selectedStudents.includes(student._id) && styles.selectedItem,
-                  ]}
-                  onPress={() => toggleStudentSelection(student._id)}
-                >
-                  <Checkbox
-                    status={selectedStudents.includes(student._id) ? "checked" : "unchecked"}
+            {/* STUDENT SELECTION */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Select Students ({selectedStudents.length})</Text>
+              {students.length > 0 ? (
+                students.map((student) => (
+                  <TouchableOpacity
+                    key={student._id}
+                    style={[
+                      styles.selectionItem,
+                      selectedStudents.includes(student._id) && styles.selectedItem,
+                    ]}
                     onPress={() => toggleStudentSelection(student._id)}
-                  />
-                  <View style={styles.studentInfo}>
-                    <Text style={styles.itemText}>{student.username}</Text>
-                    <Text style={styles.emailText}>{student.email}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <Text style={styles.emptyText}>No students available</Text>
-            )}
+                  >
+                    <Checkbox
+                      status={selectedStudents.includes(student._id) ? "checked" : "unchecked"}
+                      onPress={() => toggleStudentSelection(student._id)}
+                    />
+                    <View style={styles.studentInfo}>
+                      <Text style={styles.itemText}>{student.username}</Text>
+                      <Text style={styles.emailText}>{student.email}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>No students available</Text>
+              )}
+            </View>
+          </ScrollView>
+          {/* SUBMIT BUTTON */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleCreateClass}
+              disabled={isSubmitting}
+            >
+              {isSubmitting || loadingClassCreation ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Create Class</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-        {/* SUBMIT BUTTON */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleCreateClass}
-            disabled={isSubmitting}
-          >
-            {isSubmitting || loadingClassCreation ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Create Class</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </Portal>
+        </Modal>
+      </Portal>
+    </Provider>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "white",
     padding: 20,
     margin: 20,
     borderRadius: 8,
-    maxHeight: "80%",
   },
   loadingContainer: {
     flex: 1,

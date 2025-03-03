@@ -16,7 +16,6 @@ type ClassState = {
     studentIds: string[]
   ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
-  addStudentsToClass: (classId: string, studentIds: string[]) => Promise<boolean>;
   removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 };
 
@@ -93,7 +92,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
     }
   },
 
-  updateClass: async (classId, name, tutorId, studentIds) => {
+  updateClass: async (classId, newName, tutorId, studentIds) => {
     set({ loading: true });
     try {
       const token = await AsyncStorage.getItem("access-token");
@@ -102,33 +101,21 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return false;
       }
 
-      // Update class name
+      // Make a single API call with all update data
+      // This is more efficient than making multiple calls
       await axiosInstance.put(
-        `v1/class/${classId}/updatename`,
-        { newName: name },
+        `v1/class/${classId}/update`,
+        {
+          newName,
+          newTutorId: tutorId,
+          studentIds,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update tutor if provided
-      if (tutorId) {
-        await axiosInstance.put(
-          `v1/class/${classId}/changetutor`,
-          { tutorId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-
-      // Add students if provided
-      if (studentIds && studentIds.length > 0) {
-        await axiosInstance.put(
-          `v1/class/${classId}/addstudent`,
-          { studentIds },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-
       // Refresh classes after update
       await get().fetchClasses();
+
       Toast.show({
         type: "success",
         text1: "Success",
@@ -180,47 +167,6 @@ export const useClassStore = create<ClassState>((set, get) => ({
     }
   },
 
-  addStudentsToClass: async (classId, studentIds) => {
-    set({ loading: true });
-    try {
-      const token = await AsyncStorage.getItem("access-token");
-      if (!token) {
-        set({ loading: false });
-        return false;
-      }
-
-      await axiosInstance.put(
-        `v1/personalclass/${classId}/addstudent`,
-        { studentIds },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // Refresh classes after adding students
-      await get().fetchClasses();
-
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Students added successfully",
-      });
-
-      return true;
-    } catch (error: any) {
-      console.error("Failed to add students:", error);
-      set({
-        loading: false,
-      });
-
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error.response?.data?.message || "Failed to add students",
-      });
-
-      return false;
-    }
-  },
-
   removeStudentFromClass: async (classId, studentId) => {
     set({ loading: true });
     try {
@@ -230,7 +176,8 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return false;
       }
 
-      await axiosInstance.delete(`v1/personalclass/${classId}/deletestudent/${studentId}`, {
+      // Correct the API endpoint path
+      await axiosInstance.delete(`v1/class/${classId}/deletestudent/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -10,6 +10,7 @@ import {
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import { useAdminStore } from "../../store/useAdminStore";
 import { useClassStore } from "../../store/useClassStore";
+import Toast from "react-native-toast-message";
 
 interface IProps {
   modalVisible: boolean;
@@ -26,13 +27,18 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   const [selectedTutor, setSelectedTutor] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initialStudents, setInitialStudents] = useState<string[]>([]);
+  const [studentsToRemove, setStudentsToRemove] = useState<string[]>([]);
 
   // Initialize form with class data when modal becomes visible
   useEffect(() => {
     if (modalVisible && classData) {
+      const currentStudentIds = classData.students?.map((student: any) => student._id) || [];
       setClassName(classData.name || "");
       setSelectedTutor(classData.tutor?._id || "");
-      setSelectedStudents(classData.students?.map((student: any) => student._id) || []);
+      setSelectedStudents([...currentStudentIds]);
+      setInitialStudents([...currentStudentIds]);
+      setStudentsToRemove([]);
     }
   }, [modalVisible, classData]);
 
@@ -43,12 +49,24 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     }
   }, [fetchUsers, modalVisible]);
 
-  // Toggle student selection
+  // Toggle student selection with removal tracking
   const toggleStudentSelection = (studentId: string) => {
     if (selectedStudents.includes(studentId)) {
+      // Student is being unchecked/removed
       setSelectedStudents(selectedStudents.filter((id) => id !== studentId));
+
+      // If this student was initially in the class, add to remove list
+      if (initialStudents.includes(studentId)) {
+        setStudentsToRemove([...studentsToRemove, studentId]);
+      }
     } else {
+      // Student is being added
       setSelectedStudents([...selectedStudents, studentId]);
+
+      // If this student was in the remove list, remove them from it
+      if (studentsToRemove.includes(studentId)) {
+        setStudentsToRemove(studentsToRemove.filter((id) => id !== studentId));
+      }
     }
   };
 
@@ -60,12 +78,37 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     }
 
     setIsSubmitting(true);
-    const success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
-    setIsSubmitting(false);
 
-    if (success) {
-      // Reset form and close modal
-      handleCloseModal();
+    try {
+      // First, handle any student removals
+      let success = true;
+      for (const studentId of studentsToRemove) {
+        const removeSuccess = await useClassStore
+          .getState()
+          .removeStudentFromClass(classData._id, studentId);
+        if (!removeSuccess) {
+          success = false;
+        }
+      }
+
+      // Then update the class with remaining data
+      if (success) {
+        success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
+      }
+
+      if (success) {
+        // Reset form and close modal
+        handleCloseModal();
+      }
+    } catch (error) {
+      console.error("Error updating class:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to update class",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,6 +227,8 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 8,
     maxHeight: "80%",
+    zIndex: 1000, // Ensure modal appears on top
+    elevation: 5, // For Android elevation
   },
   loadingContainer: {
     flex: 1,
@@ -294,6 +339,16 @@ const styles = StyleSheet.create({
     color: "#555",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  removedItem: {
+    backgroundColor: "#ffeeee",
+    borderColor: "#ff9999",
+  },
+  removeText: {
+    color: "red",
+    fontSize: 12,
+    fontStyle: "italic",
+    marginTop: 4,
   },
 });
 
