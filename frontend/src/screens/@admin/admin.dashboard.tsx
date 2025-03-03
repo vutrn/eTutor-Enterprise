@@ -16,7 +16,7 @@ const AdminDashboard = () => {
     fetchUsers();
   }, [fetchUsers]);
   
-  console.log("🚀 ~ AdminDashboard ~ isTokenExpired:", isTokenExpired)
+  // console.log("🚀 ~ AdminDashboard ~ isTokenExpired:", isTokenExpired)
   if (isTokenExpired) {
     logout();
   }
