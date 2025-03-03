@@ -12,9 +12,10 @@ router.get("/", personalClassController.getPersonalClass);
 
 router.delete("/:personalClassId", middlewareController.verifyTokenAndAdmin, personalClassController.deletePersonalClass);
 
-router.delete("/:personalClassId/deletestudent/:studentId", middlewareController.verifyTokenAndAdmin, personalClassController.removeStudentFromClass);
+router.patch("/:personalClassId", middlewareController.verifyTokenAndAdmin, personalClassController.updateClass);
 
-router.put("/:personalClassId/update", middlewareController.verifyTokenAndAdmin, personalClassController.updateClass);
+router.patch("/:personalClassId/:studentId", middlewareController.verifyTokenAndAdmin, personalClassController.updateClass);
+
 
 module.exports = router;
 
