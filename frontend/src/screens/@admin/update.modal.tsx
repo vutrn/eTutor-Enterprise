@@ -8,9 +8,9 @@ import {
   View,
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
+import Toast from "react-native-toast-message";
 import { useAdminStore } from "../../store/useAdminStore";
 import { useClassStore } from "../../store/useClassStore";
-import Toast from "react-native-toast-message";
 
 interface IProps {
   modalVisible: boolean;
@@ -27,18 +27,13 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   const [selectedTutor, setSelectedTutor] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [initialStudents, setInitialStudents] = useState<string[]>([]);
-  const [studentsToRemove, setStudentsToRemove] = useState<string[]>([]);
 
-  // Initialize form with class data when modal becomes visible
   useEffect(() => {
     if (modalVisible && classData) {
       const currentStudentIds = classData.students?.map((student: any) => student._id) || [];
       setClassName(classData.name || "");
       setSelectedTutor(classData.tutor?._id || "");
       setSelectedStudents([...currentStudentIds]);
-      setInitialStudents([...currentStudentIds]);
-      setStudentsToRemove([]);
     }
   }, [modalVisible, classData]);
 
@@ -51,54 +46,43 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
 
   // Toggle student selection with removal tracking
   const toggleStudentSelection = (studentId: string) => {
-    if (selectedStudents.includes(studentId)) {
-      // Student is being unchecked/removed
-      setSelectedStudents(selectedStudents.filter((id) => id !== studentId));
-
-      // If this student was initially in the class, add to remove list
-      if (initialStudents.includes(studentId)) {
-        setStudentsToRemove([...studentsToRemove, studentId]);
+    setSelectedStudents((prevSelectedStudents) => {
+      if (prevSelectedStudents.includes(studentId)) {
+        // Remove student - log for debugging
+        console.log(`Removing student with ID: ${studentId}`);
+        return prevSelectedStudents.filter((id) => id !== studentId);
+      } else {
+        // Add student - log for debugging
+        console.log(`Adding student with ID: ${studentId}`);
+        return [...prevSelectedStudents, studentId];
       }
-    } else {
-      // Student is being added
-      setSelectedStudents([...selectedStudents, studentId]);
-
-      // If this student was in the remove list, remove them from it
-      if (studentsToRemove.includes(studentId)) {
-        setStudentsToRemove(studentsToRemove.filter((id) => id !== studentId));
-      }
-    }
+    });
   };
 
   // Handle form submission
   const handleUpdateClass = async () => {
-    if (!className || !selectedTutor || selectedStudents.length === 0) {
-      alert("Please fill in all fields and select at least one student");
+    if (!className || !selectedTutor || !selectedStudents) {
+      alert("Please fill in all fields");
       return;
     }
 
     setIsSubmitting(true);
-
     try {
-      // First, handle any student removals
-      let success = true;
-      for (const studentId of studentsToRemove) {
-        const removeSuccess = await useClassStore
-          .getState()
-          .removeStudentFromClass(classData._id, studentId);
-        if (!removeSuccess) {
-          success = false;
-        }
-      }
+      // Get the original students from classData
+      const originalStudentIds = classData.students?.map((student: any) => student._id) || [];
 
-      // Then update the class with remaining data
-      if (success) {
-        success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
-      }
+      // Log the changes for debugging
+      console.log("Original students:", originalStudentIds);
+      console.log("New selected students:", selectedStudents);
 
+      const success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
       if (success) {
-        // Reset form and close modal
-        handleCloseModal();
+        Toast.show({
+          type: "success",
+          text1: "Class updated",
+          text2: "Students have been updated successfully"
+        });
+        setModalVisible(false);
       }
     } catch (error) {
       console.error("Error updating class:", error);
@@ -107,14 +91,13 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
         text1: "Error",
         text2: "Failed to update class",
       });
-    } finally {
-      setIsSubmitting(false);
     }
+    setIsSubmitting(false);
   };
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
+  const onChangeText = useCallback((text: string) => {
+    setClassName(text);
+  }, []);
 
   if (loadingUsers) {
     return (
@@ -125,16 +108,11 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     );
   }
 
-  const onChangeText = useCallback((text: string) => {
-    setClassName(text);
-  }, []);
-
   return (
     <Portal>
       <Modal
         visible={modalVisible}
-        onDismiss={handleCloseModal}
-        dismissable={true}
+        onDismiss={() => setModalVisible(false)}
         contentContainerStyle={styles.container}
       >
         <ScrollView>
@@ -211,7 +189,7 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
               <Text style={styles.buttonText}>Update Class</Text>
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
+          <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>

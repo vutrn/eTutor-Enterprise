@@ -16,7 +16,6 @@ type ClassState = {
     studentIds: string[]
   ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
-  removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 };
 
 export const useClassStore = create<ClassState>((set, get) => ({
@@ -92,7 +91,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
     }
   },
 
-  updateClass: async (classId, newName, tutorId, studentIds) => {
+  updateClass: async (classId, newName, newTutorId, studentIds) => {
     set({ loading: true });
     try {
       const token = await AsyncStorage.getItem("access-token");
@@ -101,13 +100,12 @@ export const useClassStore = create<ClassState>((set, get) => ({
         return false;
       }
 
-      // Make a single API call with all update data
-      // This is more efficient than making multiple calls
-      await axiosInstance.put(
-        `v1/class/${classId}/update`,
+      // Update the API endpoint and request body to match backend
+      await axiosInstance.patch(
+        `v1/class/${classId}`,
         {
           newName,
-          newTutorId: tutorId,
+          newTutorId,
           studentIds,
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -161,44 +159,6 @@ export const useClassStore = create<ClassState>((set, get) => ({
         type: "error",
         text1: "Error",
         text2: error.response?.data?.message || "Failed to delete class",
-      });
-
-      return false;
-    }
-  },
-
-  removeStudentFromClass: async (classId, studentId) => {
-    set({ loading: true });
-    try {
-      const token = await AsyncStorage.getItem("access-token");
-      if (!token) {
-        set({ loading: false });
-        return false;
-      }
-
-      // Correct the API endpoint path
-      await axiosInstance.delete(`v1/class/${classId}/deletestudent/${studentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Refresh classes after removing student
-      await get().fetchClasses();
-
-      Toast.show({
-        type: "success",
-        text1: "Success",
-        text2: "Student removed successfully",
-      });
-
-      return true;
-    } catch (error: any) {
-      console.error("Failed to remove student:", error);
-      set({ loading: false });
-
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error.response?.data?.message || "Failed to remove student",
       });
 
       return false;
