@@ -1,18 +1,19 @@
+import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
-import { fonts } from "../../utils/constant";
-import { Feather } from "@expo/vector-icons";
+
+const { width } = Dimensions.get("window");
 
 const SignUpScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const { signup, isSigningUp } = useAuthStore();
 
-  // State to manage form data
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -58,70 +59,96 @@ const SignUpScreen = () => {
     }
   };
 
+  // const isWebLayout = width > 768;
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior="padding">
         <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
         <View>
           {/* Username Input */}
-          <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.username}
-            onChangeText={(text) => setFormData({ ...formData, username: text })}
-            placeholder="Enter username"
-          />
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="titleMedium">Username</Text>
+            <TextInput
+              label="Username"
+              mode="outlined"
+              value={formData.username}
+              onChangeText={(text) => setFormData({ ...formData, username: text })}
+            />
+          </View>
 
           {/* Email Input */}
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.email}
-            onChangeText={(text) => setFormData({ ...formData, email: text })}
-            keyboardType="email-address"
-            placeholder="Enter email"
-          />
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="titleMedium">Email</Text>
+            <TextInput
+              label="Email"
+              mode="outlined"
+              value={formData.email}
+              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              keyboardType="email-address"
+            />{" "}
+          </View>
 
           {/* Role Picker */}
-          <Text style={styles.label}>Role</Text>
-          <Picker
-            selectedValue={formData.role}
-            style={styles.picker}
-            onValueChange={(itemValue) => setFormData({ ...formData, role: itemValue })}
-          >
-            <Picker.Item label="Student" value="student" />
-            <Picker.Item label="Tutor" value="tutor" />
-          </Picker>
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="titleMedium">Role</Text>
+            <Picker
+              selectedValue={formData.role}
+              style={styles.picker}
+              onValueChange={(itemValue) => setFormData({ ...formData, role: itemValue })}
+            >
+              <Picker.Item label="Student" value="student" />
+              <Picker.Item label="Tutor" value="tutor" />
+            </Picker>
+          </View>
 
           {/* Password Input */}
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={formData.password}
-            onChangeText={(text) => setFormData({ ...formData, password: text })}
-            secureTextEntry
-            placeholder="Enter password"
-          />
+          <View>
+            <Text variant="titleMedium">Password</Text>
+            <TextInput
+              label="Password"
+              mode="outlined"
+              value={formData.password}
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              secureTextEntry
+            />
+          </View>
 
           {/* Sign Up Button */}
           {isSigningUp ? (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Feather name="loader" size={24} color="black" />
-              <Button title="Signing up..." disabled={true} />
-            </View>
+            <Button mode="contained" loading disabled>
+              Signing up...
+            </Button>
           ) : (
-            <Button title="Sign Up" onPress={handleSignUp} />
+            <Button
+              mode="contained"
+              buttonColor="#2D336B"
+              textColor="white"
+              style={{ marginVertical: 20 }}
+              onPress={handleSignUp}
+            >
+              Sign up
+            </Button>
           )}
 
-          {/* Login Link */}
+          <View
+            style={{
+              borderBottomColor: "black",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
+          />
 
-          <View>
-            <Text style={{ textAlign: "center", marginTop: 20 }}>
-              Already have an account?{" "}
-              <Text style={{ color: "blue" }} onPress={() => navigation.goBack()}>
-                Login
-              </Text>
-            </Text>
+          <View style={styles.linkContainer}>
+            <Text variant="titleMedium">Already have an account?</Text>
+            <Button
+              mode="outlined"
+              onPress={() => navigation.goBack()}
+              buttonColor="#2D336B"
+              textColor="white"
+              icon="arrow-left"
+            >
+              Login
+            </Button>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -131,31 +158,23 @@ const SignUpScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // borderColor: "gray",
-    // borderWidth: 3,
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    fontFamily: fonts.regular,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    width: width > 768 ? "30%" : "100%",
+    alignSelf: "center",
   },
   picker: {
     height: 50,
-    width: "100%",
-    marginBottom: 10,
-    // borderColor: "red",
-    // borderWidth: 2,
-    backgroundColor: "lightblue",
+    backgroundColor: "#7886C7",
+    color: "white",
+  },
+  linkContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    gap: 10,
   },
 });
 

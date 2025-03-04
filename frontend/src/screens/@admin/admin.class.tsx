@@ -5,8 +5,8 @@ import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from "react-nativ
 import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useClassStore } from "../../store/useClassStore";
-import CreateModal from "./create.modal";
-import UpdateModal from "./update.modal";
+import CreateModal from "./create.class.modal";
+import UpdateModal from "./update.class.modal";
 
 const AdminClass = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);

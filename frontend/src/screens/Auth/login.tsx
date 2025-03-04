@@ -1,11 +1,14 @@
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
 import { fonts } from "../../utils/constant";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TextInput, Text, Button, ActivityIndicator } from "react-native-paper";
+
+const { width } = Dimensions.get("window");
 
 const LoginScreen = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -13,6 +16,7 @@ const LoginScreen = () => {
     username: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // const isLoggingIn = useAuthStore((state) => state.isLoggingIn);
   const { login, isLoggingIn } = useAuthStore();
@@ -35,42 +39,67 @@ const LoginScreen = () => {
     }
   };
 
+  const isWebLayout = width > 768;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container]}>
       <KeyboardAvoidingView>
         <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Login</Text>
         <View>
-          <Text style={styles.text}>User name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            onChangeText={(value) => setFormData({ ...formData, username: value })}
-          />
-
-          <Text style={styles.text}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={true}
-            onChangeText={(value) => setFormData({ ...formData, password: value })}
-          />
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="titleMedium">User name</Text>
+            <TextInput
+              mode="outlined"
+              label="Username"
+              onChangeText={(value) => setFormData({ ...formData, username: value })}
+            />
+          </View>
+          <View>
+            <Text variant="titleMedium">Password</Text>
+            <TextInput
+              mode="outlined"
+              secureTextEntry={!showPassword}
+              label="Password"
+              right={<TextInput.Icon icon="eye" onPress={() => setShowPassword(!showPassword)} />}
+              onChangeText={(value) => setFormData({ ...formData, password: value })}
+            />
+          </View>
 
           {isLoggingIn ? (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Feather name="loader" size={24} color="black" />
-              <Button title="Logging in..." disabled={true} />
-            </View>
+            <Button mode="contained" loading disabled>
+              Logging in...
+            </Button>
           ) : (
-            <Button title="Login" onPress={handleLogin} />
+            <Button
+              mode="contained"
+              onPress={handleLogin}
+              style={{ marginVertical: 20 }}
+              buttonColor="#2D336B"
+              textColor="white"
+            >
+              Login
+            </Button>
           )}
 
-          <View>
-            <Text style={{ textAlign: "center", marginTop: 20 }}>
-              Don't have an account?{" "}
-              <Text style={styles.link} onPress={() => navigation.navigate("signup")}>
-                Sign up
-              </Text>
-            </Text>
+          <View
+            style={{
+              borderBottomColor: "black",
+              borderBottomWidth: StyleSheet.hairlineWidth,
+            }}
+          />
+
+          <View style={styles.linkContainer}>
+            <Text variant="titleMedium">Don't have an account?{"  "}</Text>
+            <Button
+              mode="outlined"
+              onPress={() => navigation.navigate("signup")}
+              buttonColor="#2D336B"
+              textColor="white"
+              icon="arrow-right"
+              contentStyle={{ flexDirection: "row-reverse" }}
+            >
+              Sign up
+            </Button>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -82,23 +111,17 @@ const styles = StyleSheet.create({
   container: {
     fontFamily: fonts.bold,
     justifyContent: "center",
-    padding: 16,
+    padding: 24,
     flex: 1,
+    width: width > 768 ? "30%" : "100%",
+    alignSelf: "center",
   },
-  text: {
-    fontFamily: fonts.regular,
-    fontSize: 20,
-  },
-  input: {
-    fontFamily: fonts.regular,
-    fontSize: 20,
-    padding: 10,
-    margin: 10,
-    borderWidth: 1,
-  },
-  link: {
-    color: "blue",
-    textDecorationLine: "underline",
+  linkContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    gap: 10,
   },
 });
 

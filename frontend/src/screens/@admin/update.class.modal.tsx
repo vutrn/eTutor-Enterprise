@@ -80,7 +80,7 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
         Toast.show({
           type: "success",
           text1: "Class updated",
-          text2: "Students have been updated successfully"
+          text2: "Students have been updated successfully",
         });
         setModalVisible(false);
       }
