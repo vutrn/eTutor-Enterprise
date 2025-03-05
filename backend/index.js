@@ -8,16 +8,17 @@ const userRoute = require("./routes/user");
 const classRoute = require("./routes/personalclass");
 const messageRoute = require("./routes/message");
 const blogRoute = require("./routes/blog");
-
+const meetingRoute = require("./routes/meeting");
+const dashboardRoute = require("./routes/dashboard");
 
 dotenv.config();
 const app = express();
 
-const connectDB = async () => {
+const connectDB = async() => {
     try {
         await mongoose.connect(process.env.MONGODB_URL);
         console.log("Connect Success");
-    }catch (error) {
+    } catch (error) {
         console.error("MongoDB connection error:", error);
         process.exit(1);
     }
@@ -34,6 +35,8 @@ app.use("/v1/user", userRoute);
 app.use("/v1/class", classRoute);
 app.use("/v1/message", messageRoute);
 app.use("/v1/blog", blogRoute);
+app.use("/v1/meeting", meetingRoute);
+app.use("/v1/dashboard", dashboardRoute);
 
 app.listen(8000, () => {
     console.log("Server Running on port 8000");
