@@ -43,7 +43,10 @@ export const App = () => {
     const checkToken = async () => {
       const isTokenValid = await verifyToken();
       if (!isTokenValid) {
-        console.log("Token is invalid, logging out...");
+        Toast.show({
+          type: "error",
+          text1: "Token is invalid, logging out...",
+        });
         logout();
       }
     };

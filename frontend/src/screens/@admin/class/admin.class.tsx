@@ -1,10 +1,11 @@
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useClassStore } from "../../store/useClassStore";
+import alert from "../../../components/alert";
+import { useClassStore } from "../../../store/useClassStore";
 import CreateModal from "./create.class.modal";
 import UpdateModal from "./update.class.modal";
 
@@ -28,17 +29,19 @@ const AdminClass = () => {
   };
 
   const handleDeleteClass = (classId: string, className: string) => {
-    Alert.alert("Delete Class", `Are you sure you want to delete ${className}?`, [
+    alert("Delete Class", `Are you sure you want to delete ${className}?`, [
       {
         text: "Cancel",
         style: "cancel",
+        onPress: () => {},
       },
       {
         text: "Delete",
+        style: "destructive",
         onPress: async () => {
           await deleteClass(classId);
+          loadClasses();
         },
-        style: "destructive",
       },
     ]);
   };

@@ -8,8 +8,8 @@ import {
   View,
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
-import { useAdminStore } from "../../store/useAdminStore";
-import { useClassStore } from "../../store/useClassStore";
+import { useAdminStore } from "../../../store/useAdminStore";
+import { useClassStore } from "../../../store/useClassStore";
 
 interface IProps {
   modalVisible: boolean;

@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import { useAdminStore } from "../../store/useAdminStore";
-import { useClassStore } from "../../store/useClassStore";
+import { useAdminStore } from "../../../store/useAdminStore";
+import { useClassStore } from "../../../store/useClassStore";
 
 interface IProps {
   modalVisible: boolean;
@@ -68,10 +68,8 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
 
     setIsSubmitting(true);
     try {
-      // Get the original students from classData
       const originalStudentIds = classData.students?.map((student: any) => student._id) || [];
 
-      // Log the changes for debugging
       console.log("Original students:", originalStudentIds);
       console.log("New selected students:", selectedStudents);
 

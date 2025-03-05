@@ -14,7 +14,6 @@ type AdminState = {
   deleteUser: (userId: string) => Promise<void>;
 };
 
-// Create the admin store with persist and devtools middleware
 export const useAdminStore = create<AdminState>()(
   // devtools(
   //   persist(
@@ -31,16 +30,6 @@ export const useAdminStore = create<AdminState>()(
           throw new Error("No token found");
         }
 
-        const decoded: any = jwtDecode(token);
-        if (decoded.exp * 1000 < Date.now()) {
-          Toast.show({
-            type: "error",
-            text1: "Token expired",
-            text2: "Please log in again",
-          });
-          useAuthStore.setState({ isTokenExpired: true });
-          return;
-        }
         const res = await axiosInstance.get("v1/user", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -48,8 +37,6 @@ export const useAdminStore = create<AdminState>()(
         });
         const students = res.data.filter((user: any) => user.role === "student");
         const tutors = res.data.filter((user: any) => user.role === "tutor");
-        // console.log("🚀 ~ fetchUsers: ~ students:", students)
-        // console.log("🚀 ~ fetchUsers: ~ tutors:", tutors)
         set({ students, tutors, loading: false });
       } catch (error: any) {
         set({ loading: false });
@@ -63,11 +50,21 @@ export const useAdminStore = create<AdminState>()(
     },
 
     deleteUser: async (userId: string) => {
-      
-    }
-
-
-
+      try {
+        const token = await AsyncStorage.getItem("access-token");
+        if (!token) {
+          throw new Error("No token found");
+        }
+        await axiosInstance.delete(`v1/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        Toast.show({ type: "success", text1: "User deleted successfully" });
+      } catch {
+        Toast.show({ type: "error", text1: "Failed to delete user" });
+      }
+    },
   })
   //     { name: "admin-store" }
   //   )

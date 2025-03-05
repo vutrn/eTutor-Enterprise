@@ -59,15 +59,13 @@ const SignUpScreen = () => {
     }
   };
 
-  // const isWebLayout = width > 768;
-
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior="padding">
         <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
         <View>
           {/* Username Input */}
-          <View style={{ marginBottom: 20 }}>
+          <View style={{ marginBottom: 20 }}> 
             <Text variant="titleMedium">Username</Text>
             <TextInput
               label="Username"
@@ -86,7 +84,7 @@ const SignUpScreen = () => {
               value={formData.email}
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               keyboardType="email-address"
-            />{" "}
+            />
           </View>
 
           {/* Role Picker */}
@@ -116,7 +114,7 @@ const SignUpScreen = () => {
 
           {/* Sign Up Button */}
           {isSigningUp ? (
-            <Button mode="contained" loading disabled>
+            <Button mode="contained" loading disabled style={styles.button}>
               Signing up...
             </Button>
           ) : (
@@ -124,7 +122,7 @@ const SignUpScreen = () => {
               mode="contained"
               buttonColor="#2D336B"
               textColor="white"
-              style={{ marginVertical: 20 }}
+              style={styles.button}
               onPress={handleSignUp}
             >
               Sign up
@@ -175,6 +173,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     gap: 10,
+  },
+  button: {
+    marginVertical: 20,
   },
 });
 
