@@ -1,11 +1,10 @@
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { Dimensions, FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import alert from "../../../components/alert";
 import { useAdminStore } from "../../../store/useAdminStore";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 

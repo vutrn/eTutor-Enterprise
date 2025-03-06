@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,11 +12,12 @@ import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import { useAdminStore } from "../../../store/useAdminStore";
 import { useClassStore } from "../../../store/useClassStore";
 
+const { width } = Dimensions.get("window");
+
 interface IProps {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
 }
-
 const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   // Get data from stores
   const { tutors, students, fetchUsers, loading: loadingUsers } = useAdminStore();
@@ -87,8 +89,15 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
         dismissable={true}
         contentContainerStyle={styles.container}
       >
+        <Text style={styles.title}>Create New Class</Text>
+        <View
+          style={{
+            marginBottom: 10,
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
         <ScrollView>
-          <Text style={styles.title}>Create New Class</Text>
           {/* CLASS NAME INPUT */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Class Name</Text>
@@ -172,10 +181,14 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "white",
     padding: 20,
     margin: 20,
     borderRadius: 8,
+    width: width * 0.9,
+    maxWidth: 500,
+    alignSelf: "center",
   },
   loadingContainer: {
     flex: 1,
@@ -189,7 +202,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     color: "#333",
     textAlign: "center",
   },

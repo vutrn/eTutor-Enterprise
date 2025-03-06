@@ -1,13 +1,15 @@
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import alert from "../../../components/alert";
 import { useClassStore } from "../../../store/useClassStore";
 import CreateModal from "./create.class.modal";
 import UpdateModal from "./update.class.modal";
+
+const { width } = Dimensions.get("window");
 
 const AdminClass = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -134,14 +136,15 @@ const AdminClass = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: "row",
     padding: 16,
-    position: "relative", // Ensure relative positioning for child absolute elements
+    position: "relative",
   },
   icon: {
     position: "absolute",
     bottom: 20,
     right: 20,
-    zIndex: 10, // Add z-index to ensure button is clickable
+    zIndex: 10,
   },
   card: {
     backgroundColor: "white",
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 5,
+    // width: "30%",
   },
   cardHeader: {
     flexDirection: "row",

@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { lazy, Suspense } from "react";
 import Loading from "../screens/other/loading";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Feather from "@expo/vector-icons/Feather";
 
 const AdminDashboard = lazy(() => import("../screens/@admin/dashboard/admin.dashboard"));
 const TutorList = lazy(() => import("../screens/@admin/dashboard/tutor.list"));
@@ -27,12 +28,27 @@ const AdminNavigator = () => {
 
   return (
     <Tab.Navigator
-      screenOptions={{}}
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: any;
+
+          if (route.name === "Dashboard") {
+            iconName = focused ? "home" : "home";
+          } else if (route.name === "Manage Class") {
+            iconName = focused ? "book" : "book";
+          } else if (route.name === "admin_profile") {
+            iconName = focused ? "user" : "user";
+          }
+
+          return <Feather name={iconName} size={24} color="black" />;
+        },
+        tabBarActiveTintColor: "tomato",
+        tabBarInactiveTintColor: "gray",
+      })}
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
       <Tab.Screen options={{ headerShown: false }} name="Dashboard" component={DashboardStack} />
       <Tab.Screen name="Manage Class" component={AdminClass} />
-      <Tab.Screen name="Classes" component={ViewClass} />
       <Tab.Screen
         name="admin_profile"
         options={{ tabBarLabel: "Profile" }}

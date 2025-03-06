@@ -198,13 +198,14 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "white",
     padding: 20,
     margin: 20,
     borderRadius: 8,
-    maxHeight: "80%",
-    zIndex: 1000, // Ensure modal appears on top
-    elevation: 5, // For Android elevation
+    width: "90%",
+    maxWidth: 500,
+    alignSelf: "center",
   },
   loadingContainer: {
     flex: 1,

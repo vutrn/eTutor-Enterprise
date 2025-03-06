@@ -6,7 +6,6 @@ import axiosInstance from "../utils/axios";
 type ClassState = {
   classes: any[];
   loading: boolean;
-
   fetchClasses: () => Promise<void>;
   createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
   updateClass: (
