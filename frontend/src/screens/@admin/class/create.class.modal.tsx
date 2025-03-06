@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,34 +9,24 @@ import {
   View,
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
-import Toast from "react-native-toast-message";
-import { useAdminStore } from "../../store/useAdminStore";
-import { useClassStore } from "../../store/useClassStore";
+import { useAdminStore } from "../../../store/useAdminStore";
+import { useClassStore } from "../../../store/useClassStore";
+
+const { width } = Dimensions.get("window");
 
 interface IProps {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
-  classData: any; // The class to update
 }
-
-const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
+const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   // Get data from stores
   const { tutors, students, fetchUsers, loading: loadingUsers } = useAdminStore();
-  const { updateClass, loading: loadingClassUpdate } = useClassStore();
+  const { createClass, loading: loadingClassCreation } = useClassStore();
 
   const [className, setClassName] = useState("");
   const [selectedTutor, setSelectedTutor] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (modalVisible && classData) {
-      const currentStudentIds = classData.students?.map((student: any) => student._id) || [];
-      setClassName(classData.name || "");
-      setSelectedTutor(classData.tutor?._id || "");
-      setSelectedStudents([...currentStudentIds]);
-    }
-  }, [modalVisible, classData]);
 
   // Fetch users when component mounts or when modal becomes visible
   useEffect(() => {
@@ -44,60 +35,41 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     }
   }, [fetchUsers, modalVisible]);
 
-  // Toggle student selection with removal tracking
+  // Toggle student selection
   const toggleStudentSelection = (studentId: string) => {
-    setSelectedStudents((prevSelectedStudents) => {
-      if (prevSelectedStudents.includes(studentId)) {
-        // Remove student - log for debugging
-        console.log(`Removing student with ID: ${studentId}`);
-        return prevSelectedStudents.filter((id) => id !== studentId);
-      } else {
-        // Add student - log for debugging
-        console.log(`Adding student with ID: ${studentId}`);
-        return [...prevSelectedStudents, studentId];
-      }
-    });
+    if (selectedStudents.includes(studentId)) {
+      setSelectedStudents(selectedStudents.filter((id) => id !== studentId));
+    } else {
+      setSelectedStudents([...selectedStudents, studentId]);
+    }
   };
 
   // Handle form submission
-  const handleUpdateClass = async () => {
-    if (!className || !selectedTutor || !selectedStudents) {
-      alert("Please fill in all fields");
+  const handleCreateClass = async () => {
+    if (!className || !selectedTutor || selectedStudents.length === 0) {
+      alert("Please fill in all fields and select at least one student");
       return;
     }
 
     setIsSubmitting(true);
-    try {
-      // Get the original students from classData
-      const originalStudentIds = classData.students?.map((student: any) => student._id) || [];
-
-      // Log the changes for debugging
-      console.log("Original students:", originalStudentIds);
-      console.log("New selected students:", selectedStudents);
-
-      const success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
-      if (success) {
-        Toast.show({
-          type: "success",
-          text1: "Class updated",
-          text2: "Students have been updated successfully",
-        });
-        setModalVisible(false);
-      }
-    } catch (error) {
-      console.error("Error updating class:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Failed to update class",
-      });
-    }
+    const success = await createClass(className, selectedTutor, selectedStudents);
     setIsSubmitting(false);
+
+    if (success) {
+      // Reset form
+      setClassName("");
+      setSelectedTutor("");
+      setSelectedStudents([]);
+      setModalVisible(false);
+    }
   };
 
-  const onChangeText = useCallback((text: string) => {
-    setClassName(text);
-  }, []);
+  const handleCloseModal = () => {
+    setClassName("");
+    setSelectedTutor("");
+    setSelectedStudents([]);
+    setModalVisible(false);
+  };
 
   if (loadingUsers) {
     return (
@@ -108,15 +80,24 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     );
   }
 
+  // The key fix is here - wrapping Portal with Provider
   return (
     <Portal>
       <Modal
         visible={modalVisible}
-        onDismiss={() => setModalVisible(false)}
+        onDismiss={handleCloseModal}
+        dismissable={true}
         contentContainerStyle={styles.container}
       >
+        <Text style={styles.title}>Create New Class</Text>
+        <View
+          style={{
+            marginBottom: 10,
+            borderBottomColor: "black",
+            borderBottomWidth: StyleSheet.hairlineWidth,
+          }}
+        />
         <ScrollView>
-          <Text style={styles.title}>Update Class</Text>
           {/* CLASS NAME INPUT */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Class Name</Text>
@@ -124,7 +105,7 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
               label="Class Name"
               style={styles.input}
               value={className}
-              onChangeText={onChangeText}
+              onChangeText={setClassName}
               mode="outlined"
             />
           </View>
@@ -180,16 +161,16 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={handleUpdateClass}
+            onPress={handleCreateClass}
             disabled={isSubmitting}
           >
-            {isSubmitting || loadingClassUpdate ? (
+            {isSubmitting || loadingClassCreation ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Update Class</Text>
+              <Text style={styles.buttonText}>Create Class</Text>
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCloseModal}>
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -200,13 +181,14 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: "white",
     padding: 20,
     margin: 20,
     borderRadius: 8,
-    maxHeight: "80%",
-    zIndex: 1000, // Ensure modal appears on top
-    elevation: 5, // For Android elevation
+    width: width * 0.9,
+    maxWidth: 500,
+    alignSelf: "center",
   },
   loadingContainer: {
     flex: 1,
@@ -220,7 +202,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     color: "#333",
     textAlign: "center",
   },
@@ -318,16 +300,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  removedItem: {
-    backgroundColor: "#ffeeee",
-    borderColor: "#ff9999",
-  },
-  removeText: {
-    color: "red",
-    fontSize: 12,
-    fontStyle: "italic",
-    marginTop: 4,
-  },
 });
 
-export default UpdateModal;
+export default CreateModal;

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import Toast, { BaseToast, BaseToastProps, ErrorToast } from "react-native-toast-message";
 
-export const fonts = {
+export const FONTS = {
   thin: "Inter_100Thin",
   extraLight: "Inter_200ExtraLight",
   light: "Inter_300Light",
@@ -15,8 +15,14 @@ export const fonts = {
 
 export default StyleSheet.create({
   globalFont: {
-    fontFamily: fonts.regular,
+    fontFamily: FONTS.regular,
     fontSize: 30,
   },
 });
 
+export const COLORS = {
+  one: "#FFF2F2", 
+  two: "#A9B5DF",
+  three: "#7886C7", 
+  four: "#2D336B",
+};

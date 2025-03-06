@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
-import { fonts } from "../../utils/constant";
+import { FONTS } from "../../utils/constant";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TextInput, Text, Button, ActivityIndicator } from "react-native-paper";
 
@@ -39,8 +39,6 @@ const LoginScreen = () => {
     }
   };
 
-  const isWebLayout = width > 768;
-
   return (
     <SafeAreaView style={[styles.container]}>
       <KeyboardAvoidingView>
@@ -66,14 +64,14 @@ const LoginScreen = () => {
           </View>
 
           {isLoggingIn ? (
-            <Button mode="contained" loading disabled>
+            <Button mode="contained" loading disabled style={styles.button}>
               Logging in...
             </Button>
           ) : (
             <Button
               mode="contained"
               onPress={handleLogin}
-              style={{ marginVertical: 20 }}
+              style={styles.button}
               buttonColor="#2D336B"
               textColor="white"
             >
@@ -109,7 +107,7 @@ const LoginScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    fontFamily: fonts.bold,
+    fontFamily: FONTS.bold,
     justifyContent: "center",
     padding: 24,
     flex: 1,
@@ -122,6 +120,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     gap: 10,
+  },
+  button: {
+    marginVertical: 20,
   },
 });
 
