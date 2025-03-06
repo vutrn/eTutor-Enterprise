@@ -5,24 +5,31 @@ import axiosInstance from "../utils/axios";
 
 type DashboardState = {
   dashboard: {
-    totalUsers: number;
-    totalStudents: number;
-    totalTutors: number;
-
-    classes: number;
-    totalClasses: number;
+    role?: "admin" | "tutor" | "student";
+    // Admin fields
+    totalUsers?: number;
+    studentsCount?: number;
+    tutorsCount?: number;
+    // Tutor fields
+    totalClasses?: number;
+    totalStudents?: number;
+    // Common fields
+    classes?: any[]; // For both tutor and student roles
   };
 
   getDashboard: () => Promise<void>;
 };
 
 export const useDashboardStore = create<DashboardState>()((set) => ({
+  // Initial state with all possible fields
   dashboard: {
+    role: undefined,
     totalUsers: 0,
-    totalStudents: 0,
-    totalTutors: 0,
-    classes: 0,
+    studentsCount: 0,
+    tutorsCount: 0,
     totalClasses: 0,
+    totalStudents: 0,
+    classes: [],
   },
 
   getDashboard: async () => {
@@ -36,6 +43,8 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
           Authorization: `Bearer ${token}`,
         },
       });
+
+      // Store the response data which will contain role-specific information
       set({ dashboard: res.data });
       console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {

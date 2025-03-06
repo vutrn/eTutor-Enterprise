@@ -19,7 +19,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
  */
 const ViewClass = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const { classes, loading, fetchClasses, deleteClass } = useClassStore();
+  const { classes, loading, getClasses, deleteClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   // Fetch classes when component mounts
@@ -30,7 +30,7 @@ const ViewClass = () => {
   // Handle refreshing the list
   const loadClasses = async () => {
     setRefreshing(true);
-    await fetchClasses();
+    await getClasses();
     setRefreshing(false);
   };
 

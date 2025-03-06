@@ -6,15 +6,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore } from "./useAuthStore";
 
-type AdminState = {
+type UserState = {
   students: any[];
   tutors: any[];
   loading: boolean;
-  fetchUsers: () => Promise<void>;
+  getUsers: () => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
 };
 
-export const useAdminStore = create<AdminState>()(
+export const useUserStore = create<UserState>()(
   // devtools(
   //   persist(
   (set) => ({
@@ -22,7 +22,7 @@ export const useAdminStore = create<AdminState>()(
     tutors: [],
     loading: false,
 
-    fetchUsers: async () => {
+    getUsers: async () => {
       try {
         const token = await AsyncStorage.getItem("access-token");
         if (!token) {
