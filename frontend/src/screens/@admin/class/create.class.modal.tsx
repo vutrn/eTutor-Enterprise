@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
-import { useAdminStore } from "../../../store/useAdminStore";
 import { useClassStore } from "../../../store/useClassStore";
+import { useUserStore } from "../../../store/useUserStore";
 
 const { width } = Dimensions.get("window");
 
@@ -20,7 +20,7 @@ interface IProps {
 }
 const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   // Get data from stores
-  const { tutors, students, fetchUsers, loading: loadingUsers } = useAdminStore();
+  const { tutors, students, getUsers, loading: loadingUsers } = useUserStore();
   const { createClass, loading: loadingClassCreation } = useClassStore();
 
   const [className, setClassName] = useState("");
@@ -31,9 +31,9 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   // Fetch users when component mounts or when modal becomes visible
   useEffect(() => {
     if (modalVisible) {
-      fetchUsers();
+      getUsers();
     }
-  }, [fetchUsers, modalVisible]);
+  }, [getUsers, modalVisible]);
 
   // Toggle student selection
   const toggleStudentSelection = (studentId: string) => {

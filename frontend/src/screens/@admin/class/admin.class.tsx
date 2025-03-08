@@ -15,7 +15,7 @@ const AdminClass = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<any>(null);
-  const { classes, loading, fetchClasses, deleteClass } = useClassStore();
+  const { classes, loading, getClasses, deleteClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -26,7 +26,7 @@ const AdminClass = () => {
 
   const loadClasses = async () => {
     setRefreshing(true);
-    await fetchClasses();
+    await getClasses();
     setRefreshing(false);
   };
 

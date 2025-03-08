@@ -1,17 +1,17 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useEffect } from "react";
-import { useAdminStore } from "../../../store/useAdminStore";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
+import { useUserStore } from "../../../store/useUserStore";
 const StudentList = () => {
-  const { fetchUsers, students, deleteUser } = useAdminStore();
+  const { getUsers, students, deleteUser } = useUserStore();
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    getUsers();
+  }, [getUsers]);
 
   const handleDelete = (userId: string) => {
     deleteUser(userId);
-    fetchUsers();
+    getUsers();
   };
 
   return (
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-
   },
 });
 

@@ -1,18 +1,18 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet} from "react-native";
 import React, { useEffect } from "react";
-import { useAdminStore } from "../../../store/useAdminStore";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
+import { useUserStore } from "../../../store/useUserStore";
 
 const TutorList = () => {
-  const { fetchUsers, tutors, deleteUser } = useAdminStore();
+  const { getUsers, tutors, deleteUser } = useUserStore();
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    getUsers();
+  }, [getUsers]);
 
   const handleDelete = (userId: string) => {
     deleteUser(userId);
-    fetchUsers();
+    getUsers();
   };
 
   return (

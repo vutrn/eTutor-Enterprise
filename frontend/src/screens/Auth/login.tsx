@@ -47,6 +47,7 @@ const LoginScreen = () => {
           <View style={{ marginBottom: 20 }}>
             <Text variant="titleMedium">User name</Text>
             <TextInput
+              onKeyPress={(e) => {e.nativeEvent.key === "Enter" && handleLogin()}}
               mode="outlined"
               label="Username"
               onChangeText={(value) => setFormData({ ...formData, username: value })}
@@ -55,6 +56,7 @@ const LoginScreen = () => {
           <View>
             <Text variant="titleMedium">Password</Text>
             <TextInput
+              onKeyPress={(e) => {e.nativeEvent.key === "Enter" && handleLogin()}}
               mode="outlined"
               secureTextEntry={!showPassword}
               label="Password"

@@ -36,7 +36,6 @@ axiosInstance.interceptors.response.use(
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     if (error.response && error.response.status === 401) {
-      // Token expired, show Toast notification
       Toast.show({
         type: "error",
         text1: "Token expired",

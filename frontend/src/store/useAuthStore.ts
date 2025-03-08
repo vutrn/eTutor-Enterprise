@@ -1,10 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import axiosInstance from "../utils/axios";
-import Toast from "react-native-toast-message";
 import { jwtDecode } from "jwt-decode";
-import { useAdminStore } from "./useAdminStore";
+import Toast from "react-native-toast-message";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import axiosInstance from "../utils/axios";
 
 interface AuthState {
   authUser: any;

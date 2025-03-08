@@ -4,32 +4,18 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import alert from "../../../components/alert";
-import { useAdminStore } from "../../../store/useAdminStore";
+import { useUserStore } from "../../../store/useUserStore";
 
 const { width } = Dimensions.get("window");
 
 const AdminDashboard = () => {
-  const { fetchUsers, students, tutors, deleteUser } = useAdminStore();
+  const { getUsers, students, tutors, deleteUser } = useUserStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-  const handleDelete = (userId: string) => {
-    alert("Delete User", "Are you sure you want to delete this user?", [
-      { text: "Cancel", style: "cancel", onPress: () => {} },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          deleteUser(userId);
-          fetchUsers();
-        },
-      },
-    ]);
-  };
+    getUsers();
+  }, [getUsers]);
 
   return (
     <SafeAreaView style={styles.container}>

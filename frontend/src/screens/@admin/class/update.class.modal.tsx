@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import { useAdminStore } from "../../../store/useAdminStore";
 import { useClassStore } from "../../../store/useClassStore";
+import { useUserStore } from "../../../store/useUserStore";
 
 interface IProps {
   modalVisible: boolean;
@@ -20,7 +20,7 @@ interface IProps {
 
 const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   // Get data from stores
-  const { tutors, students, fetchUsers, loading: loadingUsers } = useAdminStore();
+  const { tutors, students, getUsers, loading: loadingUsers } = useUserStore();
   const { updateClass, loading: loadingClassUpdate } = useClassStore();
 
   const [className, setClassName] = useState("");
@@ -40,21 +40,17 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   // Fetch users when component mounts or when modal becomes visible
   useEffect(() => {
     if (modalVisible) {
-      fetchUsers();
+      getUsers();
     }
-  }, [fetchUsers, modalVisible]);
+  }, [getUsers, modalVisible]);
 
   // Toggle student selection with removal tracking
   const toggleStudentSelection = (studentId: string) => {
-    setSelectedStudents((prevSelectedStudents) => {
-      if (prevSelectedStudents.includes(studentId)) {
-        // Remove student - log for debugging
-        console.log(`Removing student with ID: ${studentId}`);
-        return prevSelectedStudents.filter((id) => id !== studentId);
+    setSelectedStudents((addedStudents) => {
+      if (addedStudents.includes(studentId)) {
+        return addedStudents.filter((id) => id !== studentId);
       } else {
-        // Add student - log for debugging
-        console.log(`Adding student with ID: ${studentId}`);
-        return [...prevSelectedStudents, studentId];
+        return [...addedStudents, studentId];
       }
     });
   };
