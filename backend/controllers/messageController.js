@@ -42,7 +42,7 @@
 
       let imageUrl = "";
       if (image) {
-        const uploadResponse = await Cloudinary.uploader.upload(image);
+        const uploadResponse = await cloudinary.uploader.upload(image, {folder: "blogs"});
         imageUrl = uploadResponse.secure_url;
       }
 
