@@ -15,8 +15,11 @@ type RootStackParamList = {
 
   // Tutor navigator
   tutor_dashboard: undefined;
-  tutor_blog: undefined;
   tutor_class: undefined;
+  class_feature_tab: undefined;
+  tutor_class_detail: undefined;
+  tutor_blog: undefined;
+  tutor_message: undefined;
   tutor_document: undefined;
   tutor_meeting: undefined;
   tutor_profile: undefined;

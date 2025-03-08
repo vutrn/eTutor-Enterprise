@@ -17,20 +17,6 @@ const AdminDashboard = () => {
     getUsers();
   }, [getUsers]);
 
-  const handleDelete = (userId: string) => {
-    alert("Delete User", "Are you sure you want to delete this user?", [
-      { text: "Cancel", style: "cancel", onPress: () => {} },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          deleteUser(userId);
-          getUsers();
-        },
-      },
-    ]);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View>

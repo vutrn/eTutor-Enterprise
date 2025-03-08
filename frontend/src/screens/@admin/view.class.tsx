@@ -6,8 +6,9 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Alert,
+  RefreshControl,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useClassStore } from "../../store/useClassStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -27,12 +28,26 @@ const ViewClass = () => {
     loadClasses();
   }, []);
 
-  // Handle refreshing the list
+  // Handle refreshing the list with loading indicator
   const loadClasses = async () => {
     setRefreshing(true);
-    await getClasses();
-    setRefreshing(false);
+    try {
+      await getClasses();
+    } catch (error) {
+      console.error("Failed to load classes:", error);
+      Alert.alert(
+        "Error",
+        "Failed to load classes. Please try again."
+      );
+    } finally {
+      setRefreshing(false);
+    }
   };
+
+  // Memoized refresh handler for better performance
+  const onRefresh = useCallback(() => {
+    loadClasses();
+  }, []);
 
   // Handle deleting a class
   const handleDeleteClass = (classId: string, className: string) => {
@@ -44,7 +59,17 @@ const ViewClass = () => {
       {
         text: "Delete",
         onPress: async () => {
-          await deleteClass(classId);
+          try {
+            await deleteClass(classId);
+            // Reload the class list after deletion
+            await loadClasses();
+          } catch (error) {
+            console.error("Failed to delete class:", error);
+            Alert.alert(
+              "Error",
+              "Failed to delete class. Please try again."
+            );
+          }
         },
         style: "destructive",
       },
@@ -113,7 +138,13 @@ const ViewClass = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Classes</Text>
+      {/* Header with title and refresh button */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.title}>Classes</Text>
+        <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
+          <Feather name="refresh-cw" size={20} color="#1890ff" />
+        </TouchableOpacity>
+      </View>
 
       {classes.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -133,8 +164,15 @@ const ViewClass = () => {
           renderItem={renderClassItem}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
-          refreshing={refreshing}
-          onRefresh={loadClasses}
+          // Add RefreshControl for pull-to-refresh functionality
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#1890ff"]}
+              tintColor="#1890ff"
+            />
+          }
         />
       )}
     </SafeAreaView>
@@ -149,12 +187,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     padding: 10,
   },
+  // New style for header container with refresh button
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 10,
+    position: "relative",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 10,
     textAlign: "center",
+  },
+  // New style for refresh button
+  refreshButton: {
+    position: "absolute",
+    right: 0,
+    padding: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -255,13 +306,12 @@ const styles = StyleSheet.create({
   },
   createButton: {
     backgroundColor: "#1890ff",
+    borderRadius: 8,
   },
   createButtonText: {
     color: "white",
     padding: 10,
-    borderRadius: 8,
     textAlign: "center",
-    marginTop: 20,
     fontSize: 16,
     fontWeight: "bold",
   },

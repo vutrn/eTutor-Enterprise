@@ -14,14 +14,13 @@ type DashboardState = {
     totalClasses?: number;
     totalStudents?: number;
     // Common fields
-    classes?: any[]; // For both tutor and student roles
+    classes?: any[];
   };
 
   getDashboard: () => Promise<void>;
 };
 
 export const useDashboardStore = create<DashboardState>()((set) => ({
-  // Initial state with all possible fields
   dashboard: {
     role: undefined,
     totalUsers: 0,
@@ -44,7 +43,6 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
         },
       });
 
-      // Store the response data which will contain role-specific information
       set({ dashboard: res.data });
       console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {

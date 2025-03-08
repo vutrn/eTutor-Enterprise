@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useDashboardStore } from "../../store/useDashboadStore";
 import { useUserStore } from "../../store/useUserStore";
+import { Card, IconButton } from "react-native-paper";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
-  // Import useAdminStore to access tutors data
   const { tutors, getUsers } = useUserStore();
-  // State to track if data is loading
 
   useEffect(() => {
     getDashboard();
@@ -21,18 +21,19 @@ const TutorClass = () => {
 
   console.log("Dashboard: ", dashboard);
 
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+
   const renderItem = ({ item }: { item: any }) => {
     return (
-      <View style={styles.classCard}>
-        <Text style={styles.className}>{item.name}</Text>
-        <Text style={styles.tutorName}>
-          Tutor: {item?.tutor ? getTutorNameById(item.tutor) : "Not assigned"}
-        </Text>
-        <Text style={styles.studentCount}>{item.students.length} students</Text>
-        <Text style={styles.dateInfo}>
-          Created: {new Date(item.createdAt).toLocaleDateString()}
-        </Text>
-      </View>
+      <Card style={styles.classCard} onPress={() => {navigation.navigate("class_feature_tab") }}>
+        <Card.Title title={item.name} subtitle={`Tutor: ${getTutorNameById(item.tutor)}`} right={() => <IconButton icon="arrow-right" /> } />
+        <Card.Content>
+          <Text style={styles.studentCount}>Students: {item.students.length}</Text>
+          <Text style={styles.dateInfo}>
+            Date: {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
+          </Text>
+        </Card.Content>
+      </Card>
     );
   };
 
@@ -43,8 +44,8 @@ const TutorClass = () => {
         <FlatList
           data={dashboard.classes}
           keyExtractor={(item) => item._id}
-          renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
+          renderItem={renderItem}
         />
       ) : (
         <Text style={styles.emptyText}>No classes found</Text>
@@ -53,7 +54,6 @@ const TutorClass = () => {
   );
 };
 
-// Add styles to improve the UI appearance
 const styles = StyleSheet.create({
   container: {
     flex: 1,
