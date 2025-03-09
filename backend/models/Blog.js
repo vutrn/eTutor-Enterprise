@@ -17,6 +17,10 @@ const BlogSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    image: {
+        type: String, 
+        required: false
+    },
     comments: [{
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         text: { type: String, required: true },
