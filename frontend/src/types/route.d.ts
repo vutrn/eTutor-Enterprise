@@ -12,11 +12,13 @@ type RootStackParamList = {
   view_class: undefined;
   admin_profile: undefined;
 
-
   // Tutor navigator
   tutor_dashboard: undefined;
   tutor_class: undefined;
-  class_feature_tab: undefined;
+  class_feature_tab: {
+    // screen: "tutor_class_detail" | "tutor_message" | "tutor_document" | "tutor_blog" | "tutor_meeting";
+    className: string;
+  };
   tutor_class_detail: undefined;
   tutor_blog: undefined;
   tutor_message: undefined;

@@ -8,29 +8,46 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    getDashboard();
+    loadDashboard();
     getUsers();
   }, []);
+
+  const loadDashboard = async () => {
+    setRefreshing(true);
+    await getDashboard();
+    setRefreshing(false);
+  };
 
   const getTutorNameById = (tutorId: any) => {
     const tutor = tutors.find((value) => value._id === tutorId);
     return tutor ? tutor.username : "{Tutor}";
   };
 
-  console.log("Dashboard: ", dashboard);
-
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const renderItem = ({ item }: { item: any }) => {
     return (
-      <Card style={styles.classCard} onPress={() => {navigation.navigate("class_feature_tab") }}>
-        <Card.Title title={item.name} subtitle={`Tutor: ${getTutorNameById(item.tutor)}`} right={() => <IconButton icon="arrow-right" /> } />
+      <Card
+        style={styles.classCard}
+        onPress={() => {
+          navigation.navigate("class_feature_tab", {
+            className: item.name,
+          });
+        }}
+      >
+        <Card.Title
+          title={item.name}
+          subtitle={`Tutor: ${getTutorNameById(item.tutor)}`}
+          right={() => <IconButton icon="arrow-right" />}
+        />
         <Card.Content>
           <Text style={styles.studentCount}>Students: {item.students.length}</Text>
           <Text style={styles.dateInfo}>
-            Date: {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
+            Date: {new Date(item.startDate).toLocaleDateString()} -
+            {new Date(item.endDate).toLocaleDateString()}
           </Text>
         </Card.Content>
       </Card>
@@ -46,6 +63,8 @@ const TutorClass = () => {
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
           renderItem={renderItem}
+          refreshing={refreshing}
+          onRefresh={loadDashboard}
         />
       ) : (
         <Text style={styles.emptyText}>No classes found</Text>

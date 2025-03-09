@@ -6,22 +6,20 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import "react-native-gesture-handler";
+import { PaperProvider } from "react-native-paper";
+import Toast from "react-native-toast-message";
 import AdminNavigator from "./src/navigation/admin.navigator";
 import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-import Toast from "react-native-toast-message";
-import jwt_decode from "jwt-decode";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { PaperProvider } from "react-native-paper";
+import { FONTS } from "./src/utils/constant";
+import { FontDisplay } from "expo-font";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,8 +50,8 @@ export const App = () => {
     };
     checkToken();
 
-    // const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
-    // return () => clearInterval(tokenCheckInterval);
+    const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
+    return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
   if (!loaded && !error) {
@@ -84,10 +82,20 @@ export const App = () => {
     }
   };
 
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      // background: '#A9B5DF',
+      // primary: 'red',
+      // text: 'yellow',
+    },
+  };
+
   return (
     <>
       <PaperProvider>
-        <NavigationContainer>{renderAppContent()}</NavigationContainer>
+        <NavigationContainer theme={MyTheme}>{renderAppContent()}</NavigationContainer>
       </PaperProvider>
       <Toast />
     </>
