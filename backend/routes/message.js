@@ -3,10 +3,10 @@ const messageController = require("../controllers/messageController");
 
 const router = require("express").Router();
 
-router.get("/getusertochat", middlewareController.verifyToken, messageController.getUserToChat);
+router.get("/users/:classId", middlewareController.verifyToken, messageController.getUserToChat);
 
-router.get("/getmessage/:id", middlewareController.verifyToken, messageController.getMessages);
+router.get("/getmessage/:receiverId", middlewareController.verifyToken, messageController.getMessages);
 
-router.post("/sendmessage/:id", middlewareController.verifyToken, messageController.sendMessage);
+router.post("/sendmessage/:receiverId", middlewareController.verifyToken, messageController.sendMessage);
 
 module.exports = router;
