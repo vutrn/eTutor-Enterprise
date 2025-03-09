@@ -1,26 +1,41 @@
 const mongoose = require("mongoose");
 
 const MeetingSchema = new mongoose.Schema({
-    title: { 
-        type: String, 
-        required: true 
-    },
-    date: { 
-        type: Date, 
-        required: true 
-    },
-    location: { 
-        type: String, 
-        required: true 
-    },
-    organizer: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User", required: true 
-    }, // Admin tạo cuộc họp
-    participants: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User" 
-    }] // Danh sách người tham gia
-}, { timestamps: true });
+  class: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "PersonalClassroom", 
+    required: true 
+  },
+  title: { 
+    type: String, 
+    required: true 
+  },
+  description: { 
+    type: String 
+  },
+  location: { 
+    type: String, 
+    required: true 
+  },
+  time: { 
+    type: Date, 
+    required: true 
+  },
+  attendees: [
+    {
+      student: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      attended: { type: Boolean, default: false }
+    }
+  ],
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User", 
+    required: true 
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
 module.exports = mongoose.model("Meeting", MeetingSchema);
