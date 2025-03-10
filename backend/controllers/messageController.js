@@ -2,69 +2,103 @@
   const Message = require("../models/Message.js");
   const User = require("../models/User.js");
   const Cloudinary = require("../lib/cloudinary.js");
+  const PersonalClass = require("../models/PersonalClass");
 
   const messageController = {
-  getUserToChat : async (req, res) => {
-      try {
-      const loggedInUserId = req.user.id;
-      const filteredUsers = await User.find({ id: { $ne: loggedInUserId } }).select("-password");
-      res.status(200).json(filteredUsers);
-      } catch (error) {
-      console.log("Error in getting users to chat", error.message);
-      res.status(500).json({ message: "Server error" });
+
+    // Lấy danh sách thành viên trong lớp học
+  getUserToChat: async (req, res) => {
+    try {
+      const { classId } = req.params; 
+      // Lấy thông tin lớp học từ ID
+      const classroom = await PersonalClass.findById(classId).populate("students tutor admin", "-password");
+      if (!classroom) {
+        return res.status(404).json({ message: "Lớp học không tồn tại" });
       }
-      },
 
-  getMessages : async (req, res) => {
-      try {
-      const { id: userToChatId } = req.params;
-      const myId = req.user._id;
+      // Danh sách
+      const members = [
+        classroom.admin,
+        classroom.tutor,
+        ...classroom.students,
+      ].filter((user) => user !== null); 
+      res.status(200).json(members);
+    } catch (error) {
+      console.log("Error in getting users to chat:", error.message);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
 
+  // Lấy tin nhắn giữa user hiện tại và người khác trong lớp
+  getMessages: async (req, res) => {
+    try {
+      const { receiverId } = req.params;
+      const senderId = req.user.id;
+
+      // Truy vấn tin nhắn giữa hai người
       const messages = await Message.find({
         $or: [
-          { senderId: myId, receiverId: userToChatId },
-          { senderId: userToChatId, receiverId: myId },
+          { senderId, receiverId },
+          { senderId: receiverId, receiverId: senderId },
         ],
-      });
+      }).sort({ createdAt: 1 }); // Sắp xếp theo thời gian
 
       res.status(200).json(messages);
-      } catch (error) {
+    } catch (error) {
       console.log("Error in getting messages:", error.message);
       res.status(500).json({ message: "Server error" });
-      }
-      },
+    }
+  },
 
-  sendMessage : async (req, res) => {
-      try {
+  // Gửi tin nhắn trong lớp học
+  sendMessage: async (req, res) => {
+    try {
       const { text, image } = req.body;
       const { id: receiverId } = req.params;
       const senderId = req.user.id;
-
+  
+      //Tìm lớp học mà cả sender và receiver đều tham gia
+      const commonClass = await PersonalClass.findOne({
+        $or: [
+          { tutor: senderId, students: receiverId },
+          { tutor: receiverId, students: senderId },
+          { admin: senderId, students: receiverId },
+          { admin: receiverId, students: senderId },
+          { tutor: senderId, admin: receiverId },
+          { tutor: receiverId, admin: senderId }
+        ],
+      });
+  
+      if (!commonClass) {
+        return res.status(403).json({ message: "Người nhận không nằm trong lớp của bạn!" });
+      }
+  
       let imageUrl = "";
       if (image) {
-        const uploadResponse = await cloudinary.uploader.upload(image, {folder: "blogs"});
+        const uploadResponse = await Cloudinary.uploader.upload(image, { folder: "messages" });
         imageUrl = uploadResponse.secure_url;
       }
-
-      const newMessage = Message({
+  
+      const newMessage = new Message({
         senderId,
         receiverId,
         text,
         image: imageUrl,
       });
+  
       await newMessage.save();
-
+  
       const receiverSocketId = getReceiverSocketId(receiverId);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("newMessage", newMessage);
       }
-
+  
       res.status(200).json(newMessage);
-      } catch (error) {
-      console.log("Error in sending message controller:", error.message);
+    } catch (error) {
+      console.log("Error in sending message:", error.message);
       res.status(500).json({ message: "Server error" });
-      }
-      },
-  };
+    }
+  }
+};
 
-  module.exports = messageController;
+module.exports = messageController;
