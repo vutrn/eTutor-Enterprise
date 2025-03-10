@@ -89,7 +89,7 @@ const TutorNavigator = () => {
         name="class_feature_tab"
         component={ClassFeaturesTab}
         options={({ route }: any) => ({
-          title: route.params?.className,
+          title: route.params?.params?.name,
         })}
       />
     </Stack.Navigator>

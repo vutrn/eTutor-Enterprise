@@ -50,7 +50,7 @@ export const App = () => {
     };
     checkToken();
 
-    const tokenCheckInterval = setInterval(checkToken, 60000); // Check every minute
+    const tokenCheckInterval = setInterval(checkToken, 100000); // Check every minute
     return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
