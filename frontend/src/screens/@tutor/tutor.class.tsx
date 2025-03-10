@@ -8,31 +8,33 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    getDashboard();
+    loadDashboard();
     getUsers();
   }, []);
 
-  const getTutorNameById = (tutorId: any) => {
-    const tutor = tutors.find((value) => value._id === tutorId);
-    return tutor ? tutor.username : "{Tutor}";
+  const loadDashboard = async () => {
+    setRefreshing(true);
+    await getDashboard();
+    setRefreshing(false);
   };
-
-  console.log("Dashboard: ", dashboard);
 
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const renderItem = ({ item }: { item: any }) => {
     return (
-      <Card style={styles.classCard} onPress={() => {navigation.navigate("class_feature_tab") }}>
-        <Card.Title title={item.name} subtitle={`Tutor: ${getTutorNameById(item.tutor)}`} right={() => <IconButton icon="arrow-right" /> } />
-        <Card.Content>
-          <Text style={styles.studentCount}>Students: {item.students.length}</Text>
-          <Text style={styles.dateInfo}>
-            Date: {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
-          </Text>
-        </Card.Content>
+      <Card
+        style={styles.classCard}
+        onPress={() => {
+          navigation.navigate("class_feature_tab", {
+            screen: "tutor_class_detail",
+            params: item,
+          });
+        }}
+      >
+          <Card.Title title={item.name} right={() => <IconButton icon="arrow-right" />} />
       </Card>
     );
   };
@@ -40,12 +42,14 @@ const TutorClass = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>My Classes</Text>
-      {dashboard.classes && dashboard.classes.length > 0 ? (
+      {dashboard.classes ? (
         <FlatList
           data={dashboard.classes}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
           renderItem={renderItem}
+          refreshing={refreshing}
+          onRefresh={loadDashboard}
         />
       ) : (
         <Text style={styles.emptyText}>No classes found</Text>
@@ -83,25 +87,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-  },
-  className: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  tutorName: {
-    fontSize: 16,
-    color: "#555",
-    marginBottom: 4,
-  },
-  studentCount: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
-  },
-  dateInfo: {
-    fontSize: 12,
-    color: "#888",
   },
   emptyText: {
     textAlign: "center",
