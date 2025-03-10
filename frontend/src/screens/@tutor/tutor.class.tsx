@@ -1,9 +1,9 @@
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Card, IconButton } from "react-native-paper";
 import { useDashboardStore } from "../../store/useDashboadStore";
 import { useUserStore } from "../../store/useUserStore";
-import { Card, IconButton } from "react-native-paper";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
@@ -29,12 +29,11 @@ const TutorClass = () => {
         style={styles.classCard}
         onPress={() => {
           navigation.navigate("class_feature_tab", {
-            screen: "tutor_class_detail",
             params: item,
           });
         }}
       >
-          <Card.Title title={item.name} right={() => <IconButton icon="arrow-right" />} />
+        <Card.Title title={item.name} right={() => <IconButton icon="arrow-right" />} />
       </Card>
     );
   };

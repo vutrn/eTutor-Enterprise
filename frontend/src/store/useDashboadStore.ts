@@ -44,7 +44,7 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
       });
 
       set({ dashboard: res.data });
-      console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
+      // console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {
       console.log("🚀 ~ getDashboard: ~ error:", error);
       Toast.show({ type: "error", text1: "Failed to get dashboard" });
