@@ -3,10 +3,19 @@ import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
 
-type ClassState = {
+interface ClassState  {
   classes: any[];
   loading: boolean;
+  selectedClass: {
+    _id: string;
+    name: string;
+    students: any[];
+    tutor: string;
+    adminId: string;
+    createdAt: string;
+  };
 
+  setSelectedClass: (selectedClass: any) => void;
   getClasses: () => Promise<void>;
   createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
   updateClass: (
@@ -22,6 +31,16 @@ type ClassState = {
 export const useClassStore = create<ClassState>((set, get) => ({
   classes: [],
   loading: false,
+  selectedClass: {
+    _id: "",
+    name: "",
+    students: [],
+    tutor: "",
+    adminId: "",
+    createdAt: "",
+  },
+
+  setSelectedClass: (selectedClass: any) => set({ selectedClass }),
 
   getClasses: async () => {
     set({ loading: true });

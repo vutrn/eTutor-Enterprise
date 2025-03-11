@@ -13,9 +13,10 @@ type RootStackParamList = {
   admin_profile: undefined;
 
   // Tutor navigator
+  tutor_class_stack: undefined;
   tutor_dashboard: undefined;
   tutor_class: undefined;
-  class_feature_tab:
+  tutor_feature_stack:
     | {
         params: {
           name: string;

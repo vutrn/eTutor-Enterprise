@@ -4,10 +4,12 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Card, IconButton } from "react-native-paper";
 import { useDashboardStore } from "../../store/useDashboadStore";
 import { useUserStore } from "../../store/useUserStore";
+import { useClassStore } from "../../store/useClassStore";
 
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
+  const { selectedClass, setSelectedClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -24,12 +26,14 @@ const TutorClass = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const renderItem = ({ item }: { item: any }) => {
+    // setSelectedClass(item);
     return (
       <Card
         style={styles.classCard}
         onPress={() => {
-          navigation.navigate("class_feature_tab", {
-            params: item,
+          setSelectedClass(item);
+          navigation.navigate("tutor_feature_stack", {
+            params: item
           });
         }}
       >

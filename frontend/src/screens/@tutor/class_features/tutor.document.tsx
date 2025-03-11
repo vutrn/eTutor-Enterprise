@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-const TutorDocument = ({ route }: any) => {
+const TutorDocument = () => {
   return (
     <View>
       <Text>Tutor Document</Text>

@@ -16,8 +16,8 @@ const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.cl
 
 const ClassFeaturesTab = ({ route }: any) => {
   const Tab = createBottomTabNavigator();
-  const selectedClass = route.params?.params;
-  console.log("selectedClass", selectedClass);
+  // const selectedClass = route.params?.params;
+  // console.log("selectedClass", selectedClass);
   return (
     <Tab.Navigator
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
@@ -42,25 +42,21 @@ const ClassFeaturesTab = ({ route }: any) => {
         name="tutor_class_detail"
         component={ClassDetail}
         options={{ title: "Class Detail" }}
-        initialParams={selectedClass}
       />
       <Tab.Screen
         name="tutor_message"
         component={TutorMessage}
         options={{ title: "Message" }}
-        initialParams={selectedClass}
       />
       <Tab.Screen
         name="tutor_meeting"
         component={TutorMeeting}
         options={{ title: "Meeting" }}
-        initialParams={selectedClass}
       />
       <Tab.Screen
         name="tutor_document"
         component={TutorDocument}
         options={{ title: "Document" }}
-        initialParams={selectedClass}
       />
     </Tab.Navigator>
   );
@@ -106,12 +102,12 @@ const TutorNavigator = () => {
       screenOptions={{ presentation: "card", animation: "slide_from_right" }}
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
-      <Stack.Screen name="tutor_class" component={TutorTab} options={{ headerShown: false }} />
+      <Stack.Screen name="tutor_class_stack" component={TutorTab} options={{ headerShown: false }} />
       <Stack.Screen
-        name="class_feature_tab"
+        name="tutor_feature_stack"
         component={ClassFeaturesTab}
         options={({ route }: any) => ({
-          title: route.params?.classData?.name || "Class Detail",
+          title: route.params?.params?.name || "Class Detail",
         })}
       />
     </Stack.Navigator>

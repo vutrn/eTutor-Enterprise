@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-const TutorMeeting = ({ route }: any) => {
+const TutorMeeting = () => {
   return (
     <View>
       <Text>Tutor Meeting</Text>

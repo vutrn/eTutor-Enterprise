@@ -3,16 +3,19 @@ import React, { useEffect } from "react";
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 import { useDashboardStore } from "../../../store/useDashboadStore";
 import { useUserStore } from "../../../store/useUserStore";
-
+import { useClassStore } from "../../../store/useClassStore";
 
 const TuTorClassDetail = () => {
-  const route: RouteProp<RootStackParamList, "tutor_class_detail"> = useRoute();
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
+  const { selectedClass } = useClassStore();
 
   useEffect(() => {
-    getDashboard();
-    getUsers();
+    const loadData = async () => {
+      await getDashboard();
+      await getUsers();
+    }
+    loadData();
   }, []);
 
   const getTutorNameById = (tutorId: any) => {
@@ -20,16 +23,14 @@ const TuTorClassDetail = () => {
     return tutor ? tutor.username : "{Tutor}";
   };
 
-  // console.log("detail route", route);
-
   return (
     <SafeAreaView>
-      <Text>classname: {route.params?.name}</Text>
-      <Text>tutor: {getTutorNameById(route.params?.tutor)}</Text>
-      <Text>students: {route.params?.students.length}</Text>
+      <Text>classname: {selectedClass.name}</Text>
+      <Text>tutor: {getTutorNameById(selectedClass.tutor)}</Text>
+      <Text>students: {selectedClass.students.length}</Text>
       <Text>
         createdAt:
-        {new Date(route.params?.createdAt).toLocaleDateString("vi-VN", {
+        {new Date(selectedClass.createdAt).toLocaleDateString("vi-VN", {
           day: "numeric",
           month: "numeric",
           year: "numeric",
