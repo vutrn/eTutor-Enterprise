@@ -13,6 +13,7 @@ const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/tutor.m
 const TutorMessage = lazy(() => import("../screens/@tutor/class_features/tutor.message"));
 const TutorProfile = lazy(() => import("../screens/@tutor/tutor.profile"));
 const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));
+const MessageDetail = lazy(() => import("../screens/@tutor/class_features/message.detail"));
 
 const ClassFeaturesTab = ({ route }: any) => {
   const Tab = createBottomTabNavigator();
@@ -109,6 +110,11 @@ const TutorNavigator = () => {
         options={({ route }: any) => ({
           title: route.params?.params?.name || "Class Detail",
         })}
+      />
+      <Stack.Screen
+        name="tutor_message_detail"
+        component={MessageDetail}
+        options={{ title: "Messages" }}
       />
     </Stack.Navigator>
   );

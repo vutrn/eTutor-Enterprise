@@ -2,12 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
+import { useAuthStore } from "./useAuthStore";
 
 interface MessageState {
   messages: {
     senderId: string;
     receiverId: string;
     text: string;
+    image: string;
     createdAt: string;
   }[];
   users: any[];
@@ -30,6 +32,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       senderId: "",
       receiverId: "",
       text: "",
+      image: "",
       createdAt: "",
     },
   ],
@@ -54,10 +57,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         },
       });
 
-      const filteredUsers = res.data.filter((user: any) => user._id !== get().selectedUser._id);
+      const { authUser } = useAuthStore.getState();
+      const filteredUsers = res.data.filter((user: any) => user._id !== authUser._id);
       set({ users: filteredUsers });
-
-      // console.log("🚀 ~ getUsersToChat: ~ res.data:", res.data);
     } catch (error: any) {
       Toast.show({ type: "error", text1: "Error fetching users", text2: error?.message });
       console.error("Error fetching users:", error);

@@ -3,38 +3,29 @@ import { FlatList, SafeAreaView, Text, View } from "react-native";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { Button, TextInput } from "react-native-paper";
 import { useClassStore } from "../../../store/useClassStore";
+import { useNavigation } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 
 const TutorMessage = () => {
-  const {
-    getUsersToChat,
-    getMessages,
-    sendMessage,
-    setSelectedUser,
-    users,
-    messages,
-    selectedUser,
-  } = useMessageStore();
+  const { getUsersToChat, setSelectedUser, users } = useMessageStore();
   const { selectedClass } = useClassStore();
-  const [newMessage, setNewMessage] = useState("");
+
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
     getUsersToChat(selectedClass._id);
-    getMessages(selectedUser._id);
+  }, [selectedClass._id]);
 
-    console.log("message:", messages);
-  }, [selectedUser._id, getMessages]);
-
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      sendMessage(newMessage);
-      setNewMessage("");
-    }
+  const handleSelectUser = (user: any) => {
+    setSelectedUser(user);
+    navigation.navigate("tutor_message_detail");
   };
 
   const renderItem = ({ item }: any) => {
     return (
-      <Button mode="contained" style={{ margin: 10 }} onPress={() => setSelectedUser(item)}>
-        <Text>NAME: {item.username}</Text>
+      <Button mode="contained" style={{ margin: 10 }} onPress={() => handleSelectUser(item)}>
+        <Text> {item.username}</Text>
+        <Text> {item._id} </Text>
       </Button>
     );
   };

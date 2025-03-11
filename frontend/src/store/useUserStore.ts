@@ -9,6 +9,7 @@ import { useAuthStore } from "./useAuthStore";
 type UserState = {
   students: any[];
   tutors: any[];
+  users: any[];
   loading: boolean;
   getUsers: () => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
@@ -20,6 +21,7 @@ export const useUserStore = create<UserState>()(
   (set) => ({
     students: [],
     tutors: [],
+    users: [],
     loading: false,
 
     getUsers: async () => {
@@ -37,7 +39,7 @@ export const useUserStore = create<UserState>()(
         });
         const students = res.data.filter((user: any) => user.role === "student");
         const tutors = res.data.filter((user: any) => user.role === "tutor");
-        set({ students, tutors, loading: false });
+        set({ students, tutors, users: res.data, loading: false });
       } catch (error: any) {
         set({ loading: false });
         console.log("🚀 ~ fetchUsers: ~ error:", error.response?.data?.message);

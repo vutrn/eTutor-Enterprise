@@ -9,7 +9,7 @@ import { useClassStore } from "../../store/useClassStore";
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
-  const { selectedClass, setSelectedClass } = useClassStore();
+  const { setSelectedClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,6 @@ const TutorClass = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const renderItem = ({ item }: { item: any }) => {
-    // setSelectedClass(item);
     return (
       <Card
         style={styles.classCard}

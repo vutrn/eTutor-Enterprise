@@ -56,6 +56,9 @@
       const { text, image } = req.body;
       const { id: receiverId } = req.params;
       const senderId = req.user.id;
+
+      console.log("Sender ID:", senderId);
+      console.log("Receiver ID:", receiverId);
   
       //Tìm lớp học mà cả sender và receiver đều tham gia
       const commonClass = await PersonalClass.findOne({
@@ -68,6 +71,8 @@
           { tutor: receiverId, admin: senderId }
         ],
       });
+      console.log("Common class found:", commonClass);
+
   
       if (!commonClass) {
         return res.status(403).json({ message: "Người nhận không nằm trong lớp của bạn!" });
