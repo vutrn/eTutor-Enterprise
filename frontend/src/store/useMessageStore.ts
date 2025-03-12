@@ -6,11 +6,13 @@ import { useAuthStore } from "./useAuthStore";
 
 interface MessageState {
   messages: {
+    _id: string;
     senderId: string;
     receiverId: string;
     text: string;
     image: string;
     createdAt: string;
+    updatedAt: string;
   }[];
   users: any[];
   selectedUser: {
@@ -29,11 +31,13 @@ interface MessageState {
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [
     {
+      _id: "",
       senderId: "",
       receiverId: "",
       text: "",
       image: "",
       createdAt: "",
+      updatedAt: "",
     },
   ],
   users: [],

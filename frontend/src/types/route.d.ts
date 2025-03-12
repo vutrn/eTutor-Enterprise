@@ -41,6 +41,7 @@ type RootStackParamList = {
       _id: string;
     };
   };
+  tutor_message_detail: undefined;
   tutor_document: undefined;
   tutor_meeting: undefined;
   tutor_profile: undefined;
