@@ -14,7 +14,13 @@ interface MessageState {
     createdAt: string;
     updatedAt: string;
   }[];
-  users: any[];
+  users: {
+    _id: string;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  }[];
   selectedUser: {
     _id: string;
     username: string;
@@ -40,7 +46,15 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       updatedAt: "",
     },
   ],
-  users: [],
+  users: [
+    {
+      _id: "",
+      username: "",
+      email: "",
+      role: "",
+      createdAt: "",
+    },
+  ],
   selectedUser: {
     _id: "",
     username: "",
@@ -62,10 +76,16 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       });
 
       const { authUser } = useAuthStore.getState();
-      const filteredUsers = res.data.filter((user: any) => user._id !== authUser._id);
+      const filteredUsers = res.data.filter(
+        (user: any) => user._id !== authUser._id
+      );
       set({ users: filteredUsers });
     } catch (error: any) {
-      Toast.show({ type: "error", text1: "Error fetching users", text2: error?.message });
+      Toast.show({
+        type: "error",
+        text1: "Error fetching users",
+        text2: error?.message,
+      });
       console.error("Error fetching users:", error);
     }
   },
@@ -75,14 +95,21 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
 
-      const res = await axiosInstance.get(`v1/message/getmessage/${receiverId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosInstance.get(
+        `v1/message/getmessage/${receiverId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       set({ messages: res.data });
     } catch (error: any) {
-      Toast.show({ type: "error", text1: "Error fetching messages", text2: error.response });
+      Toast.show({
+        type: "error",
+        text1: "Error fetching messages",
+        text2: error.response,
+      });
       console.error("Error fetching messages:", error);
     }
   },

@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, SafeAreaView, StyleSheet, View } from "react-native";
+import { FlatList, Image, SafeAreaView, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { useUserStore } from "../../../store/useUserStore";
@@ -19,7 +19,7 @@ const MessageDetail = () => {
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      sendMessage({ text: newMessage, image: image });
+      sendMessage({ text: newMessage });
       setNewMessage("");
     }
   };
@@ -33,7 +33,7 @@ const MessageDetail = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
     });
     console.log(result);
     if (!result.canceled) {
@@ -51,33 +51,21 @@ const MessageDetail = () => {
 
   return (
     <SafeAreaView>
-      <View style={{ flex: 1 }}>
-        <FlatList data={messages} keyExtractor={(item) => item._id} renderItem={renderItem} />
-        <View
-          style={{
-            borderBottomColor: "black",
-            borderBottomWidth: StyleSheet.hairlineWidth,
-          }}
-        />
-        {image && <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />}
-        <View style={styles.inputContainer}>
-          <TextInput value={newMessage} onChangeText={setNewMessage} style={{ flex: 1 }} />
+      <FlatList
+        data={messages}
+        keyExtractor={(item) => item.senderId}
+        renderItem={renderItem}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
 
-          <Button onPress={handleSendMessage} mode="contained">
-            Send
-          </Button>
-          <Button onPress={pickImage}>Pick an image from camera roll</Button>
-        </View>
-      </View>
+      {image && <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />}
+      <TextInput value={newMessage} onChangeText={setNewMessage} />
+      <Button onPress={handleSendMessage} mode="contained">
+        Send
+      </Button>
+      <Button onPress={pickImage}>Pick an image from camera roll</Button>
     </SafeAreaView>
   );
 };
-const styles = StyleSheet.create({
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 10,
-  },
-});
+
 export default MessageDetail;

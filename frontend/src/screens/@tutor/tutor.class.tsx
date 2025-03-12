@@ -1,7 +1,7 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import { Card, IconButton } from "react-native-paper";
+import { Avatar, Card, IconButton } from "react-native-paper";
 import { useDashboardStore } from "../../store/useDashboadStore";
 import { useUserStore } from "../../store/useUserStore";
 import { useClassStore } from "../../store/useClassStore";
@@ -32,11 +32,20 @@ const TutorClass = () => {
         onPress={() => {
           setSelectedClass(item);
           navigation.navigate("tutor_feature_stack", {
-            params: item
+            params: item,
           });
         }}
       >
-        <Card.Title title={item.name} right={() => <IconButton icon="arrow-right" />} />
+        <Card.Title
+          title={item.name}
+          left={() => (
+            <Avatar.Text
+              size={40}
+              label={item.name.substring(0, 2).toUpperCase()}
+            />
+          )}
+          right={() => <IconButton icon="arrow-right" />}
+        />
       </Card>
     );
   };
