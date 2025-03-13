@@ -4,24 +4,38 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
 import { useRoute } from "@react-navigation/native";
+import { useClassStore } from "../store/useClassStore";
+import { useMessageStore } from "../store/useMessageStore";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorBlog = lazy(() => import("../screens/@tutor/tutor.blog"));
 const TutorClass = lazy(() => import("../screens/@tutor/tutor.class"));
-const TutorDocument = lazy(() => import("../screens/@tutor/class_features/tutor.document"));
-const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/tutor.meeting"));
-const TutorMessage = lazy(() => import("../screens/@tutor/class_features/tutor.message"));
+const TutorDocument = lazy(
+  () => import("../screens/@tutor/class_features/tutor.document")
+);
+const TutorMeeting = lazy(
+  () => import("../screens/@tutor/class_features/tutor.meeting")
+);
+const TutorMessage = lazy(
+  () => import("../screens/@tutor/class_features/tutor.message")
+);
 const TutorProfile = lazy(() => import("../screens/@tutor/tutor.profile"));
-const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));
-const MessageDetail = lazy(() => import("../screens/@tutor/class_features/message.detail"));
+const ClassDetail = lazy(
+  () => import("../screens/@tutor/class_features/tutor.class.detail")
+);
+const MessageDetail = lazy(
+  () => import("../screens/@tutor/class_features/message.detail")
+);
 
-const ClassFeaturesTab = ({ route }: any) => {
+const ClassFeaturesTab = () => {
   const Tab = createBottomTabNavigator();
   // const selectedClass = route.params?.params;
   // console.log("selectedClass", selectedClass);
   return (
     <Tab.Navigator
-      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
+      screenLayout={({ children }) => (
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+      )}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: any = "home";
@@ -68,7 +82,9 @@ const TutorTab = () => {
 
   return (
     <Tab.Navigator
-      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
+      screenLayout={({ children }) => (
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+      )}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: any = "home";
@@ -89,32 +105,50 @@ const TutorTab = () => {
         component={TutorDashboard}
         options={{ title: "Dashboard" }}
       />
-      <Tab.Screen name="tutor_class" component={TutorClass} options={{ title: "Class" }} />
-      <Tab.Screen name="tutor_blog" component={TutorBlog} options={{ title: "Blog" }} />
-      <Tab.Screen name="tutor_profile" component={TutorProfile} options={{ title: "Profile" }} />
+      <Tab.Screen
+        name="tutor_class"
+        component={TutorClass}
+        options={{ title: "Class" }}
+      />
+      <Tab.Screen
+        name="tutor_blog"
+        component={TutorBlog}
+        options={{ title: "Blog" }}
+      />
+      <Tab.Screen
+        name="tutor_profile"
+        component={TutorProfile}
+        options={{ title: "Profile" }}
+      />
     </Tab.Navigator>
   );
 };
 
 const TutorNavigator = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const { selectedClass } = useClassStore();
+  const { selectedUser } = useMessageStore();
   return (
     <Stack.Navigator
       screenOptions={{ presentation: "card", animation: "slide_from_right" }}
-      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
+      screenLayout={({ children }) => (
+        <Suspense fallback={<Loading />}>{children}</Suspense>
+      )}
     >
-      <Stack.Screen name="tutor_class_stack" component={TutorTab} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="tutor_class_stack"
+        component={TutorTab}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="tutor_feature_stack"
         component={ClassFeaturesTab}
-        options={({ route }: any) => ({
-          title: route.params?.params?.name || "Class Detail",
-        })}
+        options={{ title: selectedClass?.name || "Class Detail" }}
       />
       <Stack.Screen
         name="tutor_message_detail"
         component={MessageDetail}
-        options={{ title: "Messages" }}
+        options={{ title: selectedUser?.username || "Messages" }}
       />
     </Stack.Navigator>
   );

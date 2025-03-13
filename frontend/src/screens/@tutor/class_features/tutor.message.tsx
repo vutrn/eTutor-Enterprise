@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   buttonContent: {
     justifyContent: "flex-start",
     padding: 10,
-    
   },
   avatar: {
     backgroundColor: "#7886C7",
