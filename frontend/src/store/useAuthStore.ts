@@ -18,7 +18,7 @@ interface AuthState {
   verifyToken: () => Promise<boolean>;
 }
 
-export const useAuthStore = create<AuthState, [["zustand/persist", unknown]]>(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       authUser: null,

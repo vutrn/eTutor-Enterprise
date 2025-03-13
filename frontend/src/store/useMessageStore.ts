@@ -31,7 +31,7 @@ interface MessageState {
   setSelectedUser: (selectedUser: any) => void;
   getUsersToChat: (classId: string) => Promise<void>;
   getMessages: (receiverId: string) => Promise<void>;
-  sendMessage: (messageData: any) => Promise<void>;
+  sendMessage: (messageData: { text: string; image?: string }) => Promise<void>;
 }
 
 export const useMessageStore = create<MessageState>((set, get) => ({
@@ -114,7 +114,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
-  sendMessage: async (messageData: any) => {
+  sendMessage: async (messageData: { text: string; image?: string }) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
@@ -130,8 +130,25 @@ export const useMessageStore = create<MessageState>((set, get) => ({
           },
         }
       );
+
+      // if (messageData.image) {
+      //   const response = await fetch(messageData.image);
+      //   const blob = await response.blob();
+      //   console.log("blob", blob);
+      //   const reader = new FileReader();
+      //   reader.readAsDataURL(blob);
+      //   reader.onloadend = () => {
+      //     const base64data = reader.result;
+      //     console.log("base64data", base64data);
+      //     set({
+      //       messages: [...messages, { ...res.data, image: base64data }],
+      //     });
+      //   };
+      // }
+
+      //TODO: socket io
+
       set({ messages: [...messages, res.data] });
-      console.log("🚀 ~ sendMessage: ~ res:", res);
     } catch (error) {
       console.error("Error sending message:", error);
     }

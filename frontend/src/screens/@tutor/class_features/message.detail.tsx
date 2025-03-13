@@ -1,5 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   Image,
@@ -20,6 +20,7 @@ const MessageDetail = () => {
   const { users, getUsers } = useUserStore();
   const [newMessage, setNewMessage] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     getMessages(selectedUser._id);
@@ -27,10 +28,48 @@ const MessageDetail = () => {
     console.log("selected user:", selectedUser);
   }, [selectedUser._id]);
 
+  useEffect(() => {
+    if (flatListRef.current && messages) {
+      flatListRef.current.scrollToEnd();
+    }
+  }, [messages]);
+
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      sendMessage({ text: newMessage });
-      setNewMessage("");
+    if (newMessage.trim() || image) {
+      const prepareAndSendMessage = async () => {
+        let processedImage = image;
+
+        if (image && Platform.OS !== "web") {
+          try {
+            const response = await fetch(image);
+            const blob = await response.blob();
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+              const base64data = reader.result;
+              sendMessage({
+                text: newMessage.trim() ? newMessage : "",
+                image: base64data ? base64data.toString() : undefined,
+              });
+              setNewMessage("");
+              setImage(null);
+            };
+          } catch (error) {
+            console.error("Error processing image:", error);
+            sendMessage({ text: newMessage });
+            setNewMessage("");
+            setImage(null);
+          }
+        }
+        sendMessage({
+          text: newMessage.trim() ? newMessage : "",
+          image: processedImage || undefined,
+        });
+        setNewMessage("");
+        setImage(null);
+      };
+
+      prepareAndSendMessage();
     }
   };
 
@@ -61,14 +100,16 @@ const MessageDetail = () => {
           : styles.sentMessage,
       ]}
     >
-      {/* <Text>{getSenderNameById(item.senderId)}</Text> */}
-      <Text>{item.text}</Text>
-      {item.image && (
-        <Image
-          source={{ uri: item.image }}
-          style={{ width: 100, height: 100 }}
-        />
-      )}
+      <View>
+        {item.image && (
+          <Image
+            source={{ uri: item.image }}
+            style={{ width: 100, height: 100 }}
+          />
+        )}
+
+        {item.text && <Text>{item.text}</Text>}
+      </View>
     </View>
   );
 
@@ -78,25 +119,29 @@ const MessageDetail = () => {
       style={styles.container}
       keyboardVerticalOffset={Platform.OS === "android" ? 90 : 0}
     >
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.senderId}
-        renderItem={renderItem}
-        contentContainerStyle={styles.messagesList}
-      />
-
-      <View style={styles.inputContainer}>
-        {image && (
-          <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />
-        )}
-        <TextInput
-          value={newMessage}
-          onChangeText={setNewMessage}
-          style={styles.input}
+      <>
+        <FlatList
+          data={messages}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.messagesList}
+          ref={flatListRef}
         />
-        <IconButton icon="send" onPress={handleSendMessage} size={30} />
-        <IconButton icon="camera" onPress={pickImage} size={30} />
-      </View>
+
+        {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+        <View style={styles.inputContainer}>
+          <IconButton icon="camera" onPress={pickImage} size={30} />
+          <TextInput
+            multiline
+            mode="outlined"
+            value={newMessage}
+            onChangeText={setNewMessage}
+            style={styles.input}
+            placeholder="Aa..."
+          />
+          <IconButton icon="send" onPress={handleSendMessage} size={30} />
+        </View>
+      </>
     </KeyboardAvoidingView>
   );
 };
@@ -106,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messageContainer: {
-    maxWidth: "80%",
+    maxWidth: "50%",
     marginVertical: 4,
     padding: 12,
     borderRadius: 16,
@@ -114,7 +159,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     padding: 16,
-    backgroundColor: "#FFFFFF",
+    // backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
   },
@@ -132,9 +177,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     backgroundColor: "#F3F4F6",
-    marginRight: 8,
+    marginHorizontal: 8,
     fontSize: 16,
-    fontFamily: FONTS.regular,
+  },
+
+  imagePreview: {
+    width: 100,
+    height: 100,
+    marginRight: 8,
   },
 });
 
