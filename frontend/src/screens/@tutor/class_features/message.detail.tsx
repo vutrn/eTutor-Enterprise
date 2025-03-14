@@ -29,8 +29,8 @@ const MessageDetail = () => {
   }, [selectedUser._id]);
 
   useEffect(() => {
-    if (flatListRef.current && messages) {
-      flatListRef.current.scrollToEnd();
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
 
@@ -101,14 +101,15 @@ const MessageDetail = () => {
       ]}
     >
       <View>
-        {item.image && (
-          <Image
-            source={{ uri: item.image }}
-            style={{ width: 100, height: 100 }}
-          />
-        )}
-
-        {item.text && <Text>{item.text}</Text>}
+        <Text>
+          {item.image && (
+            <Image
+              source={{ uri: item.image }}
+              style={{ width: 100, height: 100 }}
+            />
+          )}
+        </Text>
+        <Text>{item.text && <Text>{item.text}</Text>}</Text>
       </View>
     </View>
   );

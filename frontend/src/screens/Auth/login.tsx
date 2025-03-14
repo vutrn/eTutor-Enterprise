@@ -6,7 +6,7 @@ import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
 import { FONTS } from "../../utils/constant";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput, Text, Button, ActivityIndicator } from "react-native-paper";
+import { TextInput, Text, Button, ActivityIndicator, Divider } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
@@ -50,6 +50,7 @@ const LoginScreen = () => {
               onKeyPress={(e) => {e.nativeEvent.key === "Enter" && handleLogin()}}
               mode="outlined"
               label="Username"
+              value={formData.username}
               onChangeText={(value) => setFormData({ ...formData, username: value })}
             />
           </View>
@@ -61,6 +62,7 @@ const LoginScreen = () => {
               secureTextEntry={!showPassword}
               label="Password"
               right={<TextInput.Icon icon="eye" onPress={() => setShowPassword(!showPassword)} />}
+              value={formData.password}
               onChangeText={(value) => setFormData({ ...formData, password: value })}
             />
           </View>
@@ -81,12 +83,7 @@ const LoginScreen = () => {
             </Button>
           )}
 
-          <View
-            style={{
-              borderBottomColor: "black",
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            }}
-          />
+          <Divider/>
 
           <View style={styles.linkContainer}>
             <Text variant="titleMedium">Don't have an account?{"  "}</Text>
