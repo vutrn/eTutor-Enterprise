@@ -6,15 +6,19 @@ import axiosInstance from "../utils/axios";
 type DashboardState = {
   dashboard: {
     role?: "admin" | "tutor" | "student";
-    // Admin fields
-    totalUsers?: number;
-    studentsCount?: number;
-    tutorsCount?: number;
-    // Tutor fields
     totalClasses?: number;
     totalStudents?: number;
-    // Common fields
-    classes?: any[];
+    classes?: {
+      _id: string;
+      name: string;
+      tutor: string;
+      students: {
+        _id: string;
+        username: string;
+      }[];
+      admin: string;
+      createdAt: string;
+    }[];
   };
 
   getDashboard: () => Promise<void>;
@@ -23,9 +27,6 @@ type DashboardState = {
 export const useDashboardStore = create<DashboardState>()((set) => ({
   dashboard: {
     role: undefined,
-    totalUsers: 0,
-    studentsCount: 0,
-    tutorsCount: 0,
     totalClasses: 0,
     totalStudents: 0,
     classes: [],
@@ -44,7 +45,7 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
       });
 
       set({ dashboard: res.data });
-      console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
+      // console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {
       console.log("🚀 ~ getDashboard: ~ error:", error);
       Toast.show({ type: "error", text1: "Failed to get dashboard" });

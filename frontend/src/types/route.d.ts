@@ -13,22 +13,35 @@ type RootStackParamList = {
   admin_profile: undefined;
 
   // Tutor navigator
+  tutor_class_stack: undefined;
   tutor_dashboard: undefined;
   tutor_class: undefined;
-  class_feature_tab:
+  tutor_feature_stack:
     | {
-        screen: "class_feature_tab" | "tutor_class_detail";
         params: {
           name: string;
           tutor: string;
           students: any[];
           createdAt: string;
+          _id: string;
         };
       }
     | undefined;
-  tutor_class_detail: undefined;
+  tutor_class_detail: {
+    name: string;
+    tutor: string;
+    students: any[];
+    createdAt: string;
+    _id: string;
+  };
+
   tutor_blog: undefined;
-  tutor_message: undefined;
+  tutor_message: {
+    params: {
+      _id: string;
+    };
+  };
+  tutor_message_detail: undefined;
   tutor_document: undefined;
   tutor_meeting: undefined;
   tutor_profile: undefined;

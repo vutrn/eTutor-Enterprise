@@ -1,13 +1,15 @@
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Avatar, Card, IconButton } from "react-native-paper";
 import { useDashboardStore } from "../../store/useDashboadStore";
 import { useUserStore } from "../../store/useUserStore";
-import { Card, IconButton } from "react-native-paper";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useClassStore } from "../../store/useClassStore";
 
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
+  const { setSelectedClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -28,13 +30,22 @@ const TutorClass = () => {
       <Card
         style={styles.classCard}
         onPress={() => {
-          navigation.navigate("class_feature_tab", {
-            screen: "tutor_class_detail",
+          setSelectedClass(item);
+          navigation.navigate("tutor_feature_stack", {
             params: item,
           });
         }}
       >
-          <Card.Title title={item.name} right={() => <IconButton icon="arrow-right" />} />
+        <Card.Title
+          title={item.name}
+          left={() => (
+            <Avatar.Text
+              size={40}
+              label={item.name.substring(0, 2).toUpperCase()}
+            />
+          )}
+          right={() => <IconButton icon="arrow-right" />}
+        />
       </Card>
     );
   };
