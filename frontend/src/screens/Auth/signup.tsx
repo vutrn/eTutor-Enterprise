@@ -3,7 +3,7 @@ import { Picker } from "@react-native-picker/picker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Divider, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -129,12 +129,7 @@ const SignUpScreen = () => {
             </Button>
           )}
 
-          <View
-            style={{
-              borderBottomColor: "black",
-              borderBottomWidth: StyleSheet.hairlineWidth,
-            }}
-          />
+          <Divider/>
 
           <View style={styles.linkContainer}>
             <Text variant="titleMedium">Already have an account?</Text>
