@@ -109,7 +109,7 @@ const MessageDetail = () => {
             />
           )}
         </Text>
-        <Text>{item.text && <Text>{item.text}</Text>}</Text>
+        <Text>{item?.text}</Text>
       </View>
     </View>
   );
