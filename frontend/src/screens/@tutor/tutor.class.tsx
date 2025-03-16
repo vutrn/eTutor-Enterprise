@@ -2,19 +2,16 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Avatar, Card, IconButton } from "react-native-paper";
-import { useDashboardStore } from "../../store/useDashboadStore";
-import { useUserStore } from "../../store/useUserStore";
 import { useClassStore } from "../../store/useClassStore";
+import { useDashboardStore } from "../../store/useDashboadStore";
 
 const TutorClass = () => {
   const { getDashboard, dashboard } = useDashboardStore();
-  const { tutors, getUsers } = useUserStore();
   const { setSelectedClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadDashboard();
-    getUsers();
   }, []);
 
   const loadDashboard = async () => {

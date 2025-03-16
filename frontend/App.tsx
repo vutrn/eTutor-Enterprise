@@ -9,7 +9,7 @@ import {
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { Platform, Text } from "react-native";
+import { Text } from "react-native";
 import "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
 import Toast from "react-native-toast-message";
@@ -18,8 +18,6 @@ import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-import { FONTS } from "./src/utils/constant";
-import { FontDisplay } from "expo-font";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -95,7 +93,9 @@ export const App = () => {
   return (
     <>
       <PaperProvider>
-        <NavigationContainer theme={MyTheme}>{renderAppContent()}</NavigationContainer>
+        <NavigationContainer theme={MyTheme}>
+          {renderAppContent()}
+        </NavigationContainer>
       </PaperProvider>
       <Toast />
     </>

@@ -1,21 +1,10 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
-import axiosInstance from "../utils/axios";
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
-import { useAuthStore } from "./useAuthStore";
+import Toast from "react-native-toast-message";
+import { create } from "zustand";
+import { IUserState } from "../types/store";
+import axiosInstance from "../utils/axios";
 
-type UserState = {
-  students: any[];
-  tutors: any[];
-  users: any[];
-  loading: boolean;
-  getUsers: () => Promise<void>;
-  deleteUser: (userId: string) => Promise<void>;
-};
-
-export const useUserStore = create<UserState>()(
+export const useUserStore = create<IUserState>()(
   // devtools(
   //   persist(
   (set) => ({

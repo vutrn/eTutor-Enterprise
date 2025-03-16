@@ -3,36 +3,7 @@ import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
 import { useAuthStore } from "./useAuthStore";
-
-interface MessageState {
-  messages: {
-    _id: string;
-    senderId: string;
-    receiverId: string;
-    text: string;
-    image: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-  users: {
-    _id: string;
-    username: string;
-    email: string;
-    role: string;
-    createdAt: string;
-  }[];
-  selectedUser: {
-    _id: string;
-    username: string;
-    email: string;
-    role: string;
-  };
-
-  setSelectedUser: (selectedUser: any) => void;
-  getUsersToChat: (classId: string) => Promise<void>;
-  getMessages: (receiverId: string) => Promise<void>;
-  sendMessage: (messageData: { text: string; image?: string }) => Promise<void>;
-}
+import { MessageState } from "../types/store";
 
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [
@@ -77,7 +48,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
       const { authUser } = useAuthStore.getState();
       const filteredUsers = res.data.filter(
-        (user: any) => user._id !== authUser._id
+        (user: any) => user._id !== authUser?._id
       );
       set({ users: filteredUsers });
     } catch (error: any) {

@@ -2,33 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
+import { IClassState } from "../types/store";
 
-interface ClassState  {
-  classes: any[];
-  loading: boolean;
-  selectedClass: {
-    _id: string;
-    name: string;
-    students: any[];
-    tutor: string;
-    adminId: string;
-    createdAt: string;
-  };
-
-  setSelectedClass: (selectedClass: any) => void;
-  getClasses: () => Promise<void>;
-  createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
-  updateClass: (
-    classId: string,
-    name: string,
-    tutorId: string,
-    studentIds: string[]
-  ) => Promise<boolean>;
-  deleteClass: (classId: string) => Promise<boolean>;
-  removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
-};
-
-export const useClassStore = create<ClassState>((set, get) => ({
+export const useClassStore = create<IClassState>((set, get) => ({
   classes: [],
   loading: false,
   selectedClass: {

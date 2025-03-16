@@ -1,12 +1,11 @@
-import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import { Button, Divider, HelperText, Text, TextInput } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
 import { FONTS } from "../../utils/constant";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput, Text, Button, ActivityIndicator, Divider } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
@@ -53,6 +52,9 @@ const LoginScreen = () => {
               value={formData.username}
               onChangeText={(value) => setFormData({ ...formData, username: value })}
             />
+            <HelperText type="error" visible={!formData.username.trim()} >
+              Username is required
+            </HelperText>
           </View>
           <View>
             <Text variant="titleMedium">Password</Text>
@@ -65,6 +67,9 @@ const LoginScreen = () => {
               value={formData.password}
               onChangeText={(value) => setFormData({ ...formData, password: value })}
             />
+            <HelperText type="error" visible={!formData.password} >
+              Password is required
+            </HelperText>
           </View>
 
           {isLoggingIn ? (
