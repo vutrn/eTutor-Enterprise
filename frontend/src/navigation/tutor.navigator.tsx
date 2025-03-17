@@ -3,29 +3,22 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
-import { useRoute } from "@react-navigation/native";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
+import { useBlogStore } from "../store/useBlogStore";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
-const TutorBlog = lazy(() => import("../screens/@tutor/tutor.blog"));
+const TutorBlog = lazy(() => import("../screens/@tutor/blog/tutor.blog"));
 const TutorClass = lazy(() => import("../screens/@tutor/tutor.class"));
-const TutorDocument = lazy(
-  () => import("../screens/@tutor/class_features/tutor.document")
-);
-const TutorMeeting = lazy(
-  () => import("../screens/@tutor/class_features/tutor.meeting")
-);
-const TutorMessage = lazy(
-  () => import("../screens/@tutor/class_features/tutor.message")
-);
+const TutorDocument = lazy(() => import("../screens/@tutor/class_features/tutor.document"));
+const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/tutor.meeting"));
+const TutorMessage = lazy(() => import("../screens/@tutor/class_features/tutor.message"));
 const TutorProfile = lazy(() => import("../screens/@tutor/tutor.profile"));
-const ClassDetail = lazy(
-  () => import("../screens/@tutor/class_features/tutor.class.detail")
-);
-const MessageDetail = lazy(
-  () => import("../screens/@tutor/class_features/message.detail")
-);
+const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));
+const MessageDetail = lazy(() => import("../screens/@tutor/class_features/message.detail"));
+const TutorBlogCreate = lazy(() => import("../screens/@tutor/blog/tutor.blog.create"));
+const TutorBlogUpdate = lazy(() => import("../screens/@tutor/blog/tutor.blog.update"));
+const TutorBlogDetail = lazy(() => import("../screens/@tutor/blog/tutor.blog.detail"));
 
 const ClassFeaturesTab = () => {
   const Tab = createBottomTabNavigator();
@@ -33,9 +26,7 @@ const ClassFeaturesTab = () => {
   // console.log("selectedClass", selectedClass);
   return (
     <Tab.Navigator
-      screenLayout={({ children }) => (
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-      )}
+      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: any = "home";
@@ -53,38 +44,20 @@ const ClassFeaturesTab = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen
-        name="tutor_class_detail"
-        component={ClassDetail}
-        options={{ title: "Class Detail" }}
-      />
-      <Tab.Screen
-        name="tutor_message"
-        component={TutorMessage}
-        options={{ title: "Message" }}
-      />
-      <Tab.Screen
-        name="tutor_meeting"
-        component={TutorMeeting}
-        options={{ title: "Meeting" }}
-      />
-      <Tab.Screen
-        name="tutor_document"
-        component={TutorDocument}
-        options={{ title: "Document" }}
-      />
+      <Tab.Screen name="tutor_class_detail" component={ClassDetail} options={{ title: "Class Detail" }} />
+      <Tab.Screen name="tutor_message" component={TutorMessage} options={{ title: "Message" }} />
+      <Tab.Screen name="tutor_meeting" component={TutorMeeting} options={{ title: "Meeting" }} />
+      <Tab.Screen name="tutor_document" component={TutorDocument} options={{ title: "Document" }} />
     </Tab.Navigator>
   );
 };
 
-const TutorTab = () => {
+const HomeTab = () => {
   const Tab = createBottomTabNavigator();
 
   return (
     <Tab.Navigator
-      screenLayout={({ children }) => (
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-      )}
+      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: any = "home";
@@ -100,27 +73,28 @@ const TutorTab = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen
-        name="tutor_dashboard"
-        component={TutorDashboard}
-        options={{ title: "Dashboard" }}
-      />
-      <Tab.Screen
-        name="tutor_class"
-        component={TutorClass}
-        options={{ title: "Class" }}
-      />
-      <Tab.Screen
-        name="tutor_blog"
-        component={TutorBlog}
-        options={{ title: "Blog" }}
-      />
-      <Tab.Screen
-        name="tutor_profile"
-        component={TutorProfile}
-        options={{ title: "Profile" }}
-      />
+      <Tab.Screen name="tutor_dashboard" component={TutorDashboard} options={{ title: "Dashboard" }} />
+      <Tab.Screen name="tutor_class" component={TutorClass} options={{ title: "Class" }} />
+      <Tab.Screen name="tutor_blog" component={BlogStack} options={{ headerShown: false }} />
+      <Tab.Screen name="tutor_profile" component={TutorProfile} options={{ title: "Profile" }} />
     </Tab.Navigator>
+  );
+};
+
+const BlogStack = () => {
+  const Stack = createNativeStackNavigator<RootStackParamList>();
+  const { selectedBlog } = useBlogStore();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{ presentation: "card", animation: "slide_from_right" }}
+      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
+    >
+      <Stack.Screen name="tutor_blog" component={TutorBlog} options={{ title: "Blog" }} />
+      <Stack.Screen name="tutor_blog_create" component={TutorBlogCreate} options={{ title: "Create Blog" }} />
+      <Stack.Screen name="tutor_blog_update" component={TutorBlogUpdate} options={{ title: "Edit Blog" }} />
+      <Stack.Screen name="tutor_blog_detail" component={TutorBlogDetail} options={{ title: "Details" }} />
+    </Stack.Navigator>
   );
 };
 
@@ -131,15 +105,9 @@ const TutorNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ presentation: "card", animation: "slide_from_right" }}
-      screenLayout={({ children }) => (
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-      )}
+      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
-      <Stack.Screen
-        name="tutor_class_stack"
-        component={TutorTab}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="tutor_class_stack" component={HomeTab} options={{ headerShown: false }} />
       <Stack.Screen
         name="tutor_feature_stack"
         component={ClassFeaturesTab}

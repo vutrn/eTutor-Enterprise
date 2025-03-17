@@ -15,6 +15,8 @@ type RootStackParamList = {
   // Tutor navigator
   tutor_class_stack: undefined;
   tutor_dashboard: undefined;
+
+  // TUTOR CLASS
   tutor_class: undefined;
   tutor_feature_stack:
     | {
@@ -34,14 +36,20 @@ type RootStackParamList = {
     createdAt: string;
     _id: string;
   };
-
-  tutor_blog: undefined;
   tutor_message: {
     params: {
       _id: string;
     };
   };
   tutor_message_detail: undefined;
+
+  // TUTOR BLOG 
+  tutor_blog: undefined;
+  tutor_blog_create: undefined;
+  tutor_blog_update: undefined;
+  tutor_blog_detail: undefined;
+
+
   tutor_document: undefined;
   tutor_meeting: undefined;
   tutor_profile: undefined;

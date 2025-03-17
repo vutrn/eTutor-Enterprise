@@ -40,22 +40,10 @@ export interface IClassState {
 
   setSelectedClass: (selectedClass: any) => void;
   getClasses: () => Promise<void>;
-  createClass: (
-    name: string,
-    tutorId: string,
-    studentIds: string[]
-  ) => Promise<boolean>;
-  updateClass: (
-    classId: string,
-    newName: string,
-    newTutorId: string,
-    studentIds: string[]
-  ) => Promise<boolean>;
+  createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
+  updateClass: (classId: string, newName: string, newTutorId: string, studentIds: string[]) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
-  removeStudentFromClass: (
-    classId: string,
-    studentId: string
-  ) => Promise<boolean>;
+  removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 }
 
 export interface MessageState {
@@ -112,7 +100,14 @@ export interface IDashboardState {
 export interface IUserState {
   students: any[];
   tutors: any[];
-  users: any[];
+  users: {
+    _id: string;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
   loading: boolean;
   getUsers: () => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
@@ -122,6 +117,7 @@ export interface IBlogState {
   blogs: {
     _id: string;
     title: string;
+    image?: string;
     content: string;
     author: {
       _id: string;
@@ -131,13 +127,33 @@ export interface IBlogState {
     comments: {
       _id: string;
       text: string;
-      userId: string;
-      createdAt: string; 
+      user: string;
+      createdAt: string;
     }[];
     createdAt: string;
     updatedAt: string;
   }[];
+  selectedBlog: {
+    _id: string;
+    title: string;
+    image?: string;
+    content: string;
+    author: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    comments: {
+      _id: string;
+      text: string;
+      user: string;
+      createdAt: string;
+    }[];
+    createdAt: string;
+    updatedAt: string;
+  };
 
+  setSelectedBlog: (selectedBlog: any) => void;
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
   createBlog: (title: string, content: string) => Promise<boolean>;

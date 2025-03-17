@@ -5,13 +5,27 @@ import { IBlogState } from "../types/store";
 
 export const useBlogStore = create<IBlogState>((set, get) => ({
   blogs: [],
+  selectedBlog: {
+    _id: "",
+    title: "",
+    content: "",
+    author: {
+      _id: "",
+      username: "",
+      email: "",
+    },
+    comments: [],
+    createdAt: "",
+
+    updatedAt: "",
+  },
+
+  setSelectedBlog: (selectedBlog: any) => set({ selectedBlog }),
 
   getAllBlogs: async () => {
     try {
-      const res = await axiosInstance.get("v1/blog/");
-      set({ blogs: res.data });
-
-      console.log("🚀 ~ getAllBlogs: ~ res.data:", res.data);
+      const res = await axiosInstance.get("v1/blog");
+      set({ blogs: res.data.blogs });
     } catch (error) {
       Toast.show({ type: "error", text1: "Failed to get blogs" });
       console.log("🚀 ~ getAllBlogs: ~ error:", error);
@@ -29,17 +43,14 @@ export const useBlogStore = create<IBlogState>((set, get) => ({
   },
 
   createBlog: async (title: string, content: string) => {
-
     return true;
   },
 
   updateBlog: async (blogId, title: string, content: string) => {
-
     return true;
   },
 
-  deleteBlog: async(blogId) => {
-    
+  deleteBlog: async (blogId) => {
     return true;
   },
 }));

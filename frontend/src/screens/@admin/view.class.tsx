@@ -58,7 +58,6 @@ const ViewClass = () => {
         onPress: async () => {
           try {
             await deleteClass(classId);
-            // Reload the class list after deletion
             await loadClasses();
           } catch (error) {
             console.error("Failed to delete class:", error);

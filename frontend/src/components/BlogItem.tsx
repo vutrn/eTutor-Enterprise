@@ -3,15 +3,13 @@ import { format } from "date-fns";
 import React from "react";
 import Feather from "@expo/vector-icons/Feather";
 
-
+interface BlogItemProps {
+  
+}
 
 const BlogItem = ({ post, onView, onEdit, onDelete }) => {
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onView}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity style={styles.container} onPress={onView} activeOpacity={0.7}>
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
           {post.title}
@@ -21,9 +19,7 @@ const BlogItem = ({ post, onView, onEdit, onDelete }) => {
         </Text>
         <View style={styles.meta}>
           <Text style={styles.author}>{post.author}</Text>
-          <Text style={styles.date}>
-            {format(new Date(post.createdAt), "MMM d, yyyy")}
-          </Text>
+          <Text style={styles.date}>{format(new Date(post.createdAt), "MMM d, yyyy")}</Text>
         </View>
       </View>
 
@@ -45,7 +41,7 @@ const BlogItem = ({ post, onView, onEdit, onDelete }) => {
             onDelete();
           }}
         >
-         <Feather name="trash" size={18} color="#FF3B30" />
+          <Feather name="trash" size={18} color="#FF3B30" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

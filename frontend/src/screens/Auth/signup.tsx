@@ -1,19 +1,8 @@
 import { Picker } from "@react-native-picker/picker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import {
-  Dimensions,
-  KeyboardAvoidingView,
-  StyleSheet,
-  View,
-} from "react-native";
-import {
-  Button,
-  Divider,
-  HelperText,
-  Text,
-  TextInput,
-} from "react-native-paper";
+import { Dimensions, KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import { Button, Divider, HelperText, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -92,9 +81,7 @@ const SignUpScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior="padding">
-        <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>
-          Sign Up
-        </Text>
+        <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
         <View>
           {/* Username Input */}
           <View style={{ marginBottom: 20 }}>
@@ -103,13 +90,18 @@ const SignUpScreen = () => {
               label="Username"
               mode="outlined"
               value={formData.username}
-              onChangeText={(text) =>
-                setFormData({ ...formData, username: text })
-              }
+              onChangeText={(text) => setFormData({ ...formData, username: text })}
             />
-            <HelperText type="error" visible={!formData.username.trim()}>
-              Username is required
-            </HelperText>
+            {!formData.username.trim() ? (
+              <HelperText type="error" visible={true}>
+                Username is required
+              </HelperText>
+            ) : null}
+            {formData.username && formData.username.length < 5 ? (
+              <HelperText type="error" visible={true}>
+                Username must be at least 5 characters
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Email Input */}
@@ -122,20 +114,33 @@ const SignUpScreen = () => {
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               keyboardType="email-address"
             />
-            <HelperText type="error" visible={!formData.email.trim()}>
-              Email is required
-            </HelperText>
+            {!formData.email.trim() ? (
+              <HelperText type="error" visible={true}>
+                Email is required
+              </HelperText>
+            ) : null}
+            {formData.email && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(formData.email) ? (
+              <HelperText type="error" visible={true}>
+                Invalid email format
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Role Picker */}
-          <View style={{ marginBottom: 20 }}>
-            <Text variant="titleMedium">Role</Text>
+          <View
+            style={{
+              marginBottom: 20,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text variant="titleMedium" style={{ flex: 1 }}>
+              I want to be a{" "}
+            </Text>
             <Picker
               selectedValue={formData.role}
               style={styles.picker}
-              onValueChange={(itemValue) =>
-                setFormData({ ...formData, role: itemValue })
-              }
+              onValueChange={(itemValue) => setFormData({ ...formData, role: itemValue })}
             >
               <Picker.Item label="Student" value="student" />
               <Picker.Item label="Tutor" value="tutor" />
@@ -149,14 +154,19 @@ const SignUpScreen = () => {
               label="Password"
               mode="outlined"
               value={formData.password}
-              onChangeText={(text) =>
-                setFormData({ ...formData, password: text })
-              }
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
               secureTextEntry
             />
-            <HelperText type="error" visible={!formData.password}>
-              Password is required
-            </HelperText>
+            {!formData.password ? (
+              <HelperText type="error" visible={true}>
+                Password is required
+              </HelperText>
+            ) : null}
+            {formData.password && formData.password.length < 6 ? (
+              <HelperText type="error" visible={true}>
+                Password must be at least 6 characters
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Sign Up Button */}
@@ -205,6 +215,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   picker: {
+    flex: 2,
     height: 50,
     backgroundColor: "#7886C7",
     color: "white",
