@@ -152,13 +152,13 @@ export interface IBlogState {
     createdAt: string;
     updatedAt: string;
   };
-
   setSelectedBlog: (selectedBlog: any) => void;
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
-  createBlog: (title: string, content: string) => Promise<boolean>;
-  updateBlog: (blogId: string, title: string, content: string) => Promise<boolean>;
-  deleteBlog: (blogId: string) => Promise<boolean>;
+  createBlog: (image?: string, title: string, content: string) => Promise<void>;
+  updateBlog: (blogId: string, title: string, content: string) => Promise<void>;
+  deleteBlog: (blogId: string) => Promise<void>;
+  commentBlog: (text: string) => Promise<boolean>;
 }
 // router.post("/createblog", middlewareController.verifyToken, blogController.createBlog);
 

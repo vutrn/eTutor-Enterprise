@@ -47,9 +47,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       });
 
       const { authUser } = useAuthStore.getState();
-      const filteredUsers = res.data.filter(
-        (user: any) => user._id !== authUser?._id
-      );
+      const filteredUsers = res.data.filter((user: any) => user._id !== authUser?._id);
       set({ users: filteredUsers });
     } catch (error: any) {
       Toast.show({
@@ -66,14 +64,11 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
 
-      const res = await axiosInstance.get(
-        `v1/message/getmessage/${receiverId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axiosInstance.get(`v1/message/getmessage/${receiverId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       set({ messages: res.data });
     } catch (error: any) {
       Toast.show({
@@ -92,30 +87,11 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
       const { selectedUser, messages } = get();
 
-      const res = await axiosInstance.post(
-        `v1/message/sendmessage/${selectedUser._id}`,
-        messageData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      // if (messageData.image) {
-      //   const response = await fetch(messageData.image);
-      //   const blob = await response.blob();
-      //   console.log("blob", blob);
-      //   const reader = new FileReader();
-      //   reader.readAsDataURL(blob);
-      //   reader.onloadend = () => {
-      //     const base64data = reader.result;
-      //     console.log("base64data", base64data);
-      //     set({
-      //       messages: [...messages, { ...res.data, image: base64data }],
-      //     });
-      //   };
-      // }
+      const res = await axiosInstance.post(`v1/message/sendmessage/${selectedUser._id}`, messageData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       //TODO: socket io
 

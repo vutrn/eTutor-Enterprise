@@ -6,9 +6,12 @@ import { useBlogStore } from "../../../store/useBlogStore";
 import { useUserStore } from "../../../store/useUserStore";
 import { FONTS } from "../../../utils/constant";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { format } from "date-fns";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { get } from "lodash";
 
 const TutorBlog = () => {
-  const { blogs, getAllBlogs, setSelectedBlog } = useBlogStore();
+  const { blogs, getAllBlogs, setSelectedBlog, createBlog } = useBlogStore();
   const [refreshing, setRefreshing] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
@@ -20,15 +23,6 @@ const TutorBlog = () => {
     setRefreshing(true);
     await getAllBlogs();
     setRefreshing(false);
-  };
-
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("vi-VN", options);
   };
 
   const handleSelectBlog = (item: any) => {
@@ -47,15 +41,15 @@ const TutorBlog = () => {
         <Card.Title
           titleStyle={styles.title}
           title={item.title ? item.title : "Untitled"}
-          subtitle={item.content ? item.content : "No content available"}
           right={() => <IconButton icon="arrow-right" />}
-        >
-          {/* <Text style={styles.title} >{item.title ? item.title : "Untitled"}</Text> */}
-        </Card.Title>
+        />
         <Card.Content>
+          <Text numberOfLines={1} style={styles.content}>
+            {item.content ? item.content : "No content available"}
+          </Text>
           <Text style={styles.author}>By: {item.author ? item.author.username : "Unknown author"}</Text>
           <Text style={styles.date}>
-            Published: {item.createdAt ? formatDate(item.createdAt) : "Date not available"}
+            Published: {format(new Date(item.createdAt), "MMMM dd, yyyy") || "Date not available"}
           </Text>
         </Card.Content>
       </Card>
@@ -63,7 +57,14 @@ const TutorBlog = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <IconButton
+        style={styles.icon}
+        size={50}
+        icon="plus"
+        mode="contained"
+        onPress={() => navigation.navigate("tutor_blog_create")}
+      />
       <FlatList
         data={blogs}
         keyExtractor={(item) => item._id}
@@ -74,7 +75,7 @@ const TutorBlog = () => {
         refreshing={refreshing}
         ListEmptyComponent={<Text style={styles.emptyText}>No blogs available</Text>}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -83,6 +84,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
     padding: 15,
+  },
+  icon: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    zIndex: 10,
   },
   listContainer: {
     paddingBottom: 20,
@@ -95,11 +102,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
     fontFamily: FONTS.bold,
-  },
-  divider: {
-    marginBottom: 8,
+    // borderWidth: 1,
+    // borderColor: "#ddd",
   },
   image: {
     width: "100%",
@@ -109,9 +114,10 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 16,
-    lineHeight: 24,
     marginBottom: 12,
     fontFamily: FONTS.regular,
+    // borderWidth: 1,
+    // borderColor: "#ddd",
   },
   author: {
     fontSize: 14,

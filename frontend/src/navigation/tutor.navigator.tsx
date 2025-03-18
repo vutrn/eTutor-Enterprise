@@ -6,6 +6,7 @@ import Loading from "../components/loading";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
 import { useBlogStore } from "../store/useBlogStore";
+import { Button } from "react-native-paper";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorBlog = lazy(() => import("../screens/@tutor/blog/tutor.blog"));
@@ -91,7 +92,11 @@ const BlogStack = () => {
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
       <Stack.Screen name="tutor_blog" component={TutorBlog} options={{ title: "Blog" }} />
-      <Stack.Screen name="tutor_blog_create" component={TutorBlogCreate} options={{ title: "Create Blog" }} />
+      <Stack.Screen
+        name="tutor_blog_create"
+        component={TutorBlogCreate}
+        options={{ title: "Create Blog", headerRight: () => <Button>Create</Button> }}
+      />
       <Stack.Screen name="tutor_blog_update" component={TutorBlogUpdate} options={{ title: "Edit Blog" }} />
       <Stack.Screen name="tutor_blog_detail" component={TutorBlogDetail} options={{ title: "Details" }} />
     </Stack.Navigator>

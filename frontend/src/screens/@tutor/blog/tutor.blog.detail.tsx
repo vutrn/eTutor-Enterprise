@@ -1,18 +1,20 @@
-import { Image, StyleSheet, View } from "react-native";
-import React, { useEffect } from "react";
-import { Divider, Text } from "react-native-paper";
-import { FONTS } from "../../../utils/constant";
-import { useUserStore } from "../../../store/useUserStore";
+import React, { useEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
+import { Divider, IconButton, Text, TextInput } from "react-native-paper";
 import { useBlogStore } from "../../../store/useBlogStore";
-import { formatDate } from "date-fns";
+import { useUserStore } from "../../../store/useUserStore";
+import { FONTS } from "../../../utils/constant";
+import { get } from "lodash";
 
 const TutorBlogDetail = () => {
   const { users, getUsers } = useUserStore();
-  const { selectedBlog } = useBlogStore();
+  const { selectedBlog, commentBlog, getAllBlogs } = useBlogStore();
+  const [text, setText] = useState("");
 
   useEffect(() => {
     getUsers();
-  }, []);
+    getAllBlogs();
+  }, [selectedBlog]);
 
   const getUserNameById = (userId: string) => {
     const selectedUser = users.find((user) => user._id === userId);
@@ -21,8 +23,9 @@ const TutorBlogDetail = () => {
 
   const getRoleById = (userId: string) => {
     const selectedUser = users.find((user) => user._id === userId);
-    return selectedUser ? selectedUser.role : "Unknown role";
+    return selectedUser ? selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1) : "Unknown role";
   };
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       hour: "2-digit",
@@ -33,22 +36,57 @@ const TutorBlogDetail = () => {
     };
     return new Date(dateString).toLocaleDateString("vi-VN", options);
   };
+
+  const handleSendComment = async (text: string) => {
+    if (text.trim()) {
+      await commentBlog(text);
+      setText("");
+      // loadComments(selectedBlog._id);
+    }
+  };
+
   return (
-    <View>
-      {selectedBlog.image && <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="cover" />}
-      <Text style={styles.title}>{selectedBlog.title}</Text>
-      <Text style={styles.author}>By: {selectedBlog.author ? selectedBlog.author.username : "Unknown author"}</Text>
-      <Text style={styles.content}>{selectedBlog.content}</Text>
-      <Text style={styles.date}>
-        Published: {selectedBlog.createdAt ? formatDate(selectedBlog.createdAt) : "Date not available"}
+    <ScrollView style={styles.container}>
+      {selectedBlog.image && <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />}
+      <Text style={styles.title} variant="titleLarge">
+        {selectedBlog.title}
       </Text>
+      <View style={styles.blogInfo}>
+        <Text variant="bodyMedium" style={styles.author}>
+          By: {selectedBlog.author ? selectedBlog.author.username : "Unknown author"}
+        </Text>
+        <Text style={styles.date}>
+          Published on: {selectedBlog.createdAt ? formatDate(selectedBlog.createdAt) : "Date not available"}
+        </Text>
+      </View>
+      <Text style={styles.content}>{selectedBlog.content}</Text>
 
       <Divider />
-      
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          value={text}
+          mode="outlined"
+          onChangeText={(text) => setText(text)}
+          style={styles.input}
+          label="Add a comment..."
+          onKeyPress={(e) => {
+            e.nativeEvent.key === "Enter" && handleSendComment(text);
+          }}
+        />
+        <IconButton
+          icon="send"
+          size={24}
+          onPress={() => {
+            handleSendComment(text);
+          }}
+        />
+      </View>
+
       {selectedBlog.comments && selectedBlog.comments.length > 0 && (
         <View style={styles.commentsContainer}>
           <Text style={styles.commentsHeader}>Comments ({selectedBlog.comments.length}):</Text>
-          {selectedBlog.comments.map((comment: any) => (
+          {selectedBlog.comments.toReversed().map((comment: any) => (
             <View key={comment._id} style={styles.comment}>
               <View style={styles.commentContent}>
                 <Text style={styles.commentUser}>
@@ -64,7 +102,7 @@ const TutorBlogDetail = () => {
           ))}
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -79,14 +117,18 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 20,
   },
+  blogInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 12,
+  },
   card: {
     marginVertical: 8,
     borderRadius: 8,
     elevation: 4,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 8,
     fontFamily: FONTS.bold,
   },
@@ -103,10 +145,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   author: {
-    fontSize: 14,
-    color: "#555",
     fontFamily: FONTS.regular,
-    marginBottom: 4,
   },
   date: {
     fontSize: 14,
@@ -115,11 +154,18 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontStyle: "italic",
   },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  input: {
+    flex: 1,
+    margin: 10,
+  },
   commentsContainer: {
     marginTop: 16,
     paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
   },
   commentsHeader: {
     fontSize: 16,
@@ -151,6 +197,7 @@ const styles = StyleSheet.create({
   commentText: {
     fontSize: 14,
     fontFamily: FONTS.regular,
+    marginLeft: 4,
   },
   commentDate: {
     fontSize: 12,

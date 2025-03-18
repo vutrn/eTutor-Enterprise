@@ -1,22 +1,12 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  View,
-} from "react-native";
-import { Button, IconButton, Text, TextInput } from "react-native-paper";
+import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { IconButton, Text, TextInput } from "react-native-paper";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { useUserStore } from "../../../store/useUserStore";
-import { FONTS } from "../../../utils/constant";
 
 const MessageDetail = () => {
-  const { messages, selectedUser, getMessages, sendMessage } =
-    useMessageStore();
+  const { messages, selectedUser, getMessages, sendMessage } = useMessageStore();
   const { users, getUsers } = useUserStore();
   const [newMessage, setNewMessage] = useState("");
   const [image, setImage] = useState<string | null>(null);
@@ -95,20 +85,11 @@ const MessageDetail = () => {
     <View
       style={[
         styles.messageContainer,
-        item.senderId === selectedUser._id
-          ? styles.receivedMessage
-          : styles.sentMessage,
+        item.senderId === selectedUser._id ? styles.receivedMessage : styles.sentMessage,
       ]}
     >
       <View>
-        <Text>
-          {item.image && (
-            <Image
-              source={{ uri: item.image }}
-              style={{ width: 100, height: 100 }}
-            />
-          )}
-        </Text>
+        <Text>{item.image && <Image source={{ uri: item.image }} style={{ width: 100, height: 100 }} />}</Text>
         <Text>{item?.text}</Text>
       </View>
     </View>
