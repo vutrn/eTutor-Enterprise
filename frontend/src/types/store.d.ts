@@ -41,7 +41,12 @@ export interface IClassState {
   setSelectedClass: (selectedClass: any) => void;
   getClasses: () => Promise<void>;
   createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
-  updateClass: (classId: string, newName: string, newTutorId: string, studentIds: string[]) => Promise<boolean>;
+  updateClass: (
+    classId: string,
+    newName: string,
+    newTutorId: string,
+    studentIds: string[]
+  ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
   removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 }
@@ -155,8 +160,8 @@ export interface IBlogState {
   setSelectedBlog: (selectedBlog: any) => void;
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
-  createBlog: (image?: string, title: string, content: string) => Promise<void>;
-  updateBlog: (blogId: string, title: string, content: string) => Promise<void>;
+  createBlog: (title: string, content: string, image?: string) => Promise<void>;
+  updateBlog: (blogId: string, title: string, content: string, image?: string) => Promise<boolean>;
   deleteBlog: (blogId: string) => Promise<void>;
   commentBlog: (text: string) => Promise<boolean>;
 }

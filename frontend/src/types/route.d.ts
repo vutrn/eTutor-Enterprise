@@ -45,6 +45,7 @@ type RootStackParamList = {
 
   // TUTOR BLOG 
   tutor_blog: undefined;
+  tutor_blog_list: undefined;
   tutor_blog_create: undefined;
   tutor_blog_update: undefined;
   tutor_blog_detail: undefined;

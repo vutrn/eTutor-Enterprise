@@ -47,7 +47,9 @@ const TutorBlog = () => {
           <Text numberOfLines={1} style={styles.content}>
             {item.content ? item.content : "No content available"}
           </Text>
-          <Text style={styles.author}>By: {item.author ? item.author.username : "Unknown author"}</Text>
+          <Text style={styles.author}>
+            By: {item.author ? item.author.username : "Unknown author"}
+          </Text>
           <Text style={styles.date}>
             Published: {format(new Date(item.createdAt), "MMMM dd, yyyy") || "Date not available"}
           </Text>

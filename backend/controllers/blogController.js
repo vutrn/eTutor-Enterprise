@@ -50,7 +50,7 @@ const blogController = {
     updateBlog: async (req, res) => {
         try {
             const { blogId } = req.params;
-            const { title, content } = req.body;
+            const { title, content, image } = req.body;
 
             const blog = await Blog.findById(blogId);
             if (!blog) return res.status(404).json({ message: "Blog không tồn tại" });
@@ -77,7 +77,7 @@ const blogController = {
             } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
             }
-    },
+        },
 
     // Xóa bài viết
     deleteBlog: async (req, res) => {

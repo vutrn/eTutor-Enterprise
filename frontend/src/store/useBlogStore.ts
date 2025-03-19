@@ -42,7 +42,7 @@ export const useBlogStore = create<IBlogState>((set, get) => ({
     }
   },
 
-  createBlog: async (image?: string, title: string, content: string) => {
+  createBlog: async (title: string, content: string, image?: string) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
@@ -58,7 +58,25 @@ export const useBlogStore = create<IBlogState>((set, get) => ({
     }
   },
 
-  updateBlog: async (blogId, title: string, content: string) => {},
+  updateBlog: async (blogId: string, title: string, content: string, image?: string) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      if (!token) throw new Error("No token found");
+
+      const res = await axiosInstance.put(
+        `v1/blog/${blogId}/updateblog`,
+        { image, title, content },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      set({ selectedBlog: res.data.blog });
+      Toast.show({ type: "success", text1: "Blog updated successfully" });
+      return true;
+    } catch (error) {
+      Toast.show({ type: "error", text1: "Failed to update blog" });
+      console.log("🚀 ~ updateBlog: ~ error:", error);
+      return false;
+    }
+  },
 
   deleteBlog: async (blogId) => {},
 

@@ -57,12 +57,10 @@ export const App = () => {
   }
 
   const renderAppContent = () => {
-    // If no user is authenticated, show auth navigator
     if (!authUser) {
       return <AuthNavigator />;
     }
 
-    // Select navigator based on user role
     switch (authUser.role) {
       case "student":
         return <StudentNavigator />;
@@ -71,7 +69,6 @@ export const App = () => {
       case "admin":
         return <AdminNavigator />;
       default:
-        // Return a component outside NavigationContainer for invalid role
         return (
           <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>
             Invalid role: {authUser.role}

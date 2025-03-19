@@ -6,7 +6,7 @@ import Loading from "../components/loading";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
 import { useBlogStore } from "../store/useBlogStore";
-import { Button } from "react-native-paper";
+import { Button, IconButton } from "react-native-paper";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorBlog = lazy(() => import("../screens/@tutor/blog/tutor.blog"));
@@ -45,7 +45,11 @@ const ClassFeaturesTab = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="tutor_class_detail" component={ClassDetail} options={{ title: "Class Detail" }} />
+      <Tab.Screen
+        name="tutor_class_detail"
+        component={ClassDetail}
+        options={{ title: "Class Detail" }}
+      />
       <Tab.Screen name="tutor_message" component={TutorMessage} options={{ title: "Message" }} />
       <Tab.Screen name="tutor_meeting" component={TutorMeeting} options={{ title: "Meeting" }} />
       <Tab.Screen name="tutor_document" component={TutorDocument} options={{ title: "Document" }} />
@@ -74,7 +78,11 @@ const HomeTab = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="tutor_dashboard" component={TutorDashboard} options={{ title: "Dashboard" }} />
+      <Tab.Screen
+        name="tutor_dashboard"
+        component={TutorDashboard}
+        options={{ title: "Dashboard" }}
+      />
       <Tab.Screen name="tutor_class" component={TutorClass} options={{ title: "Class" }} />
       <Tab.Screen name="tutor_blog" component={BlogStack} options={{ headerShown: false }} />
       <Tab.Screen name="tutor_profile" component={TutorProfile} options={{ title: "Profile" }} />
@@ -91,14 +99,22 @@ const BlogStack = () => {
       screenOptions={{ presentation: "card", animation: "slide_from_right" }}
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
-      <Stack.Screen name="tutor_blog" component={TutorBlog} options={{ title: "Blog" }} />
+      <Stack.Screen name="tutor_blog_list" component={TutorBlog} options={{ title: "Blog" }} />
       <Stack.Screen
         name="tutor_blog_create"
         component={TutorBlogCreate}
-        options={{ title: "Create Blog", headerRight: () => <Button>Create</Button> }}
+        options={{ title: "Create Blog" }}
       />
-      <Stack.Screen name="tutor_blog_update" component={TutorBlogUpdate} options={{ title: "Edit Blog" }} />
-      <Stack.Screen name="tutor_blog_detail" component={TutorBlogDetail} options={{ title: "Details" }} />
+      <Stack.Screen
+        name="tutor_blog_update"
+        component={TutorBlogUpdate}
+        options={{ title: "Edit Blog" }}
+      />
+      <Stack.Screen
+        name="tutor_blog_detail"
+        component={TutorBlogDetail}
+        options={{ title: "Details" }}
+      />
     </Stack.Navigator>
   );
 };

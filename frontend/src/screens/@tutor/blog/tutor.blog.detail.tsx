@@ -1,20 +1,65 @@
-import React, { useEffect, useState } from "react";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { format } from "date-fns";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { Divider, IconButton, Text, TextInput } from "react-native-paper";
+import { Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
+import { useAuthStore } from "../../../store/useAuthStore";
 import { useBlogStore } from "../../../store/useBlogStore";
 import { useUserStore } from "../../../store/useUserStore";
 import { FONTS } from "../../../utils/constant";
-import { get } from "lodash";
 
 const TutorBlogDetail = () => {
+  const { authUser } = useAuthStore();
   const { users, getUsers } = useUserStore();
-  const { selectedBlog, commentBlog, getAllBlogs } = useBlogStore();
+  const { selectedBlog, setSelectedBlog, commentBlog, getAllBlogs } = useBlogStore();
   const [text, setText] = useState("");
+  const [visible, setVisible] = useState(false);
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
     getUsers();
     getAllBlogs();
   }, [selectedBlog]);
+  console.log("visible", visible);
+
+  useLayoutEffect(() => {
+    if (authUser?._id === selectedBlog?.author?._id) {
+      navigation.setOptions({
+        headerRight: () => (
+          <Menu
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            anchor={
+              <IconButton
+                icon="dots-vertical"
+                onPress={() => {
+                  setVisible(true);
+                }}
+              />
+            }
+          >
+            <Menu.Item
+              title="Update"
+              leadingIcon="pencil"
+              onPress={() => {
+                setVisible(false);
+                setSelectedBlog(selectedBlog);
+                navigation.navigate("tutor_blog_update");
+              }}
+            />
+            <Menu.Item
+              titleStyle={{ color: "red" }}
+              title="DELETE"
+              leadingIcon="delete"
+              onPress={() => {
+                setVisible(false);
+              }}
+            />
+          </Menu>
+        ),
+      });
+    }
+  }, [navigation, visible, selectedBlog, authUser]);
 
   const getUserNameById = (userId: string) => {
     const selectedUser = users.find((user) => user._id === userId);
@@ -23,43 +68,38 @@ const TutorBlogDetail = () => {
 
   const getRoleById = (userId: string) => {
     const selectedUser = users.find((user) => user._id === userId);
-    return selectedUser ? selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1) : "Unknown role";
-  };
-
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-    };
-    return new Date(dateString).toLocaleDateString("vi-VN", options);
+    return selectedUser
+      ? selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)
+      : "Unknown role";
   };
 
   const handleSendComment = async (text: string) => {
     if (text.trim()) {
       await commentBlog(text);
       setText("");
-      // loadComments(selectedBlog._id);
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {selectedBlog.image && <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />}
+      <Text>
+        {selectedBlog?.image && (
+          <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
+        )}
+      </Text>
       <Text style={styles.title} variant="titleLarge">
-        {selectedBlog.title}
+        {selectedBlog?.title}
       </Text>
       <View style={styles.blogInfo}>
         <Text variant="bodyMedium" style={styles.author}>
-          By: {selectedBlog.author ? selectedBlog.author.username : "Unknown author"}
+          By: {selectedBlog?.author ? selectedBlog.author.username : "Unknown author"}
         </Text>
         <Text style={styles.date}>
-          Published on: {selectedBlog.createdAt ? formatDate(selectedBlog.createdAt) : "Date not available"}
+          Published on:{" "}
+          {format(new Date(selectedBlog?.createdAt), "hh:mm MMMM dd, yyyy") || "Date not available"}
         </Text>
       </View>
-      <Text style={styles.content}>{selectedBlog.content}</Text>
+      <Text style={styles.content}>{selectedBlog?.content}</Text>
 
       <Divider />
 
@@ -83,10 +123,10 @@ const TutorBlogDetail = () => {
         />
       </View>
 
-      {selectedBlog.comments && selectedBlog.comments.length > 0 && (
+      {selectedBlog?.comments && selectedBlog?.comments.length > 0 && (
         <View style={styles.commentsContainer}>
-          <Text style={styles.commentsHeader}>Comments ({selectedBlog.comments.length}):</Text>
-          {selectedBlog.comments.toReversed().map((comment: any) => (
+          <Text style={styles.commentsHeader}>Comments ({selectedBlog?.comments.length}):</Text>
+          {selectedBlog?.comments.toReversed().map((comment: any) => (
             <View key={comment._id} style={styles.comment}>
               <View style={styles.commentContent}>
                 <Text style={styles.commentUser}>
@@ -97,7 +137,11 @@ const TutorBlogDetail = () => {
                 </Text>
                 <Text style={styles.commentText}>{comment.text}</Text>
               </View>
-              <Text style={styles.commentDate}>{comment.createdAt ? formatDate(comment.createdAt) : ""}</Text>
+              <Text style={styles.commentDate}>
+                {isNaN(new Date(comment.createdAt).getTime())
+                  ? ""
+                  : format(new Date(comment.createdAt), "hh:mm MMMM dd, yyyy")}
+              </Text>
             </View>
           ))}
         </View>

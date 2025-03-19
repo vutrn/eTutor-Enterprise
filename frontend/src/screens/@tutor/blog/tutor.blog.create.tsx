@@ -15,16 +15,6 @@ const TutorBlogCreate = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Create Blog",
-      headerTitleStyle: {
-        fontFamily: FONTS.bold,
-        fontSize: 20,
-      },
-    });
-  }, []);
-
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -40,15 +30,25 @@ const TutorBlogCreate = () => {
   };
 
   const handleCreateBlog = async () => {
-    if (!title.trim()) return Toast.show({ type: "error", text1: "ERROR", text2: "Title is required" });
-    if (!content.trim()) return Toast.show({ type: "error", text1: "ERROR", text2: "Content is required" });
+    if (!title.trim())
+      return Toast.show({ type: "error", text1: "ERROR", text2: "Title is required" });
+    if (!content.trim())
+      return Toast.show({ type: "error", text1: "ERROR", text2: "Content is required" });
     if (title.length < 5)
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Title must be at least 5 characters" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Title must be at least 5 characters",
+      });
     if (content.length < 5)
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Content must be at least 5 characters" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Content must be at least 5 characters",
+      });
 
     setIsLoading(true);
-    await createBlog(image || undefined, title, content);
+    await createBlog(title, content, image || undefined);
     setImage(null);
     setTitle("");
     setContent("");
@@ -67,6 +67,7 @@ const TutorBlogCreate = () => {
         onPress={handleCreateBlog}
         disabled={isLoading}
         loading={isLoading}
+        contentStyle={{ flexDirection: "row-reverse" }}
       >
         {isLoading ? "Creating..." : "Create"}
       </Button>
@@ -74,53 +75,55 @@ const TutorBlogCreate = () => {
   });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
-        {image && <Image source={{ uri: image }} style={styles.image} resizeMode="contain" />}
-        <Button onPress={pickImage}>Choose image</Button>
-      </View>
-      <TextInput
-        mode="outlined"
-        placeholder="Post Title"
-        placeholderTextColor="#8E8E93"
-        value={title}
-        onChangeText={(text) => setTitle(text)}
-        autoCapitalize="words"
-        style={styles.titleInput}
-        outlineStyle={{ borderWidth: 0 }}
-      />
-      {!title.trim() ? (
-        <HelperText type="error" visible={true}>
-          Title is required
-        </HelperText>
-      ) : null}
-      {!title.trim() || title.length < 5 ? (
-        <HelperText type="error" visible={true}>
-          Title must be at least 5 characters
-        </HelperText>
-      ) : null}
+    <View>
+      <ScrollView style={styles.container}>
+        <View style={styles.imageContainer}>
+          {image && <Image source={{ uri: image }} style={styles.image} resizeMode="contain" />}
+          <Button onPress={pickImage}>Choose image</Button>
+        </View>
+        <TextInput
+          mode="outlined"
+          placeholder="Post Title"
+          placeholderTextColor="#8E8E93"
+          value={title}
+          onChangeText={(text) => setTitle(text)}
+          autoCapitalize="words"
+          style={styles.titleInput}
+          outlineStyle={{ borderWidth: 0 }}
+        />
+        {!title.trim() ? (
+          <HelperText type="error" visible={true}>
+            Title is required
+          </HelperText>
+        ) : null}
+        {!title.trim() || title.length < 5 ? (
+          <HelperText type="error" visible={true}>
+            Title must be at least 5 characters
+          </HelperText>
+        ) : null}
 
-      <TextInput
-        mode="outlined"
-        placeholder="Write your post..."
-        multiline
-        placeholderTextColor="#8E8E93"
-        value={content}
-        onChangeText={(text) => setContent(text)}
-        style={styles.contentInput}
-        outlineStyle={{ borderWidth: 0 }}
-      />
-      {!content.trim() ? (
-        <HelperText type="error" visible={true}>
-          Content is required
-        </HelperText>
-      ) : null}
-      {!content.trim() || content.length < 5 ? (
-        <HelperText type="error" visible={true}>
-          Content must be at least 5 characters
-        </HelperText>
-      ) : null}
-    </ScrollView>
+        <TextInput
+          mode="outlined"
+          placeholder="Write your post..."
+          multiline
+          placeholderTextColor="#8E8E93"
+          value={content}
+          onChangeText={(text) => setContent(text)}
+          style={styles.contentInput}
+          outlineStyle={{ borderWidth: 0 }}
+        />
+        {!content.trim() ? (
+          <HelperText type="error" visible={true}>
+            Content is required
+          </HelperText>
+        ) : null}
+        {!content.trim() || content.length < 5 ? (
+          <HelperText type="error" visible={true}>
+            Content must be at least 5 characters
+          </HelperText>
+        ) : null}
+      </ScrollView>
+    </View>
   );
 };
 
