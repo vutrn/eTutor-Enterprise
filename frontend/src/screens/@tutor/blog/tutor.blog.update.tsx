@@ -7,8 +7,11 @@ import Toast from "react-native-toast-message";
 import { useBlogStore } from "../../../store/useBlogStore";
 import { FONTS } from "../../../utils/constant";
 import { set } from "lodash";
+import { useAuthStore } from "../../../store/useAuthStore";
+import { useUserStore } from "../../../store/useUserStore";
 
 const TutorBlogUpdate = () => {
+  const { getUsers } = useUserStore();
   const { selectedBlog, createBlog, getAllBlogs, updateBlog } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState(selectedBlog.title || "");
@@ -32,7 +35,7 @@ const TutorBlogUpdate = () => {
         </Button>
       ),
     });
-  }, [isLoading, title, content, image, selectedBlog]);
+  }, [isLoading, title, content, image]);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -71,7 +74,7 @@ const TutorBlogUpdate = () => {
     const success = await updateBlog(selectedBlog._id, title, content, image || undefined);
     if (success) {
       navigation.goBack();
-      // await getAllBlogs();
+      await getAllBlogs();
     }
     setIsLoading(false);
   };

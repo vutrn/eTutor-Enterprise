@@ -78,7 +78,20 @@ export const useBlogStore = create<IBlogState>((set, get) => ({
     }
   },
 
-  deleteBlog: async (blogId) => {},
+  deleteBlog: async (blogId: string) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      if (!token) throw new Error("No token found");
+
+      const res = await axiosInstance.delete(`v1/blog/${blogId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      Toast.show({ type: "success", text1: "Blog deleted successfully" });
+    } catch (error) {
+      Toast.show({ type: "error", text1: "Failed to delete blog" });
+      console.log("🚀 ~ deleteBlog: ~ error:", error);
+    }
+  },
 
   commentBlog: async (text: string) => {
     try {
