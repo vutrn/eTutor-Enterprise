@@ -19,7 +19,6 @@ interface IProps {
 }
 
 const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
-  // Get data from stores
   const { tutors, students, getUsers, loading: loadingUsers } = useUserStore();
   const { updateClass, loading: loadingClassUpdate } = useClassStore();
 
@@ -37,14 +36,12 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     }
   }, [modalVisible, classData]);
 
-  // Fetch users when component mounts or when modal becomes visible
   useEffect(() => {
     if (modalVisible) {
       getUsers();
     }
   }, [getUsers, modalVisible]);
 
-  // Toggle student selection with removal tracking
   const toggleStudentSelection = (studentId: string) => {
     setSelectedStudents((addedStudents) => {
       if (addedStudents.includes(studentId)) {
@@ -55,7 +52,6 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     });
   };
 
-  // Handle form submission
   const handleUpdateClass = async () => {
     if (!className || !selectedTutor || !selectedStudents) {
       alert("Please fill in all fields");

@@ -7,8 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NavigationProp } from "@react-navigation/native";
 
 const TutorMessage = () => {
-  const { getUsersToChat, setSelectedUser, selectedUser, users } =
-    useMessageStore();
+  const { getUsersToChat, setSelectedUser, selectedUser, users } = useMessageStore();
   const { selectedClass } = useClassStore();
 
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -45,11 +44,7 @@ const TutorMessage = () => {
 
   return (
     <SafeAreaView>
-      <FlatList
-        data={users}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-      />
+      <FlatList data={users} keyExtractor={(item) => item._id} renderItem={renderItem} />
     </SafeAreaView>
   );
 };
@@ -58,7 +53,6 @@ const styles = StyleSheet.create({
   userButton: {
     marginVertical: 5,
     marginHorizontal: 10,
-
   },
   buttonContent: {
     justifyContent: "flex-start",

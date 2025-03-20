@@ -48,36 +48,30 @@ const blogController = {
 
     // Cập nhật bài viết
     updateBlog: async (req, res) => {
-        try {
-            const { blogId } = req.params;
-            const { title, content } = req.body;
+    try {
+        const { blogId } = req.params;
+        const { title, content, image } = req.body; 
 
-            const blog = await Blog.findById(blogId);
-            if (!blog) return res.status(404).json({ message: "Blog không tồn tại" });
+        const blog = await Blog.findById(blogId);
+        if (!blog) return res.status(404).json({ message: "Blog không tồn tại" });
 
-            if (blog.author.toString() !== req.user.id) {
-                return res.status(403).json({ message: "Bạn không có quyền chỉnh sửa blog này" });
-            }
+        if (blog.author.toString() !== req.user.id) {
+            return res.status(403).json({ message: "Bạn không có quyền chỉnh sửa blog này" });
+        }
+        if (image) {
+            const uploadResponse = await Cloudinary.uploader.upload(image, { folder: "blogs" });
+            blog.image = uploadResponse.secure_url;
+        }
+        if (title) blog.title = title;
+        if (content) blog.content = content;
+        await blog.save();
 
-             // Nếu có image mới, upload lên Cloudinary
-            let imageUrl = blog.image; // Giữ nguyên ảnh cũ nếu không có ảnh mới
-            if (image) {
-            const uploadResponse = await Cloudinary.uploader.upload(image, {folder: "blogs"});
-            imageUrl = uploadResponse.secure_url;
-            }
+        res.status(200).json({ message: "Blog đã được cập nhật", blog });
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+},
 
-            // Cập nhật dữ liệu
-            blog.title = title || blog.title;
-            blog.content = content || blog.content;
-            blog.image = imageUrl;
-
-            await blog.save();
-
-            res.status(200).json({ message: "Blog đã được cập nhật", blog });
-            } catch (error) {
-            res.status(500).json({ message: "Lỗi server", error: error.message });
-            }
-    },
 
     // Xóa bài viết
     deleteBlog: async (req, res) => {

@@ -4,27 +4,23 @@ import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axiosInstance from "../utils/axios";
+import { IAuthState } from "../types/store";
 
-interface AuthState {
-  authUser: any;
-  isSigningUp: boolean;
-  isLoggingIn: boolean;
-  accessToken: string | null;
-  isTokenExpired: boolean;
-
-  signup: (formData: any) => Promise<boolean>;
-  login: (formData: any) => Promise<boolean>;
-  logout: () => void;
-  verifyToken: () => Promise<boolean>;
-}
-
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<IAuthState>()(
   persist(
     (set, get) => ({
-      authUser: null,
+      authUser: {
+        _id: "",
+        username: "",
+        email: "",
+        role: "",
+        accessToken: "",
+        refreshToken: "",
+      },
       isSigningUp: false,
       isLoggingIn: false,
       accessToken: null,
+      refreshToken: null,
       isTokenExpired: false,
 
       signup: async (formData) => {
@@ -33,7 +29,11 @@ export const useAuthStore = create<AuthState>()(
           const res = await axiosInstance.post("v1/auth/register", formData);
 
           console.log("Signup successful:", res.data);
-          Toast.show({ type: "success", text1: "Signup successful", text2: "Welcome!" });
+          Toast.show({
+            type: "success",
+            text1: "Signup successful",
+            text2: "Welcome!",
+          });
           return true;
         } catch (error: any) {
           console.log("Signup failed:", error.response?.data?.message);
@@ -75,7 +75,11 @@ export const useAuthStore = create<AuthState>()(
           await axiosInstance.post("v1/auth/logout");
           await AsyncStorage.removeItem("access-token");
           set({ authUser: null, accessToken: null, isTokenExpired: false });
-          Toast.show({ type: "success", text1: "Logged out", text2: "See you soon!" });
+          Toast.show({
+            type: "success",
+            text1: "Logged out",
+            text2: "See you soon!",
+          });
         } catch (error: any) {
           console.log(error.response?.data?.message);
         }

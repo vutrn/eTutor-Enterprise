@@ -34,6 +34,7 @@ const TutorDashboard = () => {
           />
         </Card>
       </View>
+      {/* View student list and message */}
     </ScrollView>
   );
 };

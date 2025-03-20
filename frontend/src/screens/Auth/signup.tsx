@@ -1,9 +1,8 @@
-import { Feather } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-import { Button, Divider, Text, TextInput } from "react-native-paper";
+import { Dimensions, KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import { Button, Divider, HelperText, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -25,7 +24,11 @@ const SignUpScreen = () => {
   const handleSignUp = async () => {
     // Validation
     if (!formData.username.trim())
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Username is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Username is required",
+      });
     if (formData.username.length < 5)
       return Toast.show({
         type: "error",
@@ -34,12 +37,24 @@ const SignUpScreen = () => {
       });
 
     if (!formData.email.trim())
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Email is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Email is required",
+      });
     if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(formData.email))
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Invalid email format" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Invalid email format",
+      });
 
     if (!formData.password)
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Password is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Password is required",
+      });
     if (formData.password.length < 6)
       return Toast.show({
         type: "error",
@@ -59,13 +74,17 @@ const SignUpScreen = () => {
     }
   };
 
+  const hasError = () => {
+    if (!formData.username.trim()) return;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior="padding">
         <Text style={{ textAlign: "center", fontSize: 24, marginBottom: 20 }}>Sign Up</Text>
         <View>
           {/* Username Input */}
-          <View style={{ marginBottom: 20 }}> 
+          <View style={{ marginBottom: 20 }}>
             <Text variant="titleMedium">Username</Text>
             <TextInput
               label="Username"
@@ -73,6 +92,16 @@ const SignUpScreen = () => {
               value={formData.username}
               onChangeText={(text) => setFormData({ ...formData, username: text })}
             />
+            {!formData.username.trim() ? (
+              <HelperText type="error" visible={true}>
+                Username is required
+              </HelperText>
+            ) : null}
+            {formData.username && formData.username.length < 5 ? (
+              <HelperText type="error" visible={true}>
+                Username must be at least 5 characters
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Email Input */}
@@ -85,11 +114,29 @@ const SignUpScreen = () => {
               onChangeText={(text) => setFormData({ ...formData, email: text })}
               keyboardType="email-address"
             />
+            {!formData.email.trim() ? (
+              <HelperText type="error" visible={true}>
+                Email is required
+              </HelperText>
+            ) : null}
+            {formData.email && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(formData.email) ? (
+              <HelperText type="error" visible={true}>
+                Invalid email format
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Role Picker */}
-          <View style={{ marginBottom: 20 }}>
-            <Text variant="titleMedium">Role</Text>
+          <View
+            style={{
+              marginBottom: 20,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text variant="titleMedium" style={{ flex: 1 }}>
+              I want to be a{" "}
+            </Text>
             <Picker
               selectedValue={formData.role}
               style={styles.picker}
@@ -110,6 +157,16 @@ const SignUpScreen = () => {
               onChangeText={(text) => setFormData({ ...formData, password: text })}
               secureTextEntry
             />
+            {!formData.password ? (
+              <HelperText type="error" visible={true}>
+                Password is required
+              </HelperText>
+            ) : null}
+            {formData.password && formData.password.length < 6 ? (
+              <HelperText type="error" visible={true}>
+                Password must be at least 6 characters
+              </HelperText>
+            ) : null}
           </View>
 
           {/* Sign Up Button */}
@@ -129,7 +186,7 @@ const SignUpScreen = () => {
             </Button>
           )}
 
-          <Divider/>
+          <Divider />
 
           <View style={styles.linkContainer}>
             <Text variant="titleMedium">Already have an account?</Text>
@@ -158,6 +215,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   picker: {
+    flex: 2,
     height: 50,
     backgroundColor: "#7886C7",
     color: "white",

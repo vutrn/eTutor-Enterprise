@@ -1,12 +1,11 @@
-import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Dimensions, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, StyleSheet, View } from "react-native";
+import { Button, Divider, HelperText, Text, TextInput } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/useAuthStore";
 import { FONTS } from "../../utils/constant";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { TextInput, Text, Button, ActivityIndicator, Divider } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
@@ -23,10 +22,18 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!formData.username.trim()) {
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Username is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Username is required",
+      });
     }
     if (!formData.password) {
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Password is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Password is required",
+      });
     }
 
     try {
@@ -35,7 +42,11 @@ const LoginScreen = () => {
       //   navigation.navigate("admin_dashboard");
       // }
     } catch (error: any) {
-      Toast.show({ type: "error", text1: "ERROR", text2: error.response?.data?.message });
+      Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: error.response?.data?.message,
+      });
     }
   };
 
@@ -47,17 +58,26 @@ const LoginScreen = () => {
           <View style={{ marginBottom: 20 }}>
             <Text variant="titleMedium">User name</Text>
             <TextInput
-              onKeyPress={(e) => {e.nativeEvent.key === "Enter" && handleLogin()}}
+              onKeyPress={(e) => {
+                e.nativeEvent.key === "Enter" && handleLogin();
+              }}
               mode="outlined"
               label="Username"
               value={formData.username}
               onChangeText={(value) => setFormData({ ...formData, username: value })}
             />
+            {!formData.username.trim() ? (
+              <HelperText type="error" visible={true}>
+                Username is required
+              </HelperText>
+            ) : null}
           </View>
           <View>
             <Text variant="titleMedium">Password</Text>
             <TextInput
-              onKeyPress={(e) => {e.nativeEvent.key === "Enter" && handleLogin()}}
+              onKeyPress={(e) => {
+                e.nativeEvent.key === "Enter" && handleLogin();
+              }}
               mode="outlined"
               secureTextEntry={!showPassword}
               label="Password"
@@ -65,6 +85,11 @@ const LoginScreen = () => {
               value={formData.password}
               onChangeText={(value) => setFormData({ ...formData, password: value })}
             />
+            {!formData.password ? (
+              <HelperText type="error" visible={true}>
+                Password is required
+              </HelperText>
+            ) : null}
           </View>
 
           {isLoggingIn ? (
@@ -83,7 +108,7 @@ const LoginScreen = () => {
             </Button>
           )}
 
-          <Divider/>
+          <Divider />
 
           <View style={styles.linkContainer}>
             <Text variant="titleMedium">Don't have an account?{"  "}</Text>

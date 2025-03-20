@@ -13,6 +13,8 @@ import { useClassStore } from "../../store/useClassStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import alert from "../../components/alert";
+import Toast from "react-native-toast-message";
 
 /**
  * ViewClass component for displaying all the classes in the system
@@ -23,55 +25,49 @@ const ViewClass = () => {
   const { classes, loading, getClasses, deleteClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch classes when component mounts
   useEffect(() => {
     loadClasses();
   }, []);
 
-  // Handle refreshing the list with loading indicator
   const loadClasses = async () => {
     setRefreshing(true);
     try {
       await getClasses();
     } catch (error) {
       console.error("Failed to load classes:", error);
-      Alert.alert(
-        "Error",
-        "Failed to load classes. Please try again."
-      );
+      Alert.alert("Error", "Failed to load classes. Please try again.");
     } finally {
       setRefreshing(false);
     }
   };
 
-  // Memoized refresh handler for better performance
   const onRefresh = useCallback(() => {
     loadClasses();
   }, []);
 
-  // Handle deleting a class
   const handleDeleteClass = (classId: string, className: string) => {
-    Alert.alert("Delete Class", `Are you sure you want to delete ${className}?`, [
+    alert("Delete Class", `Are you sure you want to delete ${className}?`, [
       {
         text: "Cancel",
         style: "cancel",
+        onPress: () => {},
       },
       {
         text: "Delete",
+        style: "destructive",
         onPress: async () => {
           try {
             await deleteClass(classId);
-            // Reload the class list after deletion
             await loadClasses();
           } catch (error) {
             console.error("Failed to delete class:", error);
-            Alert.alert(
-              "Error",
-              "Failed to delete class. Please try again."
-            );
+            Toast.show({
+              type: "error",
+              text1: "Error",
+              text2: "Failed to delete class. Please try again.",
+            });
           }
         },
-        style: "destructive",
       },
     ]);
   };
@@ -82,13 +78,6 @@ const ViewClass = () => {
       <View style={styles.cardHeader}>
         <Text style={styles.className}>{item.name}</Text>
         <View style={styles.actionButtons}>
-          {/* <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate("create_class", { classData: item })}
-          >
-            <Feather name="edit" size={20} color="#1890ff" />
-          </TouchableOpacity> */}
-
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => handleDeleteClass(item._id, item.name)}
@@ -101,13 +90,19 @@ const ViewClass = () => {
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>Tutor:</Text>
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{item.tutor?.username || "Unknown"}</Text>
-          <Text style={styles.userEmail}>{item.tutor?.email || "No email"}</Text>
+          <Text style={styles.userName}>
+            {item.tutor?.username || "Unknown"}
+          </Text>
+          <Text style={styles.userEmail}>
+            {item.tutor?.email || "No email"}
+          </Text>
         </View>
       </View>
 
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Students ({item.students?.length || 0}):</Text>
+        <Text style={styles.sectionTitle}>
+          Students ({item.students?.length || 0}):
+        </Text>
         {item.students && item.students.length > 0 ? (
           <FlatList
             data={item.students}

@@ -2,29 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
+import { IDashboardState } from "../types/store";
 
-type DashboardState = {
-  dashboard: {
-    role?: "admin" | "tutor" | "student";
-    totalClasses?: number;
-    totalStudents?: number;
-    classes?: {
-      _id: string;
-      name: string;
-      tutor: string;
-      students: {
-        _id: string;
-        username: string;
-      }[];
-      admin: string;
-      createdAt: string;
-    }[];
-  };
-
-  getDashboard: () => Promise<void>;
-};
-
-export const useDashboardStore = create<DashboardState>()((set) => ({
+export const useDashboardStore = create<IDashboardState>()((set) => ({
   dashboard: {
     role: undefined,
     totalClasses: 0,
@@ -48,7 +28,7 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
       // console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {
       console.log("🚀 ~ getDashboard: ~ error:", error);
-      Toast.show({ type: "error", text1: "Failed to get dashboard" });
+      // Toast.show({ type: "error", text1: "Failed to get dashboard" });
     }
   },
 }));
