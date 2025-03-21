@@ -6,12 +6,12 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import {  NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { Text } from "react-native";
 import "react-native-gesture-handler";
-import { PaperProvider } from "react-native-paper";
+import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import AdminNavigator from "./src/navigation/admin.navigator";
 import AuthNavigator from "./src/navigation/auth.navigator";
@@ -77,20 +77,23 @@ export const App = () => {
     }
   };
 
-  const MyTheme = {
+  const theme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
       // background: '#A9B5DF',
-      // primary: 'red',
-      // text: 'yellow',
+      // text: '#000',
+      // primary: "#6200ee",
+      // secondary: "#03dac4",
+      // error: "#b00020",
+      // background: "#f6f6f6",
     },
   };
 
   return (
     <>
-      <PaperProvider>
-        <NavigationContainer theme={MyTheme}>
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
           {renderAppContent()}
         </NavigationContainer>
       </PaperProvider>

@@ -48,14 +48,14 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: width > 768 ? "row" : "column",
     justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: "red",
+    // borderWidth: 1,
+    // borderColor: "red",
   },
   card: {
     flex: 1,
     margin: 8,
-    borderWidth: 1,
-    borderColor: "blue",
+    // borderWidth: 1,
+    // borderColor: "blue",
   },
 });
 
