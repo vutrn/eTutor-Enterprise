@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "eTutor Enterprise",
+    "slug": "etutor-enterprise",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.etutor.enterprise"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.etutor.enterprise",
       "jsEngine": "hermes"
     },
     "web": {
@@ -35,6 +37,9 @@
         }
       ]
     ],
-    "jsEngine": "hermes"
+    "jsEngine": "hermes",
+    "extra": {
+      "apiUrl": "https://etutor-enterprise-backend.onrender.com/"
+    }
   }
 }
