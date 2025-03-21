@@ -7,7 +7,8 @@
     "avd": "emulator -avd Pixel_8_Pro_API_31 -no-snapshot-load",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prod": "expo export --platform web && eas deploy --prod"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
