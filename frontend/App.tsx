@@ -71,7 +71,7 @@ export const App = () => {
       default:
         return (
           <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>
-            Invalid role: {authUser.role}
+            INVALID ROLE
           </Text>
         );
     }
