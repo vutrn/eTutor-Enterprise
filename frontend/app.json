@@ -22,7 +22,10 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.etutor.enterprise",
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -39,7 +42,10 @@
     ],
     "jsEngine": "hermes",
     "extra": {
-      "apiUrl": "https://etutor-enterprise-backend.onrender.com/"
+      "apiUrl": "https://etutor-enterprise.onrender.com/",
+      "eas": {
+        "projectId": "34784bba-4a11-449a-9f7a-796f859c1c00"
+      }
     }
   }
 }
