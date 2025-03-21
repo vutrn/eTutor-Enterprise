@@ -25,7 +25,12 @@ const connectDB = async() => {
 };
 connectDB();
 
-app.use(cors({ origin: "http://localhost:8081", credentials: true }));
+// Configure CORS for production or development
+const corsOrigin = process.env.FRONTEND_URL || "http://localhost:8081";
+app.use(cors({ 
+    origin: corsOrigin, 
+    credentials: true 
+}));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -38,8 +43,11 @@ app.use("/v1/blog", blogRoute);
 app.use("/v1/meeting", meetingRoute);
 app.use("/v1/dashboard", dashboardRoute);
 app.use("/v1/document", documentRoute);
-app.listen(8000, () => {
-    console.log("Server Running on port 8000");
+
+// Server port configuration
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+    console.log(`Server Running on port ${PORT}`);
 });
 
 //Authentication
