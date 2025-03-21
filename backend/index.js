@@ -26,11 +26,27 @@ const connectDB = async() => {
 connectDB();
 
 // Configure CORS for production or development
-const corsOrigin = process.env.FRONTEND_URL || "http://localhost:8081";
+const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:8081",
+    "https://etutor-enterprise.expo.app",
+    // Add any other origins you need here
+];
+
 app.use(cors({ 
-    origin: corsOrigin, 
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log("Blocked by CORS: ", origin);
+            callback(null, true); // Temporarily allow all origins while testing
+        }
+    },
     credentials: true 
 }));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -49,6 +65,3 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`);
 });
-
-//Authentication
-//Authorization
