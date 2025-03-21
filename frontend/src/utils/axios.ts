@@ -1,11 +1,23 @@
 import axios from "axios";
+import { get } from "lodash";
 import { Platform } from "react-native";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
-const baseURL = Platform.OS === "android" ? "http://10.0.2.2:8000/" : "http://localhost:8000/";
+const getBaseUrl = () => {
+  // For production deployment
+  if (Constants.expoConfig?.extra?.apiUrl) {
+    return Constants.expoConfig.extra.apiUrl;
+  }
+  
+  // For local development
+  return Platform.OS === "android" 
+    ? "http://10.0.2.2:8000/" 
+    : "http://localhost:8000/";
+};
 
 const axiosInstance = axios.create({
-  baseURL,
+  baseURL: getBaseUrl(),
   withCredentials: true,
   // timeout: 1000,
   // headers: {'X-Custom-Header': 'foobar'}

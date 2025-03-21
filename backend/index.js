@@ -30,6 +30,9 @@ app.use(cookieParser());
 app.use(express.json());
 
 //Routes
+app.use("/", (req,res) => {
+    res.send("Welcome to the backend API");
+})
 app.use("/v1/auth", authRoute);
 app.use("/v1/user", userRoute);
 app.use("/v1/class", classRoute);
