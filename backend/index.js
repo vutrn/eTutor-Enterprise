@@ -25,14 +25,15 @@ const connectDB = async() => {
 };
 connectDB();
 
-// const allowedOrigins = [
-//     process.env.FRONTEND_URL || "http://localhost:8081",
-//     "https://etutor-enterprise.expo.app",
-//     "https://vtn-frontend.expo.app",
-// ];
+const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:8081",
+    "https://etutor-enterprise.expo.app",
+    "https://vtn-frontend.expo.app",
+    // Add any other origins you need here
+];
 
 app.use(cors({ 
-    origin: process.env.FRONTEND_URL || "http://localhost:8081",
+    origin: allowedOrigins,
     credentials: true 
 })); 
 
