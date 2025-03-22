@@ -7,6 +7,7 @@ import Constants from "expo-constants";
 const getBaseUrl = () => {
   // For production deployment
   if (Constants.expoConfig?.extra?.apiUrl) {
+    console.log("Constants.expoConfig.extra.apiUrl", Constants.expoConfig.extra.apiUrl);
     return Constants.expoConfig.extra.apiUrl;
   }
   

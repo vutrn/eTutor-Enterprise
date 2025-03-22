@@ -28,6 +28,7 @@ connectDB();
 const allowedOrigins = [
     process.env.FRONTEND_URL || "http://localhost:8081",
     "https://etutor-enterprise.expo.app",
+    "https://vtn-frontend.expo.app",
     // Add any other origins you need here
 ];
 
