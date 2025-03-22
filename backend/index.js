@@ -25,25 +25,14 @@ const connectDB = async() => {
 };
 connectDB();
 
-const allowedOrigins = [
-    process.env.FRONTEND_URL || "http://localhost:8081",
-    "https://etutor-enterprise.expo.app",
-    "https://vtn-frontend.expo.app",
-    // Add any other origins you need here
-];
+// const allowedOrigins = [
+//     process.env.FRONTEND_URL || "http://localhost:8081",
+//     "https://etutor-enterprise.expo.app",
+//     "https://vtn-frontend.expo.app",
+// ];
 
 app.use(cors({ 
-    origin: function(origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl, etc.)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.log("Blocked by CORS: ", origin);
-            callback(null, true); // Temporarily allow all origins while testing
-        }
-    },
+    origin: process.env.FRONTEND_URL || "http://localhost:8081",
     credentials: true 
 })); 
 
