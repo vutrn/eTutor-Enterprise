@@ -11,7 +11,6 @@ import { useAuthStore } from "../../../store/useAuthStore";
 import { useUserStore } from "../../../store/useUserStore";
 
 const TutorBlogUpdate = () => {
-  const { getUsers } = useUserStore();
   const { selectedBlog, createBlog, getAllBlogs, updateBlog } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState(selectedBlog.title || "");
@@ -26,7 +25,10 @@ const TutorBlogUpdate = () => {
           icon="content-save"
           mode="contained"
           style={styles.createButton}
-          onPress={handleUpdateBlog}
+          onPress={() => {
+            handleUpdateBlog();
+            navigation.goBack();
+          }}
           disabled={isLoading}
           loading={isLoading}
           contentStyle={{ flexDirection: "row-reverse" }}
@@ -73,7 +75,6 @@ const TutorBlogUpdate = () => {
 
     const success = await updateBlog(selectedBlog._id, title, content, image || undefined);
     if (success) {
-      navigation.goBack();
       await getAllBlogs();
     }
     setIsLoading(false);

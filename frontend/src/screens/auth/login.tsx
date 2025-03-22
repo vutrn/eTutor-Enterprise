@@ -65,6 +65,7 @@ const LoginScreen = () => {
               label="Username"
               value={formData.username}
               onChangeText={(value) => setFormData({ ...formData, username: value })}
+              // style={{backgroundColor:}}
             />
             {!formData.username.trim() ? (
               <HelperText type="error" visible={true}>

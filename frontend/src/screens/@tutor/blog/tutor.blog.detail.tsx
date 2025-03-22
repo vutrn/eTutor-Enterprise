@@ -1,8 +1,8 @@
 import { NavigationProp, useFocusEffect, useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
+import { Button, Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useBlogStore } from "../../../store/useBlogStore";
 import { useUserStore } from "../../../store/useUserStore";
@@ -31,61 +31,65 @@ const TutorBlogDetail = () => {
   //   }, [])
   // );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const isAuthor = selectedBlog?.author?._id === authUser?._id;
-    console.log("visible", visible);
+    // console.log("isAuthor", isAuthor);
+    // console.log("visible", visible);
 
-    navigation.setOptions({
-      headerRight: isAuthor
-        ? () => (
-            <Menu
-              visible={visible}
-              onDismiss={() => setVisible(false)}
-              anchor={
-                <IconButton
-                  icon="dots-vertical"
-                  onPress={() => {
-                    setVisible(true);
-                  }}
-                />
-              }
-            >
-              <Menu.Item
-                title="Update"
-                leadingIcon="pencil"
+    if (isAuthor) {
+      console.log("isAuthor", isAuthor);
+      navigation.setOptions({
+        headerRight: () => (
+          <Menu
+            visible={visible}
+            onDismiss={() => setVisible(false)}
+            anchor={
+              <Button
+                // icon="dots-vertical"
                 onPress={() => {
-                  setVisible(false);
-                  setSelectedBlog(selectedBlog);
-                  navigation.navigate("tutor_blog_update");
+                  setVisible(true);
                 }}
-              />
-              <Menu.Item
-                titleStyle={{ color: "red" }}
-                title="DELETE"
-                leadingIcon="delete"
-                onPress={() => {
-                  setVisible(false);
-                  alert("WARNING", "This action cannot be undone", [
-                    {
-                      text: "Cancel",
-                      style: "cancel",
-                      onPress: () => {},
+              >
+                open
+              </Button>
+            }
+          >
+            <Menu.Item
+              title="Update"
+              leadingIcon="pencil"
+              onPress={() => {
+                // setVisible(false);
+                setSelectedBlog(selectedBlog);
+                navigation.navigate("tutor_blog_update");
+              }}
+            />
+            <Menu.Item
+              titleStyle={{ color: "red" }}
+              title="DELETE"
+              leadingIcon="delete"
+              onPress={() => {
+                // setVisible(false);
+                alert("WARNING", "This action cannot be undone", [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                    onPress: () => {},
+                  },
+                  {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: async () => {
+                      handleDeleteBlog(selectedBlog._id);
                     },
-                    {
-                      text: "Delete",
-                      style: "destructive",
-                      onPress: async () => {
-                        handleDeleteBlog(selectedBlog._id);
-                      },
-                    },
-                  ]);
-                }}
-              />
-            </Menu>
-          )
-        : undefined,
-    });
-  }, [navigation, visible, selectedBlog?.author?._id, authUser?._id]);
+                  },
+                ]);
+              }}
+            />
+          </Menu>
+        ),
+      });
+    }
+  }, [visible, selectedBlog?.author?._id, authUser?._id]);
 
   const getUserNameById = (userId: string) => {
     const selectedUser = users.find((user) => user._id === userId);
