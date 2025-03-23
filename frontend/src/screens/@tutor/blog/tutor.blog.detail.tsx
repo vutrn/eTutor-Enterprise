@@ -44,14 +44,12 @@ const TutorBlogDetail = () => {
             visible={visible}
             onDismiss={() => setVisible(false)}
             anchor={
-              <Button
-                // icon="dots-vertical"
+              <IconButton
+                icon="dots-vertical"
                 onPress={() => {
                   setVisible(true);
                 }}
-              >
-                open
-              </Button>
+              />
             }
           >
             <Menu.Item

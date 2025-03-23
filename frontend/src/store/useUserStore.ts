@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { IUserState } from "../types/store";
 import axiosInstance from "../utils/axios";
 
-export const useUserStore = create<IUserState>()(
+export const useUserStore = create<IUserState>(
   // devtools(
   //   persist(
   (set) => ({

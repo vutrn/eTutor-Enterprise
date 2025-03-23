@@ -4,7 +4,7 @@ import { create } from "zustand";
 import axiosInstance from "../utils/axios";
 import { IDashboardState } from "../types/store";
 
-export const useDashboardStore = create<IDashboardState>()((set) => ({
+export const useDashboardStore = create<IDashboardState>((set) => ({
   dashboard: {
     role: undefined,
     totalClasses: 0,

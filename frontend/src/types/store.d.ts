@@ -165,14 +165,38 @@ export interface IBlogState {
   deleteBlog: (blogId: string) => Promise<void>;
   commentBlog: (text: string) => Promise<boolean>;
 }
-// router.post("/createblog", middlewareController.verifyToken, blogController.createBlog);
 
-// router.get("/", blogController.getAllBlogs);
+export interface IDocumentState {
+  documents: {
+    _id: string;
+    filename: string;
+    url: string;
+    uploadedBy: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    uploadedAt: string;
+  }[];
+  selectedDocument: {
+    _id: string;
+    filename: string;
+    url: string;
+    uploadedBy: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    uploadedAt: string;
+  };
+  loading: boolean;
+  setSelectedDocument: (selectedDocument: any) => void;
+  getDocuments: () => Promise<void>;
+  uploadDocument: (formData: FormData) => Promise<any>;
+  deleteDocument: (documentId: string) => Promise<void>;
+}
+// router.post("/upload", middlewareController.verifyTokenAndAdminAndTutor, documentController.uploadDocument);
 
-// router.get("/:blogId/getbyId", blogController.getBlogById);
+// router.get("/",  documentController.getDocuments);
 
-// router.put("/:blogId/updateblog", middlewareController.verifyToken, blogController.updateBlog);
-
-// router.delete("/:blogId", middlewareController.verifyToken, blogController.deleteBlog);
-
-// router.post("/:blogId/comment", middlewareController.verifyToken, blogController.commentBlog);
+// router.delete("/:documentId", middlewareController.verifyTokenAndAdmin, documentController.deleteDocument);

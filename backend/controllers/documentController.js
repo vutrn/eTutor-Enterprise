@@ -22,6 +22,8 @@ const documentController = {
     // Upload file lên Cloudinary và lưu vào MongoDB
     uploadDocument: async (req, res) => {
         upload(req, res, async (err) => {
+            console.log("req.file", req.file);
+            console.log("req.body", req.body);
             if (err) {
                 return res.status(500).json({ message: "Lỗi khi tải lên tập tin", error: err.message });
             }
@@ -32,6 +34,9 @@ const documentController = {
             try {
                 const { originalname, path } = req.file;
                 const { userId } = req.body; 
+                console.log("originalname", originalname);
+                console.log("path", path);
+                console.log("userId", userId);
             if (!userId) {
                 return res.status(400).json({ message: "Trường 'userId' là bắt buộc" });
             }
