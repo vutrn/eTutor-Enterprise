@@ -1,14 +1,11 @@
-import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import { IconButton, Text } from "react-native-paper";
-import { useBlogStore } from "../../../store/useBlogStore";
-import { useUserStore } from "../../../store/useUserStore";
-import { FONTS } from "../../../utils/constant";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet } from "react-native";
+import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { get } from "lodash";
 import BlogCard from "../../../components/BlogCard";
+import { useBlogStore } from "../../../store/useBlogStore";
+import { FONTS } from "../../../utils/constant";
 
 const TutorBlog = () => {
   const { blogs, getAllBlogs, setSelectedBlog, createBlog } = useBlogStore();
