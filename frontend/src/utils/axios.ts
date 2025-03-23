@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
         text2: "Please log in again",
       });
     }
-    console.log("axios error.response:", error);
+    console.log("axios error", error);
     return Promise.reject(error);
   }
 );

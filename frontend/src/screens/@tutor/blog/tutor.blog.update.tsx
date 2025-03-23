@@ -27,7 +27,6 @@ const TutorBlogUpdate = () => {
           style={styles.createButton}
           onPress={() => {
             handleUpdateBlog();
-            navigation.goBack();
           }}
           disabled={isLoading}
           loading={isLoading}
@@ -76,6 +75,7 @@ const TutorBlogUpdate = () => {
     const success = await updateBlog(selectedBlog._id, title, content, image || undefined);
     if (success) {
       await getAllBlogs();
+      navigation.goBack();
     }
     setIsLoading(false);
   };

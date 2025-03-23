@@ -6,7 +6,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import {  NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { Text } from "react-native";
@@ -69,11 +69,7 @@ export const App = () => {
       case "admin":
         return <AdminNavigator />;
       default:
-        return (
-          <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>
-            INVALID ROLE
-          </Text>
-        );
+        return <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>INVALID ROLE</Text>;
     }
   };
 
@@ -93,9 +89,7 @@ export const App = () => {
   return (
     <>
       <PaperProvider theme={theme}>
-        <NavigationContainer>
-          {renderAppContent()}
-        </NavigationContainer>
+        <NavigationContainer>{renderAppContent()}</NavigationContainer>
       </PaperProvider>
       <Toast />
     </>

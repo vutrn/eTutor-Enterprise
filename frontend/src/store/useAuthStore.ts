@@ -62,7 +62,7 @@ export const useAuthStore = create<IAuthState>()(
           Toast.show({
             type: "error",
             text1: "Login failed",
-            text2: error.response?.data?.message,
+            text2: error?.message,
           });
           return false;
         } finally {
@@ -81,7 +81,7 @@ export const useAuthStore = create<IAuthState>()(
             text2: "See you soon!",
           });
         } catch (error: any) {
-          console.log(error.response?.data?.message);
+          console.log(error.message);
         }
       },
 
