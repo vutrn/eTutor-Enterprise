@@ -1,33 +1,42 @@
 import axios from "axios";
-import { get } from "lodash";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 import Toast from "react-native-toast-message";
-import Constants from "expo-constants";
+
+const isDevelopment = __DEV__;
+console.log("Running in", isDevelopment ? "development" : "production", "mode");
 
 const getBaseUrl = () => {
   // For production deployment
-  if (Constants.expoConfig?.extra?.apiUrl) {
-    console.log("Constants.expoConfig.extra.apiUrl", Constants.expoConfig.extra.apiUrl);
+  if (!isDevelopment && Constants.expoConfig?.extra?.apiUrl) {
+    console.log("Using production API URL:", Constants.expoConfig.extra.apiUrl);
     return Constants.expoConfig.extra.apiUrl;
   }
-  
+
   // For local development
-  return Platform.OS === "android" 
-    ? "http://10.0.2.2:8000/" 
-    : "http://localhost:8000/";
+  const localUrl = Platform.OS === "android" ? "http://10.0.2.2:8000/" : "http://localhost:8000/";
+
+  console.log("Using development API URL:", localUrl);
+  return localUrl;
 };
 
 const axiosInstance = axios.create({
   baseURL: getBaseUrl(),
   withCredentials: true,
   // timeout: 1000,
-  // headers: {'X-Custom-Header': 'foobar'}
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    // console.log(
+    //   `Making ${config.method?.toUpperCase()} request to: ${config.baseURL}${config.url}`
+    // );
     return config;
   },
   function (error) {
@@ -55,7 +64,7 @@ axiosInstance.interceptors.response.use(
         text2: "Please log in again",
       });
     }
-    console.log("axios error.response:", error);
+    console.log("axios error", error);
     return Promise.reject(error);
   }
 );
