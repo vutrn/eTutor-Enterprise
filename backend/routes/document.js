@@ -2,11 +2,11 @@ const router = require("express").Router();
 const middlewareController = require("../controllers/middlewareController");
 const documentController = require("../controllers/documentController");
 
-router.post("/upload", middlewareController.verifyTokenAndAdminAndTutor, documentController.uploadDocument);
+router.post("/upload/:classId", middlewareController.verifyTokenAndAdminAndTutor, documentController.uploadDocument);
 
-router.get("/:classId/:userId",  documentController.getDocuments);
+router.get("/:classId",  documentController.getDocuments);
 
-router.delete("/:classId/:documentId", middlewareController.verifyTokenAndAdmin, documentController.deleteDocument);
+router.delete("/:classId/:documentId", middlewareController.verifyTokenAndAdminAndTutor, documentController.deleteDocument);
 
 
 module.exports = router;    

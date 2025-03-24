@@ -1,8 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import { IDocumentState } from "../types/store";
 import axiosInstance from "../utils/axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useClassStore } from "./useClassStore";
+import { useAuthStore } from "./useAuthStore";
 
 export const useDocumentStore = create<IDocumentState>((set, get) => ({
   documents: [],
@@ -21,11 +23,12 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
 
   setSelectedDocument: (selectedDocument: any) => set({ selectedDocument }),
 
-  getDocuments: async () => {
+  getDocuments: async (classId: string) => {
     try {
-      const res = await axiosInstance.get("v1/document");
+      const res = await axiosInstance.get(`v1/document/${classId}`);
       set({ documents: res.data.documents, loading: false });
     } catch (error) {
+      console.error("Error fetching documents:", error);
       Toast.show({
         type: "error",
         text1: "Error fetching documents",
@@ -33,36 +36,41 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
     }
   },
 
-  uploadDocument: async (formData: FormData) => {
+  uploadDocument: async (formData: FormData, classId: string) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
+
       set({ loading: true });
-      const res = await axiosInstance.post("v1/document/upload", formData, {
+      const res = await axiosInstance.post(`v1/document/upload/${classId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // Update documents list with new document
       Toast.show({
         type: "success",
         text1: "Document uploaded successfully",
       });
+
       set({ loading: false });
       return res.data.document;
-    } catch (error) {
+    } catch (error: any) {
       set({ loading: false });
-      Toast.show({ type: "error", text1: "Error uploading document" });
+      console.error("Upload error:", error);
+      Toast.show({
+        type: "error",
+        text1: error.response?.data?.message || "Please try again",
+      });
       throw error;
     }
   },
 
-  deleteDocument: async (documentId: string) => {
+  deleteDocument: async (classId:string, documentId: string) => {
     try {
       set({ loading: true });
-      await axiosInstance.delete(`v1/document/${documentId}`);
+      await axiosInstance.delete(`v1/document/${classId}/${documentId}`);
 
       // Update documents list by removing deleted document
       const { documents } = get();
@@ -70,9 +78,10 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
 
       set({ documents: updatedDocuments, loading: false });
       Toast.show({ type: "success", text1: "Document deleted successfully" });
-    } catch (error) {
+    } catch (error: any) {
       set({ loading: false });
-      Toast.show({ type: "error", text1: "Error deleting document" });
+      console.error("Delete error:", error);
+      Toast.show({ type: "error", text1: error.response?.data?.message || "Please try again" });
       throw error;
     }
   },

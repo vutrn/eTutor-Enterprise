@@ -1,36 +1,19 @@
 import { format } from "date-fns";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useEffect, useState } from "react";
-import { Linking, Platform, StyleSheet, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import {
-  ActivityIndicator,
-  Button,
-  Card,
-  IconButton,
-  Modal,
-  Paragraph,
-  Portal,
-  Text,
-  Title,
-} from "react-native-paper";
+import { FlatList, Linking, Platform, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Button, Card, IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useDocumentStore } from "../../../store/useDocumentStore";
 import { FONTS } from "../../../utils/constant";
-import alert from "../../../components/alert";
+import { useClassStore } from "../../../store/useClassStore";
 
 const TutorDocument = () => {
-  const {
-    documents,
-    selectedDocument,
-    setSelectedDocument,
-    getDocuments,
-    uploadDocument,
-    deleteDocument,
-    loading,
-  } = useDocumentStore();
+  const { documents, getDocuments, uploadDocument, deleteDocument, loading } = useDocumentStore();
+  const { selectedClass } = useClassStore();
   const { authUser } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,42 +23,48 @@ const TutorDocument = () => {
 
   const loadDocuments = async () => {
     setRefreshing(true);
-    await getDocuments();
+    await getDocuments(selectedClass._id);
     setRefreshing(false);
   };
 
   const handlePickDocument = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "application/doc",
-        copyToCacheDirectory: true,
-      });
-      if (result.canceled === false && result.assets && result.assets.length > 0) {
-        const file = result.assets[0];
-        const formData = new FormData();
+    const result = await DocumentPicker.getDocumentAsync({
+      // WORD DOCX ONLY
+      type: [
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/pdf",
+      ],
 
-        // Create file object compatible with FormData
-        const fileObj = {
-          uri: Platform.OS === 'ios' ? file.uri.replace('file://', '') : file.uri,
-          name: file.name,
-          type: file.mimeType,
-        };
-        console.log("DocumentPicker result:", result);
-        console.log("File object:", fileObj);
-        formData.append("file", fileObj as any);
-        if (authUser?._id) {
-          formData.append("userId", authUser._id); // Include userId if available
-        }
+      copyToCacheDirectory: true,
+    });
 
-        await uploadDocument(formData);
-        loadDocuments();
+    if (result.canceled === false && result.assets && result.assets.length > 0) {
+      const file = result.assets[0];
+      const formData = new FormData();
+
+      if ((file.size as any) > 10 * 1024 * 1024) {
+        return Toast.show({
+          type: "error",
+          text1: "File too large",
+          text2: "Please select a file smaller than 10MB",
+        });
       }
-    } catch (error: any) {
-      console.error("Error picking document:", error);
-      Toast.show({
-        type: "error",
-        text1: error.response.data.message,
-      });
+      if (
+        file.mimeType !== "application/pdf" &&
+        file.mimeType !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        return Toast.show({
+          type: "error",
+          text1: "Invalid file type",
+          text2: "Please select a PDF or Word document",
+        });
+      }
+      console.log("File", file);
+      formData.append("file", file.file as any);
+      formData.append("userId", authUser?._id as any);
+
+      await uploadDocument(formData, selectedClass._id);
+      loadDocuments();
     }
   };
 
@@ -100,12 +89,8 @@ const TutorDocument = () => {
         {
           text: "Delete",
           onPress: async () => {
-            await deleteDocument(selectedDocumentId);
+            await deleteDocument(selectedClass._id, selectedDocumentId);
             loadDocuments();
-            Toast.show({
-              type: "success",
-              text1: "Document deleted successfully",
-            });
           },
         },
       ]);

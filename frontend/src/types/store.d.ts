@@ -191,9 +191,9 @@ export interface IDocumentState {
   };
   loading: boolean;
   setSelectedDocument: (selectedDocument: any) => void;
-  getDocuments: () => Promise<void>;
-  uploadDocument: (formData: FormData) => Promise<any>;
-  deleteDocument: (documentId: string) => Promise<void>;
+  getDocuments: (classId: string) => Promise<void>;
+  uploadDocument: (formData: FormData, classId: string) => Promise<any>;
+  deleteDocument: (classId: string, documentId: string) => Promise<void>;
 }
 // router.post("/upload", middlewareController.verifyTokenAndAdminAndTutor, documentController.uploadDocument);
 

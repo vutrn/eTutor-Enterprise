@@ -31,26 +31,19 @@ const documentController = {
 
             try {
                 const { originalname, path } = req.file;
-                const { userId, classId } = req.body; 
+                const { userId } = req.body; 
+                const { classId } = req.params; 
 
-                if (!userId || !classId) {
+                if (!classId) {
                     return res.status(400).json({ message: "userId và classId là bắt buộc" });
-                }
-
-                const user = await User.findById(userId);
-                if (!user) {
-                    return res.status(404).json({ message: "User không tồn tại" });
                 }
 
                 const personalClass = await PersonalClass.findById(classId);
                 if (!personalClass) {
                     return res.status(404).json({ message: "Lớp học không tồn tại" });
                 }
-
-                if (![personalClass.admin, personalClass.tutor, ...personalClass.students].some(member => member.equals(user._id))) {
-                    return res.status(403).json({ message: "Bạn không có quyền upload tài liệu cho lớp này" });
-                }
-
+                
+                const user = await User.findById(userId);
                 const newDocument = new Document({
                     filename: originalname,
                     url: path,
@@ -71,21 +64,16 @@ const documentController = {
     // Lấy danh sách file theo classId (chỉ hiển thị tài liệu của lớp đó)
     getDocuments: async (req, res) => {
         try {
-            const { classId, userId } = req.params;
-            if (!classId || !userId) {
-                return res.status(400).json({ message: "Trường 'classId' và 'userId' là bắt buộc" });
+            const { classId } = req.params;
+            if (!classId) {
+                return res.status(400).json({ message: "Trường 'classId' là bắt buộc" });
             }
 
             const personalClass = await PersonalClass.findById(classId);
             if (!personalClass) {
                 return res.status(404).json({ message: "Lớp học không tồn tại" });
             }
-
-            // Kiểm tra user có thuộc lớp không
-            if (![personalClass.admin, personalClass.tutor, ...personalClass.students].some(member => member.equals(userId))) {
-                return res.status(403).json({ message: "Bạn không có quyền truy cập tài liệu của lớp này" });
-            }
-
+    
             const documents = await Document.find({ classId }).populate("uploadedBy", "username email");
             res.status(200).json({ documents });
         } catch (error) {

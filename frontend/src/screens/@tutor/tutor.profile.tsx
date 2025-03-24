@@ -11,9 +11,10 @@ const TutorProfile = () => {
 
   return (
     <View>
+
       <Text>Welcome, {authUser?.username ? authUser?.username : "{USERNAME}"}</Text>
       <Text>Your role: {authUser?.role || "{ROLE}"}</Text>
-
+      <Text>Your ID: {authUser?._id || "{ID}"}</Text>
       <Text>Your email: {authUser?.email || "{EMAIL}"}</Text>
       <Text>Access token: {authUser?.accessToken || "{ACCESS_TOKEN}"}</Text>
       <Text>Refresh token: {authUser?.refreshToken || "{REFRESH_TOKEN}"}</Text>
