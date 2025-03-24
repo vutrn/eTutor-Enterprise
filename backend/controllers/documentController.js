@@ -4,7 +4,7 @@ const Cloudinary = require("../lib/cloudinary.js");
 const multer = require("multer");
 const User = require("../models/User");
 const sendEmail = require("../lib/emailService");
-
+const PersonalClass = require("../models/PersonalClass");
 // Cấu hình Multer với Cloudinary
 const storage = new CloudinaryStorage({
     cloudinary: Cloudinary,
@@ -19,11 +19,9 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage }).single("file");
 
 const documentController = {
-    // Upload file lên Cloudinary và lưu vào MongoDB
+    // Upload tài liệu cho một lớp cụ thể
     uploadDocument: async (req, res) => {
         upload(req, res, async (err) => {
-            console.log("req.file", req.file);
-            console.log("req.body", req.body);
             if (err) {
                 return res.status(500).json({ message: "Lỗi khi tải lên tập tin", error: err.message });
             }
@@ -33,65 +31,92 @@ const documentController = {
 
             try {
                 const { originalname, path } = req.file;
-                const { userId } = req.body; 
-                console.log("originalname", originalname);
-                console.log("path", path);
-                console.log("userId", userId);
-            if (!userId) {
-                return res.status(400).json({ message: "Trường 'userId' là bắt buộc" });
-            }
-            const user = await User.findById(userId);
-            if (!user) {
-                return res.status(404).json({ message: "Người dùng không tồn tại" });
-            }
+                const { userId, classId } = req.body; 
 
-            const newDocument = new Document({
-            filename: originalname,
-            url: path,
-            uploadedBy: user.id, // Lưu userId vào uploadedBy
-            uploadedAt: new Date(),
-            });
+                if (!userId || !classId) {
+                    return res.status(400).json({ message: "userId và classId là bắt buộc" });
+                }
 
-            await newDocument.save();
-                
-            res.status(201).json({ message: "Tải lên thành công", document: newDocument });
+                const user = await User.findById(userId);
+                if (!user) {
+                    return res.status(404).json({ message: "User không tồn tại" });
+                }
+
+                const personalClass = await PersonalClass.findById(classId);
+                if (!personalClass) {
+                    return res.status(404).json({ message: "Lớp học không tồn tại" });
+                }
+
+                if (![personalClass.admin, personalClass.tutor, ...personalClass.students].some(member => member.equals(user._id))) {
+                    return res.status(403).json({ message: "Bạn không có quyền upload tài liệu cho lớp này" });
+                }
+
+                const newDocument = new Document({
+                    filename: originalname,
+                    url: path,
+                    uploadedBy: user.id,
+                    classId: personalClass.id, 
+                    uploadedAt: new Date(),
+                });
+
+                await newDocument.save();
+
+                res.status(201).json({ message: "Tải lên thành công", document: newDocument });
             } catch (error) {
-            res.status(500).json({ message: "Lỗi server", error: error.message });
+                res.status(500).json({ message: "Lỗi server", error: error.message });
             }
         });
     },
 
-    // Lấy danh sách file đã upload
+    // Lấy danh sách file theo classId (chỉ hiển thị tài liệu của lớp đó)
     getDocuments: async (req, res) => {
         try {
-            const documents = await Document.find().populate("uploadedBy", "username email");
+            const { classId, userId } = req.params;
+            if (!classId || !userId) {
+                return res.status(400).json({ message: "Trường 'classId' và 'userId' là bắt buộc" });
+            }
+
+            const personalClass = await PersonalClass.findById(classId);
+            if (!personalClass) {
+                return res.status(404).json({ message: "Lớp học không tồn tại" });
+            }
+
+            // Kiểm tra user có thuộc lớp không
+            if (![personalClass.admin, personalClass.tutor, ...personalClass.students].some(member => member.equals(userId))) {
+                return res.status(403).json({ message: "Bạn không có quyền truy cập tài liệu của lớp này" });
+            }
+
+            const documents = await Document.find({ classId }).populate("uploadedBy", "username email");
             res.status(200).json({ documents });
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
 
-    // Xóa file khỏi Cloudinary và MongoDB
     deleteDocument: async (req, res) => {
         try {
-            const { documentId } = req.params;
-            const document = await Document.findById(documentId);
-            if (!document) {
-                return res.status(404).json({ message: "Không tìm thấy tài liệu" });
-            }
+            const { classId, documentId } = req.params;
 
+            const document = await Document.findOne({ _id: documentId, classId });
+    
+            if (!document) {
+                return res.status(404).json({ message: "Tài liệu không tồn tại hoặc không thuộc lớp này" });
+            }
+    
             // Xóa file trên Cloudinary
             const fileUrlParts = document.url.split("/");
             const publicId = `documents/${fileUrlParts[fileUrlParts.length - 1].split(".")[0]}`;
             await Cloudinary.uploader.destroy(publicId, { resource_type: "raw" });
-            
+    
+            // Xóa tài liệu khỏi MongoDB
             await Document.findByIdAndDelete(documentId);
-            
+    
             res.status(200).json({ message: "Xóa tài liệu thành công" });
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     }
+    
 };
 
 module.exports = documentController;
