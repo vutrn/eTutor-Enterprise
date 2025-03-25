@@ -8,7 +8,7 @@ import Toast from "react-native-toast-message";
 import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useDocumentStore } from "../../../store/useDocumentStore";
-import { FONTS } from "../../../utils/constant";
+import { FONTS, MIME_TYPES } from "../../../utils/constant";
 import { useClassStore } from "../../../store/useClassStore";
 
 const TutorDocument = () => {
@@ -30,12 +30,12 @@ const TutorDocument = () => {
   const handlePickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
       // WORD DOCX ONLY
-      type: [
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/pdf",
-      ],
-
-      copyToCacheDirectory: true,
+      // type: [
+      //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      //   "application/pdf",
+      // ],
+      type: "*/*",
+      copyToCacheDirectory: false,
     });
 
     if (result.canceled === false && result.assets && result.assets.length > 0) {
@@ -49,18 +49,28 @@ const TutorDocument = () => {
           text2: "Please select a file smaller than 10MB",
         });
       }
-      if (
-        file.mimeType !== "application/pdf" &&
-        file.mimeType !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      ) {
-        return Toast.show({
-          type: "error",
-          text1: "Invalid file type",
-          text2: "Please select a PDF or Word document",
-        });
-      }
+      // if (
+      //   file.mimeType !== "application/pdf" &&
+      //   file.mimeType !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      // ) {
+      //   return Toast.show({
+      //     type: "error",
+      //     text1: "Invalid file type",
+      //     text2: "Please select a PDF or Word document",
+      //   });
+      // }
+      const fileObj = {
+        uri: file.uri,
+        name: file.name,
+        type: file.mimeType,
+      };
+
       console.log("File", file);
-      formData.append("file", file.file as any);
+      if (Platform.OS === "android") {
+        formData.append("file", fileObj as any);
+      } else {
+        formData.append("file", file.file as any);
+      }
       formData.append("userId", authUser?._id as any);
 
       await uploadDocument(formData, selectedClass._id);

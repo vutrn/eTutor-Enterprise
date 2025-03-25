@@ -67,16 +67,17 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
     }
   },
 
-  deleteDocument: async (classId:string, documentId: string) => {
+  deleteDocument: async (classId: string, documentId: string) => {
     try {
+      const token = await AsyncStorage.getItem("access-token");
+      if (!token) throw new Error("No token found");
       set({ loading: true });
-      await axiosInstance.delete(`v1/document/${classId}/${documentId}`);
-
-      // Update documents list by removing deleted document
-      const { documents } = get();
-      const updatedDocuments = documents.filter((doc) => doc._id !== documentId);
-
-      set({ documents: updatedDocuments, loading: false });
+      await axiosInstance.delete(`v1/document/${classId}/${documentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      set({ loading: false });
       Toast.show({ type: "success", text1: "Document deleted successfully" });
     } catch (error: any) {
       set({ loading: false });
