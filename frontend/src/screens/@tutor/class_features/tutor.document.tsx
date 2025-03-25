@@ -7,9 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
-import { useDocumentStore } from "../../../store/useDocumentStore";
-import { FONTS, MIME_TYPES } from "../../../utils/constant";
 import { useClassStore } from "../../../store/useClassStore";
+import { useDocumentStore } from "../../../store/useDocumentStore";
+import { FONTS } from "../../../utils/constant";
+import { DocumentCard } from "../../../components/DocumentCard";
+
+// DocumentCard component
 
 const TutorDocument = () => {
   const { documents, getDocuments, uploadDocument, deleteDocument, loading } = useDocumentStore();
@@ -35,7 +38,7 @@ const TutorDocument = () => {
       //   "application/pdf",
       // ],
       type: "*/*",
-      copyToCacheDirectory: false,
+      copyToCacheDirectory: true,
     });
 
     if (result.canceled === false && result.assets && result.assets.length > 0) {
@@ -110,27 +113,7 @@ const TutorDocument = () => {
   };
 
   const renderItem = ({ item }: any) => {
-    return (
-      <Card style={styles.card}>
-        <Card.Content>
-          <Card.Title titleStyle={styles.filename} title={item.filename} />
-          <Text style={styles.uploadInfo}>
-            <Text style={styles.uploadText}>Uploaded by: </Text>
-            {item.uploadedBy?.username || "Unknown user"}
-          </Text>
-          <Text style={styles.uploadInfo}>
-            <Text style={styles.uploadText}>Uploaded on: </Text>
-            {format(new Date(item.uploadedAt), "dd/MM/yyyy")}
-          </Text>
-        </Card.Content>
-        <Card.Actions>
-          <Button mode="contained" icon="open-in-new" onPress={() => openDocument(item.url)}>
-            Open
-          </Button>
-          <IconButton icon="delete" onPress={() => handleDeleteDocument(item._id)} />
-        </Card.Actions>
-      </Card>
-    );
+    return <DocumentCard document={item} onDelete={handleDeleteDocument} onOpen={openDocument} />;
   };
 
   return (

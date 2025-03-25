@@ -1,13 +1,13 @@
-import { NavigationProp, useFocusEffect, useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { Button, Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
+import { Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
+import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useBlogStore } from "../../../store/useBlogStore";
 import { useUserStore } from "../../../store/useUserStore";
 import { FONTS } from "../../../utils/constant";
-import alert from "../../../components/alert";
 
 const TutorBlogDetail = () => {
   const { authUser } = useAuthStore();
@@ -22,24 +22,46 @@ const TutorBlogDetail = () => {
     getAllBlogs();
   }, []);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const refreshData = async () => {
-  //       await getAllBlogs();
-  //     };
-  //     refreshData();
-  //   }, [])
-  // );
+  const isAuthor = selectedBlog?.author?._id === authUser?._id;
 
-  useEffect(() => {
-    const isAuthor = selectedBlog?.author?._id === authUser?._id;
-    // console.log("isAuthor", isAuthor);
-    // console.log("visible", visible);
+  const handleSendComment = async (text: string) => {
+    if (text.trim()) {
+      await commentBlog(text);
+      setText("");
+    }
+  };
 
-    if (isAuthor) {
-      console.log("isAuthor", isAuthor);
-      navigation.setOptions({
-        headerRight: () => (
+  const handleDeleteBlog = async (selectedBlogId: string) => {
+    await deleteBlog(selectedBlogId);
+    navigation.goBack();
+  };
+
+  const getUserNameById = (userId: string) => {
+    const selectedUser = users.find((user) => user._id === userId);
+    return selectedUser ? selectedUser.username : "Unknown";
+  };
+
+  const getRoleById = (userId: string) => {
+    const selectedUser = users.find((user) => user._id === userId);
+    return selectedUser
+      ? selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)
+      : "Unknown role";
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text>
+        {selectedBlog?.image && (
+          <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
+        )}
+      </Text>
+
+      <View style={styles.titleContainer}>
+        <Text style={styles.title} variant="titleLarge">
+          {selectedBlog?.title}
+        </Text>
+
+        {isAuthor && (
           <Menu
             visible={visible}
             onDismiss={() => setVisible(false)}
@@ -49,6 +71,7 @@ const TutorBlogDetail = () => {
                 onPress={() => {
                   setVisible(true);
                 }}
+                size={20}
               />
             }
           >
@@ -56,7 +79,7 @@ const TutorBlogDetail = () => {
               title="Update"
               leadingIcon="pencil"
               onPress={() => {
-                // setVisible(false);
+                setVisible(false);
                 setSelectedBlog(selectedBlog);
                 navigation.navigate("tutor_blog_update");
               }}
@@ -66,7 +89,7 @@ const TutorBlogDetail = () => {
               title="DELETE"
               leadingIcon="delete"
               onPress={() => {
-                // setVisible(false);
+                setVisible(false);
                 alert("WARNING", "This action cannot be undone", [
                   {
                     text: "Cancel",
@@ -84,46 +107,10 @@ const TutorBlogDetail = () => {
               }}
             />
           </Menu>
-        ),
-      });
-    }
-  }, [visible, selectedBlog?.author?._id, authUser?._id]);
-
-  const getUserNameById = (userId: string) => {
-    const selectedUser = users.find((user) => user._id === userId);
-    return selectedUser ? selectedUser.username : "Unknown";
-  };
-
-  const getRoleById = (userId: string) => {
-    const selectedUser = users.find((user) => user._id === userId);
-    return selectedUser
-      ? selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)
-      : "Unknown role";
-  };
-
-  const handleSendComment = async (text: string) => {
-    if (text.trim()) {
-      await commentBlog(text);
-      setText("");
-    }
-  };
-
-  const handleDeleteBlog = async (selectedBlogId: string) => {
-    await deleteBlog(selectedBlogId);
-    navigation.goBack();
-  };
-
-  return (
-    <ScrollView style={styles.container}>
-      <Text>
-        {selectedBlog?.image && (
-          <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
         )}
-      </Text>
-      <Text style={styles.title} variant="titleLarge">
-        {selectedBlog?.title}
-      </Text>
-      <View style={styles.blogInfo}>
+      </View>
+
+      <View>
         <Text variant="bodyMedium" style={styles.author}>
           By: {selectedBlog?.author ? selectedBlog.author.username : "Unknown author"}
         </Text>
@@ -194,19 +181,14 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 20,
   },
-  blogInfo: {
+  titleContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 10,
-    marginBottom: 12,
-  },
-  card: {
-    marginVertical: 8,
-    borderRadius: 8,
-    elevation: 4,
+    marginBottom: 8,
   },
   title: {
-    marginBottom: 8,
+    flex: 1,
     fontFamily: FONTS.bold,
   },
   image: {

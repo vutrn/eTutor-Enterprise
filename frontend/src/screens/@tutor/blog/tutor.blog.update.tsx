@@ -6,12 +6,9 @@ import { Button, HelperText, Text, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { useBlogStore } from "../../../store/useBlogStore";
 import { FONTS } from "../../../utils/constant";
-import { set } from "lodash";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { useUserStore } from "../../../store/useUserStore";
 
 const TutorBlogUpdate = () => {
-  const { selectedBlog, createBlog, getAllBlogs, updateBlog } = useBlogStore();
+  const { selectedBlog,setSelectedBlog, createBlog, getAllBlogs, updateBlog } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState(selectedBlog.title || "");
   const [content, setContent] = useState(selectedBlog.content || "");
@@ -74,7 +71,17 @@ const TutorBlogUpdate = () => {
 
     const success = await updateBlog(selectedBlog._id, title, content, image || undefined);
     if (success) {
-      await getAllBlogs();
+      // Refresh the blogs list
+      // await getAllBlogs();
+      
+      const currentBlog = { ...selectedBlog };
+      setSelectedBlog({
+        ...currentBlog,
+        title,
+        content,
+        image: image || currentBlog.image
+      });
+      
       navigation.goBack();
     }
     setIsLoading(false);
