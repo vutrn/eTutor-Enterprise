@@ -89,7 +89,9 @@ const MessageDetail = () => {
       ]}
     >
       <View>
-        <Text>{item.image && <Image source={{ uri: item.image }} style={{ width: 100, height: 100 }} />}</Text>
+        <Text>
+          {item.image && <Image source={{ uri: item.image }} style={{ width: 100, height: 100 }} />}
+        </Text>
         <Text>{item?.text}</Text>
       </View>
     </View>

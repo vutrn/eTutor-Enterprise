@@ -14,7 +14,7 @@ const TuTorClassDetail = () => {
     const loadData = async () => {
       await getDashboard();
       await getUsers();
-    }
+    };
     loadData();
   }, []);
 

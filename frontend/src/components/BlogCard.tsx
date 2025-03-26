@@ -1,23 +1,28 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { Card, IconButton, Text } from "react-native-paper";
 import { format } from "date-fns";
 import { FONTS } from "../utils/constant";
+import { IBlogState } from "../types/store";
 
 interface BlogCardProps {
-  blog: any;
-  onPress: (blog: any) => void;
+  blog: IBlogState["blogs"][number];
+  onPress: (blog: IBlogState["blogs"][number]) => void;
 }
 
 const BlogCard = ({ blog, onPress }: BlogCardProps) => {
   return (
-    <Card
-      style={styles.card}
-      onPress={() => onPress(blog)}
-    >
+    <Card style={styles.card} onPress={() => onPress(blog)}>
       <Card.Title
         titleStyle={styles.title}
         title={blog.title ? blog.title : "Untitled"}
+        left={() => (
+          <Image
+            source={{ uri: blog.image }}
+            style={{ width: 50, height: 50 }}
+            resizeMode="contain"
+          />
+        )}
         right={() => <IconButton icon="arrow-right" />}
       />
       <Card.Content>

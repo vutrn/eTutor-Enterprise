@@ -44,8 +44,9 @@ const meetingController = {
         try {
           const { classId } = req.params;
           const meetings = await Meeting.find({ class: classId })
-            .populate("class", "name")
-            .populate("attendees.student", "username email");
+            .populate({ path: "class", select: "name" })
+            .populate({ path: "attendees.student", select: "username email" });
+
     
           res.status(200).json({ meetings });
         } catch (error) {
