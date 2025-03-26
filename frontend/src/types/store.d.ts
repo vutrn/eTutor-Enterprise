@@ -27,14 +27,21 @@ export interface IAuthState {
 }
 
 export interface IClassState {
-  classes: any[];
+  classes: {
+    _id: string;
+    name: string;
+    students: any[];
+    tutor: string;
+    admin: string;
+    createdAt: string;
+  }[];
   loading: boolean;
   selectedClass: {
     _id: string;
     name: string;
     students: any[];
     tutor: string;
-    adminId: string;
+    admin: string;
     createdAt: string;
   };
 

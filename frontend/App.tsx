@@ -18,7 +18,7 @@ import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-
+import { enGB, registerTranslation } from 'react-native-paper-dates';
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
@@ -41,8 +41,9 @@ export const App = () => {
       if (isTokenExpired) {
         // Toast.show({
         //   type: "error",
-        //   text1: "Token is invalid, logging out...",
+        //   text1: "Token is invalid",
         // });
+        console.error("Token is invalid");
         logout();
       }
     };
@@ -85,6 +86,8 @@ export const App = () => {
       // background: "#f6f6f6",
     },
   };
+
+  registerTranslation("en", enGB)
 
   return (
     <>

@@ -12,7 +12,7 @@ export const useClassStore = create<IClassState>((set, get) => ({
     name: "",
     students: [],
     tutor: "",
-    adminId: "",
+    admin: "",
     createdAt: "",
   },
 

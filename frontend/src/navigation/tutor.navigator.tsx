@@ -5,8 +5,6 @@ import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
-import { useBlogStore } from "../store/useBlogStore";
-import { Button, IconButton } from "react-native-paper";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorBlog = lazy(() => import("../screens/@tutor/blog/tutor.blog"));
@@ -92,7 +90,6 @@ const HomeTab = () => {
 
 const BlogStack = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
-  const { selectedBlog } = useBlogStore();
 
   return (
     <Stack.Navigator
