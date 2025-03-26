@@ -22,7 +22,7 @@ import { useAuthStore } from "./src/store/useAuthStore";
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
-  const { authUser, verifyToken, logout } = useAuthStore();
+  const { authUser, verifyToken, logout, isTokenExpired } = useAuthStore();
   const [loaded, error] = useFonts({
     Inter_300Light,
     Inter_400Regular,
@@ -37,12 +37,12 @@ export const App = () => {
     }
 
     const checkToken = async () => {
-      const isTokenValid = await verifyToken();
-      if (!isTokenValid) {
-        Toast.show({
-          type: "error",
-          text1: "Token is invalid, logging out...",
-        });
+      await verifyToken();
+      if (isTokenExpired) {
+        // Toast.show({
+        //   type: "error",
+        //   text1: "Token is invalid, logging out...",
+        // });
         logout();
       }
     };

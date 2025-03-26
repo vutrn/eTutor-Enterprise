@@ -75,11 +75,11 @@ export const useAuthStore = create<IAuthState>()(
           await axiosInstance.post("v1/auth/logout");
           await AsyncStorage.removeItem("access-token");
           set({ authUser: null, accessToken: null, isTokenExpired: false });
-          Toast.show({
-            type: "success",
-            text1: "Logged out",
-            text2: "See you soon!",
-          });
+          // Toast.show({
+          //   type: "success",
+          //   text1: "Logged out",
+          //   text2: "See you soon!",
+          // });
         } catch (error: any) {
           console.log(error.message);
         }
@@ -89,28 +89,28 @@ export const useAuthStore = create<IAuthState>()(
         try {
           const token = await AsyncStorage.getItem("access-token");
           if (!token) {
-            Toast.show({
-              type: "error",
-              text1: "No token found",
-              text2: "Please log in again",
-            });
+            // Toast.show({
+            //   type: "error",
+            //   text1: "No token found",
+            //   text2: "Please log in again",
+            // });
             return false;
           }
 
           // Decode token and check expiration
           const decoded: any = jwtDecode(token);
           if (decoded.exp * 1000 < Date.now()) {
-            Toast.show({
-              type: "error",
-              text1: "Session expired",
-              text2: "Please log in again",
-            });
+            // Toast.show({
+            //   type: "error",
+            //   text1: "Session expired",
+            //   text2: "Please log in again",
+            // });
             set({ isTokenExpired: true });
             return false;
           }
           return true;
         } catch (error: any) {
-          console.log("🚀 ~ login: ~ error:", error.response?.data?.message);
+          console.log("Error verifying token:", error?.message);
           Toast.show({
             type: "error",
             text1: "Login failed",
