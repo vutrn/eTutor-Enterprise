@@ -39,10 +39,10 @@ export const App = () => {
     const checkToken = async () => {
       await verifyToken();
       if (isTokenExpired) {
-        // Toast.show({
-        //   type: "error",
-        //   text1: "Token is invalid",
-        // });
+        Toast.show({
+          type: "error",
+          text1: "Session expired",
+        });
         console.error("Token is invalid");
         logout();
       }

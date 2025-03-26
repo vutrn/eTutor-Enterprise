@@ -50,14 +50,27 @@ type RootStackParamList = {
   tutor_blog_update: undefined;
   tutor_blog_detail: undefined;
 
-
   tutor_document: undefined;
   tutor_meeting: undefined;
   tutor_profile: undefined;
 
   // Student navigator
   student_dashboard: undefined;
+  student_class: undefined;
+  student_feature_stack: undefined;
   student_document: undefined;
+  student_message: undefined;
+  student_message_detail: undefined;
+  student_meeting: undefined;
+  student_class_detail: undefined;
+  
+  // STUDENT BLOG
   student_blog: undefined;
+  student_blog_list: undefined;
+  student_blog_create: undefined;
+  student_blog_update: undefined;
+  student_blog_detail: undefined;
+  
+  student_home_stack: undefined;
   student_profile: undefined;
 };

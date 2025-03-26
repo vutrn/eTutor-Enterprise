@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { StyleSheet } from "react-native";
 import { Button, Card, IconButton, Text } from "react-native-paper";
+import { useAuthStore } from "../store/useAuthStore";
 
 interface DocumentCardProps {
   document: {
@@ -18,6 +19,7 @@ interface DocumentCardProps {
 }
 
 export const DocumentCard = ({ document, onDelete, onOpen }: DocumentCardProps) => {
+  const { authUser } = useAuthStore();
   return (
     <Card style={styles.card}>
       <Card.Content>
@@ -35,7 +37,9 @@ export const DocumentCard = ({ document, onDelete, onOpen }: DocumentCardProps) 
         <Button mode="contained" icon="open-in-new" onPress={() => onOpen(document.url)}>
           Open
         </Button>
-        <IconButton icon="delete" onPress={() => onDelete(document._id)} />
+        {authUser?.role === "tutor" || authUser?.role === "admin" ? (
+          <IconButton icon="delete" onPress={() => onDelete(document._id)} />
+        ) : null}
       </Card.Actions>
     </Card>
   );

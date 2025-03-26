@@ -99,6 +99,7 @@ export const useAuthStore = create<IAuthState>()(
 
           // Decode token and check expiration
           const decoded: any = jwtDecode(token);
+          console.log("expire in", decoded.exp * 1000, Date.now());
           if (decoded.exp * 1000 < Date.now()) {
             // Toast.show({
             //   type: "error",

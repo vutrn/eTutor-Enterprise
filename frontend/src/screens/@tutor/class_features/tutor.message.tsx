@@ -29,7 +29,6 @@ const TutorMessage = () => {
         contentStyle={styles.buttonContent}
         onPress={() => handleSelectUser(item)}
       >
-        {/* random color */}
         <Avatar.Text
           size={40}
           color={"#fff"}

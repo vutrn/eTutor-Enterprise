@@ -31,19 +31,35 @@ export interface IClassState {
     _id: string;
     name: string;
     students: any[];
-    tutor: string;
-    admin: string;
+    tutor: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    admin: {
+      _id: string;
+      username: string;
+      email: string;
+    };
     createdAt: string;
   }[];
-  loading: boolean;
   selectedClass: {
     _id: string;
     name: string;
     students: any[];
-    tutor: string;
-    admin: string;
+    tutor: {
+      _id: string;
+      username: string;
+      email: string;
+    };
+    admin: {
+      _id: string;
+      username: string;
+      email: string;
+    };
     createdAt: string;
   };
+  loading: boolean;
 
   setSelectedClass: (selectedClass: any) => void;
   getClasses: () => Promise<void>;
