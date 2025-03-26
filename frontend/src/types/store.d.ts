@@ -195,8 +195,31 @@ export interface IDocumentState {
   uploadDocument: (formData: FormData, classId: string) => Promise<any>;
   deleteDocument: (classId: string, documentId: string) => Promise<void>;
 }
-// router.post("/upload", middlewareController.verifyTokenAndAdminAndTutor, documentController.uploadDocument);
 
-// router.get("/",  documentController.getDocuments);
+export interface IMeetingState {
+  meetings: {
+    _id: string;
+    title: string;
+    description: string;
+    location: string;
+    time: Date;
+    class: {
+      _id: string;
+      name: string;
+    };
+    attendees: {
+      student: {
+        _id: string;
+        username: string;
+        email: string;
+      };
+      attended: boolean;
+    }[];
+    createdAt: Date;
+  }[];
 
-// router.delete("/:documentId", middlewareController.verifyTokenAndAdmin, documentController.deleteDocument);
+  loading: boolean;
+  getMeetingsByClass: (classId: string) => Promise<void>;
+  createMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
+  markAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+}

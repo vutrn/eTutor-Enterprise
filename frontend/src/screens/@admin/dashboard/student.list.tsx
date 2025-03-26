@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button } from "react-native-paper";
 import { useUserStore } from "../../../store/useUserStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 const StudentList = () => {
   const { getUsers, students, deleteUser } = useUserStore();
 
@@ -14,26 +15,25 @@ const StudentList = () => {
     getUsers();
   };
 
+  const renderItem = ({ item }: { item: any }) => {
+    return (
+      <View style={styles.card}>
+        <View key={item._id}>
+          <Text>Name: {item.username}</Text>
+          <Text>Email: {item.email}</Text>
+          <Text>Role: {item.role}</Text>
+          <Button onPress={() => handleDelete(item._id)} mode="contained">
+            Delete
+          </Button>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <View>
-      <Text>StudentList</Text>
-      <FlatList
-        data={students}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
-            <View key={item._id}>
-              <Text>Name: {item.username}</Text>
-              <Text>Email: {item.email}</Text>
-              <Text>Role: {item.role}</Text>
-              <Button onPress={() => handleDelete(item._id)} mode="contained">
-                Delete
-              </Button>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+    <SafeAreaView>
+      <FlatList data={students} keyExtractor={(item) => item._id} renderItem={renderItem} />
+    </SafeAreaView>
   );
 };
 

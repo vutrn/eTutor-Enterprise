@@ -17,7 +17,6 @@ const TutorList = () => {
 
   return (
     <View>
-      <Text>TutorList</Text>
       <FlatList
         data={tutors}
         keyExtractor={(item) => item._id}
