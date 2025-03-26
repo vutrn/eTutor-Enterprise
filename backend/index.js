@@ -30,7 +30,14 @@ const frontendOrigin = process.env.NODE_ENV === 'development'
     : (process.env.FRONTEND_URL || "https://etutor.expo.app");
 
 app.use(cors({
-    origin: frontendOrigin,
+    origin: function(origin, callback) {
+        const allowedOrigins = [frontendOrigin, "http://localhost:8081", "https://etutor.expo.app"];
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, origin);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     
     credentials: true 
 }));
