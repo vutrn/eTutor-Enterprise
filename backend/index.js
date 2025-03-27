@@ -12,6 +12,8 @@ const meetingRoute = require("./routes/meeting");
 const dashboardRoute = require("./routes/dashboard");
 const documentRoute = require("./routes/document");
 const onlmeetingRoute = require("./routes/onlmeeting");
+const bodyParser = require("body-parser");
+
 dotenv.config();
 const app = express();
 
@@ -42,7 +44,8 @@ app.use(cors({
     
     credentials: true 
 }));
-
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 app.use(express.json());
 

@@ -5,16 +5,11 @@ import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
+import { BlogStack } from "./blog.navigator";
 
 const StudentDashboard = lazy(() => import("../screens/@student/student.dashboard"));
 const StudentClass = lazy(() => import("../screens/@student/student.class"));
 const StudentProfile = lazy(() => import("../screens/@student/student.profile"));
-
-// Blog screens
-const StudentBlog = lazy(() => import("../screens/@student/blog/blog"));
-const StudentBlogCreate = lazy(() => import("../screens/@student/blog/blog.create"));
-const StudentBlogDetail = lazy(() => import("../screens/@student/blog/blog.detail"));
-const StudentBlogUpdate = lazy(() => import("../screens/@student/blog/blog.update"));
 
 // Class feature screens
 const ClassDetail = lazy(() => import("../screens/@student/class_features/class.detail"));
@@ -50,38 +45,22 @@ const ClassFeaturesTab = () => {
         component={ClassDetail}
         options={{ title: "Class Detail" }}
       />
-      <Tab.Screen name="student_message" component={StudentMessage} options={{ title: "Message" }} />
-      <Tab.Screen name="student_meeting" component={StudentMeeting} options={{ title: "Meeting" }} />
-      <Tab.Screen name="student_document" component={StudentDocument} options={{ title: "Document" }} />
+      <Tab.Screen
+        name="student_message"
+        component={StudentMessage}
+        options={{ title: "Message" }}
+      />
+      <Tab.Screen
+        name="student_meeting"
+        component={StudentMeeting}
+        options={{ title: "Meeting" }}
+      />
+      <Tab.Screen
+        name="student_document"
+        component={StudentDocument}
+        options={{ title: "Document" }}
+      />
     </Tab.Navigator>
-  );
-};
-
-const BlogStack = () => {
-  const Stack = createNativeStackNavigator<RootStackParamList>();
-
-  return (
-    <Stack.Navigator
-      screenOptions={{ presentation: "card", animation: "slide_from_right" }}
-      screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
-    >
-      <Stack.Screen name="student_blog_list" component={StudentBlog} options={{ title: "Blog" }} />
-      <Stack.Screen
-        name="student_blog_create"
-        component={StudentBlogCreate}
-        options={{ title: "Create Blog" }}
-      />
-      <Stack.Screen
-        name="student_blog_update"
-        component={StudentBlogUpdate}
-        options={{ title: "Edit Blog" }}
-      />
-      <Stack.Screen
-        name="student_blog_detail"
-        component={StudentBlogDetail}
-        options={{ title: "Details" }}
-      />
-    </Stack.Navigator>
   );
 };
 
@@ -113,7 +92,11 @@ const HomeTab = () => {
       />
       <Tab.Screen name="student_class" component={StudentClass} options={{ title: "Class" }} />
       <Tab.Screen name="student_blog" component={BlogStack} options={{ headerShown: false }} />
-      <Tab.Screen name="student_profile" component={StudentProfile} options={{ title: "Profile" }} />
+      <Tab.Screen
+        name="student_profile"
+        component={StudentProfile}
+        options={{ title: "Profile" }}
+      />
     </Tab.Navigator>
   );
 };
@@ -122,13 +105,17 @@ const StudentNavigator = () => {
   const Stack = createNativeStackNavigator<RootStackParamList>();
   const { selectedClass } = useClassStore();
   const { selectedUser } = useMessageStore();
-  
+
   return (
     <Stack.Navigator
       screenOptions={{ presentation: "card", animation: "slide_from_right" }}
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
-      <Stack.Screen name="student_home_stack" component={HomeTab} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="student_home_stack"
+        component={HomeTab}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="student_feature_stack"
         component={ClassFeaturesTab}
