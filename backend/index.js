@@ -11,6 +11,7 @@ const blogRoute = require("./routes/blog");
 const meetingRoute = require("./routes/meeting");
 const dashboardRoute = require("./routes/dashboard");
 const documentRoute = require("./routes/document");
+const onlmeetingRoute = require("./routes/onlmeeting");
 dotenv.config();
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/v1/blog", blogRoute);
 app.use("/v1/meeting", meetingRoute);
 app.use("/v1/dashboard", dashboardRoute);
 app.use("/v1/document", documentRoute);
+app.use("/v1/onlmeeting", onlmeetingRoute);
 app.listen(8000, () => {
     console.log("Server Running on port 8000");
 });
