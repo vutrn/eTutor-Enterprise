@@ -33,13 +33,6 @@ const MessageDetail = () => {
     }, 200);
   };
 
-  const handleSend = async () => {
-    if (text.trim()) {
-      await sendMessage({ text });
-      setText("");
-      await fetchMessages();
-    }
-  };
   const handleSendMessage = () => {
     if (text.trim() || image) {
       const prepareAndSendMessage = async () => {
@@ -59,6 +52,7 @@ const MessageDetail = () => {
               });
               setText("");
               setImage(null);
+              return;
             };
           } catch (error) {
             console.error("Error processing image:", error);
@@ -67,10 +61,7 @@ const MessageDetail = () => {
             setImage(null);
           }
         }
-        sendMessage({
-          text: text.trim() ? text : "",
-          image: processedImage || undefined,
-        });
+        sendMessage({ text: text.trim() ? text : "", image: processedImage || undefined });
         setText("");
         setImage(null);
       };
@@ -157,10 +148,17 @@ const MessageDetail = () => {
           onChangeText={setText}
           style={styles.input}
           placeholder="Type a message..."
-          left={<TextInput.Icon icon="account" />}
+          left={<TextInput.Icon icon="camera" onPress={pickImage} />}
           right={
-            <TextInput.Icon icon="send" onPress={handleSend} disabled={text.trim().length === 0} />
+            <TextInput.Icon
+              icon="send"
+              onPress={handleSendMessage}
+              disabled={text.trim().length === 0}
+            />
           }
+          onKeyPress={(e) => {
+            e.nativeEvent.key === "Enter" && handleSendMessage();
+          }}
         />
       </View>
     </View>

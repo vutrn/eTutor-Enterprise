@@ -43,12 +43,11 @@ type RootStackParamList = {
   };
   tutor_message_detail: undefined;
 
-  // TUTOR BLOG 
-  tutor_blog: undefined;
-  tutor_blog_list: undefined;
-  tutor_blog_create: undefined;
-  tutor_blog_update: undefined;
-  tutor_blog_detail: undefined;
+  // BLOG 
+  blog_list: undefined;
+  blog_create: undefined;
+  blog_update: undefined;
+  blog_detail: undefined;
 
   tutor_document: undefined;
   tutor_meeting: undefined;
@@ -63,13 +62,7 @@ type RootStackParamList = {
   student_message_detail: undefined;
   student_meeting: undefined;
   student_class_detail: undefined;
-  
-  // STUDENT BLOG
-  student_blog: undefined;
-  student_blog_list: undefined;
-  student_blog_create: undefined;
-  student_blog_update: undefined;
-  student_blog_detail: undefined;
+
   
   student_home_stack: undefined;
   student_profile: undefined;

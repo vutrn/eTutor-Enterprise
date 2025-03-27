@@ -3,17 +3,17 @@ import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BlogCard from "../../../components/BlogCard";
-import { useBlogStore } from "../../../store/useBlogStore";
-import { FONTS } from "../../../utils/constant";
+import { useBlogStore } from "../../store/useBlogStore";
+import { FONTS } from "../../utils/constant";
+import BlogCard from "../BlogCard";
 
-const StudentBlog = () => {
-  const { blogs, getAllBlogs, setSelectedBlog, createBlog } = useBlogStore();
+const BlogList = () => {
+  const { blogs, getAllBlogs, setSelectedBlog } = useBlogStore();
   const [refreshing, setRefreshing] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
-    fetchData();  
+    fetchData();
   }, []);
 
   const fetchData = async () => {
@@ -24,7 +24,7 @@ const StudentBlog = () => {
 
   const handleSelectBlog = (item: any) => {
     setSelectedBlog(item);
-    navigation.navigate("tutor_blog_detail");
+    navigation.navigate("blog_detail");
   };
 
   const renderItem = ({ item }: any) => {
@@ -38,7 +38,7 @@ const StudentBlog = () => {
         size={50}
         icon="plus"
         mode="contained"
-        onPress={() => navigation.navigate("tutor_blog_create")}
+        onPress={() => navigation.navigate("blog_create")}
       />
       <FlatList
         data={blogs}
@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StudentBlog;
+export default BlogList;

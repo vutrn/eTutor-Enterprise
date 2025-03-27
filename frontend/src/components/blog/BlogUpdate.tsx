@@ -4,11 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, Text, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import { useBlogStore } from "../../../store/useBlogStore";
-import { FONTS } from "../../../utils/constant";
+import { useBlogStore } from "../../store/useBlogStore";
+import { FONTS } from "../../utils/constant";
 
-const TutorBlogUpdate = () => {
-  const { selectedBlog,setSelectedBlog, createBlog, getAllBlogs, updateBlog } = useBlogStore();
+const BlogUpdate = () => {
+  const { selectedBlog, setSelectedBlog, updateBlog } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState(selectedBlog.title || "");
   const [content, setContent] = useState(selectedBlog.content || "");
@@ -36,7 +36,6 @@ const TutorBlogUpdate = () => {
   }, [isLoading, title, content, image]);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -44,7 +43,7 @@ const TutorBlogUpdate = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
   };
@@ -71,17 +70,14 @@ const TutorBlogUpdate = () => {
 
     const success = await updateBlog(selectedBlog._id, title, content, image || undefined);
     if (success) {
-      // Refresh the blogs list
-      // await getAllBlogs();
-      
       const currentBlog = { ...selectedBlog };
       setSelectedBlog({
         ...currentBlog,
         title,
         content,
-        image: image || currentBlog.image
+        image: image || currentBlog.image,
       });
-      
+
       navigation.goBack();
     }
     setIsLoading(false);
@@ -146,8 +142,6 @@ const TutorBlogUpdate = () => {
   );
 };
 
-export default TutorBlogUpdate;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -168,7 +162,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   titleInput: {
-    // marginBottom: 20,
     fontSize: 24,
     backgroundColor: "white",
     fontFamily: FONTS.bold,
@@ -202,3 +195,5 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 });
+
+export default BlogUpdate;
