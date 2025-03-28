@@ -71,6 +71,7 @@ export interface IClassState {
     studentIds: string[]
   ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
+  getClassDetails: (classId: string) => Promise<boolean>;
   removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 }
 
