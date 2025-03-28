@@ -6,8 +6,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { IAuthState } from "../types/store";
 import axiosInstance from "../utils/axios";
-
-const API_URL = "http://localhost:8000";
+import { API_BASE_URL } from "../utils/constant";
 
 export const useAuthStore = create<IAuthState>()(
   persist(
@@ -113,7 +112,7 @@ export const useAuthStore = create<IAuthState>()(
       connectSocket: () => {
         const { authUser } = get();
         if (!authUser || get().socket?.connected) return;
-        const socket = io(API_URL, {
+        const socket = io(API_BASE_URL, {
           query: { userId: authUser._id },
         });
 

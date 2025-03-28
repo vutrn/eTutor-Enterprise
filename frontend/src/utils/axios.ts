@@ -1,27 +1,12 @@
 import axios from "axios";
-import Constants from "expo-constants";
-import { Platform } from "react-native";
 import Toast from "react-native-toast-message";
+import { API_BASE_URL } from "./constant";
 
 const isDevelopment = __DEV__;
 console.log("Running in", isDevelopment ? "development" : "production", "mode");
 
-const getBaseUrl = () => {
-  // For production deployment
-  if (!isDevelopment && Constants.expoConfig?.extra?.apiUrl) {
-    console.log("Using production API URL:", Constants.expoConfig.extra.apiUrl);
-    return Constants.expoConfig.extra.apiUrl;
-  }
-
-  // For local development
-  const localUrl = Platform.OS === "android" ? "http://10.0.2.2:8000/" : "http://localhost:8000/";
-
-  console.log("Using development API URL:", localUrl);
-  return localUrl;
-};
-
 const axiosInstance = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: API_BASE_URL,
   withCredentials: true,
   // timeout: 1000,
   headers: {
