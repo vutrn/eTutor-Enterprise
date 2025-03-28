@@ -33,7 +33,7 @@ const frontendOrigin = process.env.NODE_ENV === 'development'
 
 app.use(cors({
     origin: function(origin, callback) {
-        const allowedOrigins = [frontendOrigin, "http://localhost:8081", "https://etutor.expo.app"];
+        const allowedOrigins = [frontendOrigin];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, origin);
         } else {
