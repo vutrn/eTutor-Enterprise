@@ -4,7 +4,7 @@ const userController = require("../controllers/userController");
 const router = require("express").Router();
 
 //Get All User
-router.get("/", middlewareController.verifyTokenAndAdminAndTutor, userController.getAllUsers);
+router.get("/",userController.getAllUsers);
 
 //Delete User
 router.delete("/:id", middlewareController.verifyTokenAndAdmin, userController.deleteUser);
