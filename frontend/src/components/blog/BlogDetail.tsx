@@ -50,9 +50,11 @@ const BlogDetail = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {selectedBlog?.image && (
-        <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
-      )}
+      <Text>
+        {selectedBlog?.image && (
+          <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
+        )}
+      </Text>
 
       <View style={styles.titleContainer}>
         <Text style={styles.title} variant="titleLarge">
