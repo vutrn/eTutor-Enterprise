@@ -1,22 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
+import { IMessageState } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useAuthStore } from "./useAuthStore";
-import { MessageState } from "../types/store";
 
-export const useMessageStore = create<MessageState>((set, get) => ({
-  messages: [
-    {
-      _id: "",
-      senderId: "",
-      receiverId: "",
-      text: "",
-      image: "",
-      createdAt: "",
-      updatedAt: "",
-    },
-  ],
+export const useMessageStore = create<IMessageState>((set, get) => ({
+  messages: [],
   users: [
     {
       _id: "",
@@ -33,7 +23,13 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     role: "",
   },
 
-  setSelectedUser: (selectedUser: any) => set({ selectedUser }),
+  setSelectedUser: (selectedUser: any) => {
+    set({ selectedUser });
+    set({ messages: [] });
+    if (selectedUser?._id) {
+      get().getMessages(selectedUser._id);
+    }
+  },
 
   getUsersToChat: async (classId) => {
     try {
@@ -74,7 +70,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       Toast.show({
         type: "error",
         text1: "Error fetching messages",
-        text2: error.response,
+        text2: error.response?.data?.message || "Failed to fetch messages",
       });
       console.error("Error fetching messages:", error);
     }
@@ -86,18 +82,48 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       if (!token) throw new Error("No token found");
 
       const { selectedUser, messages } = get();
+      const { socket } = useAuthStore.getState();
 
-      const res = await axiosInstance.post(`v1/message/sendmessage/${selectedUser._id}`, messageData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosInstance.post(
+        `v1/message/sendmessage/${selectedUser._id}`,
+        messageData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      //TODO: socket io
-
+      // Update local message list immediately for better UX
       set({ messages: [...messages, res.data] });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending message:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to send message",
+        text2: error.response?.data?.message || "Please try again",
+      });
     }
+  },
+
+  subscribeToMessages: () => {
+    const { socket } = useAuthStore.getState();
+    const { selectedUser } = get();
+
+    if (!socket) return;
+
+    socket.on("newMessage", (newMessage: any) => {
+      if (newMessage.senderId !== selectedUser._id) return;
+      const { messages } = get();
+      const updatedMessages = [...messages, newMessage];
+      set({ messages: updatedMessages });
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const { socket } = useAuthStore.getState();
+    if (!socket) return;
+
+    socket.off("newMessage");
   },
 }));

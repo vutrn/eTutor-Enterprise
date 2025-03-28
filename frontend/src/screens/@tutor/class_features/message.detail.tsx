@@ -1,16 +1,24 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-import { Avatar, Text, TextInput } from "react-native-paper";
+import { Badge, Text, TextInput } from "react-native-paper";
+import MessageItem from "../../../components/MessageItem";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { useUserStore } from "../../../store/useUserStore";
 import { FONTS } from "../../../utils/constant";
 
 const MessageDetail = () => {
-  const { messages, selectedUser, getMessages, sendMessage } = useMessageStore();
+  const {
+    messages,
+    selectedUser,
+    getMessages,
+    sendMessage,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useMessageStore();
   const { users, getUsers } = useUserStore();
-  const { authUser } = useAuthStore();
+  const { authUser, onlineUsers } = useAuthStore();
   const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
@@ -19,10 +27,18 @@ const MessageDetail = () => {
   useEffect(() => {
     fetchMessages();
     getUsers();
+
+    if (selectedUser?._id) {
+      subscribeToMessages();
+    }
+
+    // Cleanup function to unsubscribe when component unmounts
+    return () => {
+      unsubscribeFromMessages();
+    };
   }, [selectedUser._id]);
 
   useEffect(() => {
-    // Scroll to bottom when messages change
     if (flatListRef.current && messages.length > 0) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -55,15 +71,21 @@ const MessageDetail = () => {
               });
               setText("");
               setImage(null);
+              return;
             };
-            return; // Exit early as we'll send in the onloadend callback
           } catch (error) {
-            // console.error("Error processing image:", error);
-            // Continue with sending the message without the image
+            console.error("Error processing image:", error);
+            // Fall back to sending text only if image processing fails
+            if (text.trim()) {
+              sendMessage({ text: text.trim() });
+            }
+            setText("");
+            setImage(null);
+            return;
           }
         }
 
-        // Send message without image or if image processing failed
+        // If we didn't return early from the image processing
         sendMessage({
           text: text.trim() ? text : "",
           image: processedImage || undefined,
@@ -77,65 +99,42 @@ const MessageDetail = () => {
   };
 
   const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.5, // Reduced quality to make the image smaller
-      });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        setImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      // console.error("Error picking image:", error);
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
+  const isUserOnline = selectedUser && onlineUsers.includes(selectedUser._id);
+
   const renderItem = ({ item }: any) => {
     const isMyMessage = item.senderId === authUser?._id;
-    return (
-      <View
-        style={[
-          styles.messageContainer,
-          isMyMessage ? styles.myMessageContainer : styles.theirMessageContainer,
-        ]}
-      >
-        {!isMyMessage && (
-          <Avatar.Text
-            size={32}
-            label={selectedUser.username.substring(0, 2).toUpperCase()}
-            style={styles.avatar}
-          />
-        )}
-        <View
-          style={[
-            styles.messageBubble,
-            isMyMessage ? styles.myMessageBubble : styles.theirMessageBubble,
-          ]}
-        >
-          <Text style={styles.messageText}>{item.text}</Text>
-          <Text>
-            {item.image && <Image source={{ uri: item.image }} style={styles.messageImage} />}
-          </Text>
-          <Text style={styles.timestamp}>
-            {new Date(item.createdAt).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
-        </View>
-      </View>
-    );
+    return <MessageItem message={item} isMyMessage={isMyMessage} selectedUser={selectedUser} />;
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
+      {/* Header with online status */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>{selectedUser?.username}</Text>
+        <View style={styles.statusContainer}>
+          <Badge
+            size={12}
+            style={[styles.statusDot, isUserOnline ? styles.onlineDot : styles.offlineDot]}
+          />
+          <Text style={styles.statusText}>{isUserOnline ? "Online" : "Offline"}</Text>
+        </View>
+      </View>
+
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -189,10 +188,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  messageContainer: {
+  headerContainer: {
+    backgroundColor: "#2D336B",
+    padding: 16,
     flexDirection: "row",
-    maxWidth: "80%",
-    marginBottom: 12,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerText: {
+    color: "white",
+    fontSize: 18,
+    fontFamily: FONTS.medium,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusDot: {
+    marginRight: 6,
+  },
+  onlineDot: {
+    backgroundColor: "#4CAF50",
+  },
+  offlineDot: {
+    backgroundColor: "#9E9E9E",
+  },
+  statusText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: FONTS.regular,
   },
   inputContainer: {
     padding: 16,
@@ -207,52 +231,12 @@ const styles = StyleSheet.create({
   },
   messagesList: {
     padding: 16,
-    paddingBottom: 80,
-  },
-  messageImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 8,
-    marginTop: 8,
   },
   imagePreview: {
     width: 60,
     height: 60,
     marginRight: 8,
     borderRadius: 4,
-  },
-  avatar: {
-    backgroundColor: "#7886C7",
-  },
-  myMessageContainer: {
-    alignSelf: "flex-end",
-  },
-  theirMessageContainer: {
-    alignSelf: "flex-start",
-  },
-  messageBubble: {
-    padding: 12,
-    borderRadius: 16,
-    marginHorizontal: 8,
-  },
-  myMessageBubble: {
-    backgroundColor: "#DCF8C6",
-    borderBottomRightRadius: 0,
-  },
-  theirMessageBubble: {
-    backgroundColor: "white",
-    borderBottomLeftRadius: 0,
-  },
-  messageText: {
-    fontFamily: FONTS.regular,
-    fontSize: 16,
-  },
-  timestamp: {
-    alignSelf: "flex-end",
-    fontSize: 11,
-    marginTop: 4,
-    color: "#888",
-    fontFamily: FONTS.light,
   },
   emptyContainer: {
     flex: 1,

@@ -9,16 +9,15 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
-import { Text } from "react-native";
 import "react-native-gesture-handler";
 import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
+import { enGB, registerTranslation } from "react-native-paper-dates";
 import Toast from "react-native-toast-message";
 import AdminNavigator from "./src/navigation/admin.navigator";
 import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-import { enGB, registerTranslation } from 'react-native-paper-dates';
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
@@ -58,20 +57,12 @@ export const App = () => {
   }
 
   const renderAppContent = () => {
-    if (!authUser) {
+    if (!authUser || !authUser.role) {
       return <AuthNavigator />;
     }
-
-    switch (authUser.role) {
-      case "student":
-        return <StudentNavigator />;
-      case "tutor":
-        return <TutorNavigator />;
-      case "admin":
-        return <AdminNavigator />;
-      default:
-        return <Text style={{ flex: 1, textAlign: "center", marginTop: 50 }}>INVALID ROLE</Text>;
-    }
+    if (authUser.role === "admin") return <AdminNavigator />;
+    if (authUser.role === "tutor") return <TutorNavigator />;
+    if (authUser.role === "student") return <StudentNavigator />;
   };
 
   const theme = {
@@ -87,7 +78,7 @@ export const App = () => {
     },
   };
 
-  registerTranslation("en", enGB)
+  registerTranslation("en", enGB);
 
   return (
     <>

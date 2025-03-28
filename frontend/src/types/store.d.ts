@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 interface Form {
   username: string;
   email: string;
@@ -19,11 +21,15 @@ export interface IAuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isTokenExpired: boolean;
+  socket: Socket | null;
+  onlineUsers: string[];
 
   signup: (formData: Form) => Promise<boolean>;
   login: (formData: { username: string; password: string }) => Promise<boolean>;
   logout: () => void;
   verifyToken: () => Promise<boolean>;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
 }
 
 export interface IClassState {
@@ -74,16 +80,18 @@ export interface IClassState {
   removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 }
 
-export interface MessageState {
-  messages: {
-    _id: string;
-    senderId: string;
-    receiverId: string;
-    text: string;
-    image: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
+interface Message {
+  _id: string;
+  senderId: string;
+  receiverId: string;
+  text: string;
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IMessageState {
+  messages: Message[];
   users: {
     _id: string;
     username: string;
@@ -102,6 +110,8 @@ export interface MessageState {
   getUsersToChat: (classId: string) => Promise<void>;
   getMessages: (receiverId: string) => Promise<void>;
   sendMessage: (messageData: { text: string; image?: string }) => Promise<void>;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
 }
 
 export interface IDashboardState {
