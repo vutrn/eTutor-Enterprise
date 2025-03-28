@@ -11,10 +11,12 @@ const blogRoute = require("./routes/blog");
 const meetingRoute = require("./routes/meeting");
 const dashboardRoute = require("./routes/dashboard");
 const documentRoute = require("./routes/document");
+const onlmeetingRoute = require("./routes/onlmeeting");
 const bodyParser = require("body-parser");
 const { server, app } = require("./lib/socket");
 
 dotenv.config();
+const app = express();
 
 const connectDB = async() => {
     try {
@@ -60,8 +62,8 @@ app.use("/v1/blog", blogRoute);
 app.use("/v1/meeting", meetingRoute);
 app.use("/v1/dashboard", dashboardRoute);
 app.use("/v1/document", documentRoute);
-
-server.listen(8000, () => {
+app.use("/v1/onlmeeting", onlmeetingRoute);
+app.listen(8000, () => {
     console.log("Server Running on port 8000");
 });
 
