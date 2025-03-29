@@ -8,7 +8,6 @@ const AdminDashboard = lazy(() => import("../screens/@admin/dashboard/admin.dash
 const TutorList = lazy(() => import("../screens/@admin/dashboard/tutor.list"));
 const StudentList = lazy(() => import("../screens/@admin/dashboard/student.list"));
 const AdminClass = lazy(() => import("../screens/@admin/class/admin.class"));
-const ViewClass = lazy(() => import("../screens/@admin/view.class"));
 const AdminProfile = lazy(() => import("../screens/@admin/admin.profile"));
 
 const DashboardStack = () => {

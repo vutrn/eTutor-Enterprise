@@ -166,39 +166,6 @@ export const useClassStore = create<IClassState>((set, get) => ({
     }
   },
 
-  getClassDetails: async (classId: string) => {
-    set({ loading: true });
-    try {
-      const token = await AsyncStorage.getItem("access-token");
-      if (!token) {
-        set({ loading: false });
-        return null;
-      }
-  
-      const res = await axiosInstance.get(`v1/class/${classId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      set({
-        selectedClass: res.data,
-        loading: false,
-      });
-  
-      return res.data;
-    } catch (error: any) {
-      console.error("Failed to fetch class details:", error);
-      set({ loading: false });
-  
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error.response?.data?.message || "Failed to fetch class details",
-      });
-  
-      return null;
-    }
-  },
-
   removeStudentFromClass: async (classId, studentId) => {
     set({ loading: true });
     try {

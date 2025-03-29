@@ -5,6 +5,21 @@ interface Form {
   password: string;
 }
 
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+}
+
+interface Class {
+  _id: string;
+  name: string;
+  students: User[];
+  tutor: User;
+  admin: User;
+  createdAt: string;
+}
+
 export interface IAuthState {
   authUser: {
     _id: string;
@@ -27,38 +42,8 @@ export interface IAuthState {
 }
 
 export interface IClassState {
-  classes: {
-    _id: string;
-    name: string;
-    students: any[];
-    tutor: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    admin: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    createdAt: string;
-  }[];
-  selectedClass: {
-    _id: string;
-    name: string;
-    students: any[];
-    tutor: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    admin: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    createdAt: string;
-  };
+  classes: Class[];
+  selectedClass: Class;
   loading: boolean;
 
   setSelectedClass: (selectedClass: any) => void;
@@ -71,7 +56,6 @@ export interface IClassState {
     studentIds: string[]
   ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
-  getClassDetails: (classId: string) => Promise<boolean>;
   removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
 }
 
