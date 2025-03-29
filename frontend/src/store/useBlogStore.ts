@@ -1,24 +1,12 @@
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
 import Toast from "react-native-toast-message";
-import { IBlogState } from "../types/store";
+import { Blog, IBlogState } from "../types/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const useBlogStore = create<IBlogState>((set, get) => ({
-  blogs: [],
-  selectedBlog: {
-    _id: "",
-    title: "",
-    content: "",
-    author: {
-      _id: "",
-      username: "",
-      email: "",
-    },
-    comments: [],
-    createdAt: "",
-    updatedAt: "",
-  },
+  blogs: [] as Blog[],
+  selectedBlog: {} as Blog,
 
   setSelectedBlog: (selectedBlog: any) => set({ selectedBlog }),
 

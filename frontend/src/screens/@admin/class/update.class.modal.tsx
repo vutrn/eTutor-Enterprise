@@ -11,11 +11,12 @@ import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { useClassStore } from "../../../store/useClassStore";
 import { useUserStore } from "../../../store/useUserStore";
+import { Class } from "../../../types/store";
 
 interface IProps {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
-  classData: any; // The class to update
+  classData: Class; // The class to update
 }
 
 const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {

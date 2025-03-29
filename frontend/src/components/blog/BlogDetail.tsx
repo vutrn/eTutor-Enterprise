@@ -19,7 +19,6 @@ const BlogDetail = () => {
 
   useEffect(() => {
     getUsers();
-    getAllBlogs();
   }, []);
 
   const isAuthor = selectedBlog?.author?._id === authUser?._id;

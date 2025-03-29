@@ -8,7 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "prod": "expo export --platform web && eas deploy --prod"
+    "prod": "expo export --platform web && eas deploy --prod",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
@@ -38,12 +39,13 @@
     "react-native-gesture-handler": "~2.20.2",
     "react-native-gifted-charts": "^1.4.58",
     "react-native-paper": "^5.13.1",
-    "react-native-paper-dates": "^0.22.38",
+    "react-native-paper-dates": "github:vutrn/react-native-paper-dates",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-svg": "15.8.0",
     "react-native-toast-message": "^2.2.1",
+    "react-native-ui-datepicker": "^3.1.2",
     "react-native-web": "~0.19.13",
     "socket.io-client": "^4.8.1",
     "zustand": "^5.0.3"
@@ -51,6 +53,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "patch-package": "^8.0.0",
     "typescript": "^5.3.3"
   },
   "private": true

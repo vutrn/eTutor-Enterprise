@@ -7,6 +7,12 @@ interface Form {
   password: string;
 }
 
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+}
+
 export interface IAuthState {
   authUser: {
     _id: string;
@@ -32,39 +38,18 @@ export interface IAuthState {
   disconnectSocket: () => void;
 }
 
+interface Class {
+  _id: string;
+  name: string;
+  students: User[];
+  tutor: User;
+  admin: User;
+  createdAt: string;
+}
+
 export interface IClassState {
-  classes: {
-    _id: string;
-    name: string;
-    students: any[];
-    tutor: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    admin: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    createdAt: string;
-  }[];
-  selectedClass: {
-    _id: string;
-    name: string;
-    students: any[];
-    tutor: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    admin: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    createdAt: string;
-  };
+  classes: Class[];
+  selectedClass: Class;
   loading: boolean;
 
   setSelectedClass: (selectedClass: any) => void;
@@ -151,45 +136,25 @@ export interface IUserState {
   deleteUser: (userId: string) => Promise<void>;
 }
 
-export interface IBlogState {
-  blogs: {
+interface Blog {
+  _id: string;
+  title: string;
+  image?: string;
+  content: string;
+  author: User;
+  comments: {
     _id: string;
-    title: string;
-    image?: string;
-    content: string;
-    author: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    comments: {
-      _id: string;
-      text: string;
-      user: string;
-      createdAt: string;
-    }[];
+    text: string;
+    user: string;
     createdAt: string;
-    updatedAt: string;
   }[];
-  selectedBlog: {
-    _id: string;
-    title: string;
-    image?: string;
-    content: string;
-    author: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    comments: {
-      _id: string;
-      text: string;
-      user: string;
-      createdAt: string;
-    }[];
-    createdAt: string;
-    updatedAt: string;
-  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IBlogState {
+  blogs: Blog[];
+  selectedBlog: Blog;
   setSelectedBlog: (selectedBlog: any) => void;
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
@@ -241,11 +206,7 @@ export interface IMeetingState {
       name: string;
     };
     attendees: {
-      student: {
-        _id: string;
-        username: string;
-        email: string;
-      };
+      student: User;
       attended: boolean;
     }[];
     createdAt: Date;
@@ -253,6 +214,20 @@ export interface IMeetingState {
 
   loading: boolean;
   getMeetingsByClass: (classId: string) => Promise<void>;
-  createMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
+  createOfflineMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
+  createOnlineMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
   markAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }
+
+// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.createOnlMeeting);
+
+// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.getMeetingsByClass);
+
+// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.markAttendance);
+
+
+// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, meetingController.createMeeting);
+
+// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.getMeetingsByClass);
+
+// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.markAttendance);
