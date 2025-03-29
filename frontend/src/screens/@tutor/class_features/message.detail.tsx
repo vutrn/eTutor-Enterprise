@@ -1,31 +1,59 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
-import { IconButton, Text, TextInput } from "react-native-paper";
+import { Badge, Text, TextInput } from "react-native-paper";
+import MessageItem from "../../../components/MessageItem";
+import { useAuthStore } from "../../../store/useAuthStore";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { useUserStore } from "../../../store/useUserStore";
+import { FONTS } from "../../../utils/constant";
 
 const MessageDetail = () => {
-  const { messages, selectedUser, getMessages, sendMessage } = useMessageStore();
+  const {
+    messages,
+    selectedUser,
+    getMessages,
+    sendMessage,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useMessageStore();
   const { users, getUsers } = useUserStore();
-  const [newMessage, setNewMessage] = useState("");
+  const { authUser, onlineUsers } = useAuthStore();
+  const [text, setText] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    getMessages(selectedUser._id);
+    fetchMessages();
     getUsers();
-    console.log("selected user:", selectedUser);
+
+    if (selectedUser?._id) {
+      subscribeToMessages();
+    }
+
+    // Cleanup function to unsubscribe when component unmounts
+    return () => {
+      unsubscribeFromMessages();
+    };
   }, [selectedUser._id]);
 
   useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
+    if (flatListRef.current && messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 200);
     }
   }, [messages]);
 
+  const fetchMessages = async () => {
+    setRefreshing(true);
+    await getMessages(selectedUser._id);
+    setRefreshing(false);
+  };
+
   const handleSendMessage = () => {
-    if (newMessage.trim() || image) {
+    if (text.trim() || image) {
       const prepareAndSendMessage = async () => {
         let processedImage = image;
 
@@ -38,24 +66,31 @@ const MessageDetail = () => {
             reader.onloadend = () => {
               const base64data = reader.result;
               sendMessage({
-                text: newMessage.trim() ? newMessage : "",
+                text: text.trim() ? text : "",
                 image: base64data ? base64data.toString() : undefined,
               });
-              setNewMessage("");
+              setText("");
               setImage(null);
+              return;
             };
           } catch (error) {
             console.error("Error processing image:", error);
-            sendMessage({ text: newMessage });
-            setNewMessage("");
+            // Fall back to sending text only if image processing fails
+            if (text.trim()) {
+              sendMessage({ text: text.trim() });
+            }
+            setText("");
             setImage(null);
+            return;
           }
         }
+
+        // If we didn't return early from the image processing
         sendMessage({
-          text: newMessage.trim() ? newMessage : "",
+          text: text.trim() ? text : "",
           image: processedImage || undefined,
         });
-        setNewMessage("");
+        setText("");
         setImage(null);
       };
 
@@ -63,69 +98,87 @@ const MessageDetail = () => {
     }
   };
 
-  const getSenderNameById = (senderId: string) => {
-    const sender = users.find((user) => user._id === senderId);
-    return sender ? sender.username : "Unknown";
-  };
-
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
+      quality: 0.8,
     });
 
-    console.log(result);
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
-  const renderItem = ({ item }: any) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.senderId === selectedUser._id ? styles.receivedMessage : styles.sentMessage,
-      ]}
-    >
-      <View>
-        <Text>
-          {item.image && <Image source={{ uri: item.image }} style={{ width: 100, height: 100 }} />}
-        </Text>
-        <Text>{item?.text}</Text>
-      </View>
-    </View>
-  );
+  const isUserOnline = selectedUser && onlineUsers.includes(selectedUser._id);
+
+  const renderItem = ({ item }: any) => {
+    const isMyMessage = item.senderId === authUser?._id;
+    return <MessageItem message={item} isMyMessage={isMyMessage} selectedUser={selectedUser} />;
+  };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "android" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "android" ? 90 : 0}
     >
-      <>
-        <FlatList
-          data={messages}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.messagesList}
-          ref={flatListRef}
-        />
-
-        {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
-        <View style={styles.inputContainer}>
-          <IconButton icon="camera" onPress={pickImage} size={30} />
-          <TextInput
-            multiline
-            mode="outlined"
-            value={newMessage}
-            onChangeText={setNewMessage}
-            style={styles.input}
-            placeholder="Aa..."
+      {/* Header with online status */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>{selectedUser?.username}</Text>
+        <View style={styles.statusContainer}>
+          <Badge
+            size={12}
+            style={[styles.statusDot, isUserOnline ? styles.onlineDot : styles.offlineDot]}
           />
-          <IconButton icon="send" onPress={handleSendMessage} size={30} />
+          <Text style={styles.statusText}>{isUserOnline ? "Online" : "Offline"}</Text>
         </View>
-      </>
+      </View>
+
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.messagesList}
+        onRefresh={fetchMessages}
+        refreshing={refreshing}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No messages yet</Text>
+            <Text style={styles.emptySubtext}>Start a conversation!</Text>
+          </View>
+        }
+        onContentSizeChange={() => {
+          if (flatListRef.current && messages.length > 0) {
+            flatListRef.current.scrollToEnd({ animated: true });
+          }
+        }}
+      />
+
+      <View style={styles.inputContainer}>
+        {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+        <TextInput
+          mode="outlined"
+          value={text}
+          onChangeText={setText}
+          style={styles.input}
+          placeholder="Type a message..."
+          left={<TextInput.Icon icon="camera" onPress={pickImage} />}
+          right={
+            <TextInput.Icon
+              icon="send"
+              onPress={handleSendMessage}
+              disabled={text.trim().length === 0 && image === null}
+            />
+          }
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === "Enter") {
+              handleSendMessage();
+            }
+          }}
+        />
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -133,42 +186,74 @@ const MessageDetail = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f5f5f5",
   },
-  messageContainer: {
-    maxWidth: "50%",
-    marginVertical: 4,
-    padding: 12,
-    borderRadius: 16,
+  headerContainer: {
+    backgroundColor: "#2D336B",
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerText: {
+    color: "white",
+    fontSize: 18,
+    fontFamily: FONTS.medium,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusDot: {
+    marginRight: 6,
+  },
+  onlineDot: {
+    backgroundColor: "#4CAF50",
+  },
+  offlineDot: {
+    backgroundColor: "#9E9E9E",
+  },
+  statusText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: FONTS.regular,
   },
   inputContainer: {
-    flexDirection: "row",
     padding: 16,
-    // backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
+    backgroundColor: "#f5f5f5",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  input: {
+    flex: 1,
   },
   messagesList: {
     padding: 16,
   },
-  sentMessage: {
-    alignSelf: "flex-end",
-    backgroundColor: "#6366F1",
-  },
-  receivedMessage: {
-    alignSelf: "flex-start",
-    backgroundColor: "#FFFFFF",
-  },
-  input: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-    marginHorizontal: 8,
-    fontSize: 16,
-  },
-
   imagePreview: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
     marginRight: 8,
+    borderRadius: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontFamily: FONTS.medium,
+    color: "#757575",
+  },
+  emptySubtext: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: "#9E9E9E",
+    marginTop: 8,
   },
 });
 

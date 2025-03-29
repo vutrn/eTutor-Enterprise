@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Button, HelperText, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import { useBlogStore } from "../../../store/useBlogStore";
-import { FONTS } from "../../../utils/constant";
+import { useBlogStore } from "../../store/useBlogStore";
+import { FONTS } from "../../utils/constant";
 
-const TutorBlogCreate = () => {
+const BlogCreate = () => {
   const { createBlog, getAllBlogs } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -16,7 +16,6 @@ const TutorBlogCreate = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -24,7 +23,7 @@ const TutorBlogCreate = () => {
       quality: 1,
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
   };
@@ -58,21 +57,23 @@ const TutorBlogCreate = () => {
     setIsLoading(false);
   };
 
-  navigation.setOptions({
-    headerRight: () => (
-      <Button
-        icon="plus"
-        mode="contained"
-        style={styles.createButton}
-        onPress={handleCreateBlog}
-        disabled={isLoading}
-        loading={isLoading}
-        contentStyle={{ flexDirection: "row-reverse" }}
-      >
-        {isLoading ? "Creating..." : "Create"}
-      </Button>
-    ),
-  });
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          icon="plus"
+          mode="contained"
+          style={styles.createButton}
+          onPress={handleCreateBlog}
+          disabled={isLoading}
+          loading={isLoading}
+          contentStyle={{ flexDirection: "row-reverse" }}
+        >
+          {isLoading ? "Creating..." : "Create"}
+        </Button>
+      ),
+    });
+  }, [isLoading, title, content, image]);
 
   return (
     <View>
@@ -127,8 +128,6 @@ const TutorBlogCreate = () => {
   );
 };
 
-export default TutorBlogCreate;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -149,7 +148,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   titleInput: {
-    // marginBottom: 20,
     fontSize: 24,
     backgroundColor: "white",
     fontFamily: FONTS.bold,
@@ -171,3 +169,5 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
 });
+
+export default BlogCreate;

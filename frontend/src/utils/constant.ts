@@ -1,4 +1,6 @@
 import { StyleSheet } from "react-native";
+import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 export const FONTS = {
   light: "Inter_300Light",
@@ -16,9 +18,9 @@ export default StyleSheet.create({
 });
 
 export const COLORS = {
-  one: "#FFF2F2", 
+  one: "#FFF2F2",
   two: "#A9B5DF",
-  three: "#7886C7", 
+  three: "#7886C7",
   four: "#2D336B",
 };
 
@@ -32,4 +34,11 @@ export const MIME_TYPES = {
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   csv: "text/csv",
   txt: "text/plain",
-}
+};
+
+const DEV_API_URL = "http://localhost:8000";
+const PROD_API_URL =
+  Constants.expoGoConfig?.extra?.apiUrl || "https://etutor-backend-229b.onrender.com";
+const isDevelopment = __DEV__;
+
+export const API_BASE_URL = isDevelopment ? DEV_API_URL : PROD_API_URL;

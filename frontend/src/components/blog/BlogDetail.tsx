@@ -3,13 +3,13 @@ import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
-import alert from "../../../components/alert";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { useBlogStore } from "../../../store/useBlogStore";
-import { useUserStore } from "../../../store/useUserStore";
-import { FONTS } from "../../../utils/constant";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useBlogStore } from "../../store/useBlogStore";
+import { useUserStore } from "../../store/useUserStore";
+import { FONTS } from "../../utils/constant";
+import alert from "../alert";
 
-const TutorBlogDetail = () => {
+const BlogDetail = () => {
   const { authUser } = useAuthStore();
   const { users, getUsers } = useUserStore();
   const { selectedBlog, setSelectedBlog, commentBlog, getAllBlogs, deleteBlog } = useBlogStore();
@@ -80,8 +80,7 @@ const TutorBlogDetail = () => {
               leadingIcon="pencil"
               onPress={() => {
                 setVisible(false);
-                setSelectedBlog(selectedBlog);
-                navigation.navigate("tutor_blog_update");
+                navigation.navigate("blog_update");
               }}
             />
             <Menu.Item
@@ -131,7 +130,7 @@ const TutorBlogDetail = () => {
           style={styles.input}
           label="Add a comment..."
           onKeyPress={(e) => {
-            e.nativeEvent.key === "Enter" && handleSendComment(text);
+            if (e.nativeEvent.key === "Enter") handleSendComment(text);
           }}
         />
         <IconButton
@@ -170,8 +169,6 @@ const TutorBlogDetail = () => {
   );
 };
 
-export default TutorBlogDetail;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -204,6 +201,9 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   author: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 4,
     fontFamily: FONTS.regular,
   },
   date: {
@@ -272,3 +272,5 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 });
+
+export default BlogDetail;
