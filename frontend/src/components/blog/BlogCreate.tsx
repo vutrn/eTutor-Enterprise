@@ -6,6 +6,7 @@ import { Button, HelperText, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { useBlogStore } from "../../store/useBlogStore";
 import { FONTS } from "../../utils/constant";
+import { Text } from "@/components/ui/text";
 
 const BlogCreate = () => {
   const { createBlog, getAllBlogs } = useBlogStore();
@@ -30,9 +31,17 @@ const BlogCreate = () => {
 
   const handleCreateBlog = async () => {
     if (!title.trim())
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Title is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Title is required",
+      });
     if (!content.trim())
-      return Toast.show({ type: "error", text1: "ERROR", text2: "Content is required" });
+      return Toast.show({
+        type: "error",
+        text1: "ERROR",
+        text2: "Content is required",
+      });
     if (title.length < 5)
       return Toast.show({
         type: "error",
@@ -51,9 +60,12 @@ const BlogCreate = () => {
     setImage(null);
     setTitle("");
     setContent("");
-    await getAllBlogs();
     navigation.goBack();
-    Toast.show({ type: "success", text1: "SUCCESS", text2: "Blog created successfully" });
+    Toast.show({
+      type: "success",
+      text1: "SUCCESS",
+      text2: "Blog created successfully",
+    });
     setIsLoading(false);
   };
 
@@ -78,10 +90,20 @@ const BlogCreate = () => {
   return (
     <View>
       <ScrollView style={styles.container}>
+        {/* IMAGE PREVIEW */}
         <View style={styles.imageContainer}>
-          {image && <Image source={{ uri: image }} style={styles.image} resizeMode="contain" />}
+          {image ? (
+            <Image
+              source={{ uri: image }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          ) : (
+            <Text>No image selected</Text>
+          )}
           <Button onPress={pickImage}>Choose image</Button>
         </View>
+        {/* TITLE INPUTS */}
         <TextInput
           mode="outlined"
           placeholder="Post Title"
@@ -92,17 +114,20 @@ const BlogCreate = () => {
           style={styles.titleInput}
           outlineStyle={{ borderWidth: 0 }}
         />
+        {/* ko có title hiện helpertext  */}
         {!title.trim() ? (
           <HelperText type="error" visible={true}>
             Title is required
           </HelperText>
         ) : null}
+        {/* title < 5 hiện helpertext  */}
         {!title.trim() || title.length < 5 ? (
           <HelperText type="error" visible={true}>
             Title must be at least 5 characters
           </HelperText>
         ) : null}
 
+        {/* CONTENT INPUTS */}
         <TextInput
           mode="outlined"
           placeholder="Write your post..."

@@ -11,16 +11,16 @@ import { Checkbox, Modal, Portal, TextInput } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import { useClassStore } from "../../../store/useClassStore";
 import { useUserStore } from "../../../store/useUserStore";
+import { User } from "../../../types/store";
 
 interface IProps {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
-  classData: any; // The class to update
 }
 
-const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
+const UpdateModal = ({ modalVisible, setModalVisible }: IProps) => {
   const { tutors, students, getUsers, loading: loadingUsers } = useUserStore();
-  const { updateClass, loading: loadingClassUpdate } = useClassStore();
+  const {selectedClass, updateClass, loading: loadingClassUpdate } = useClassStore();
 
   const [className, setClassName] = useState("");
   const [selectedTutor, setSelectedTutor] = useState("");
@@ -28,13 +28,13 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (modalVisible && classData) {
-      const currentStudentIds = classData.students?.map((student: any) => student._id) || [];
-      setClassName(classData.name || "");
-      setSelectedTutor(classData.tutor?._id || "");
+    if (modalVisible && selectedClass) {
+      const currentStudentIds = selectedClass.students?.map((student: User) => student._id) || [];
+      setClassName(selectedClass.name || "");
+      setSelectedTutor(selectedClass.tutor?._id || "");
       setSelectedStudents([...currentStudentIds]);
     }
-  }, [modalVisible, classData]);
+  }, [modalVisible, selectedClass]);
 
   useEffect(() => {
     if (modalVisible) {
@@ -53,19 +53,19 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
   };
 
   const handleUpdateClass = async () => {
-    if (!className || !selectedTutor || !selectedStudents) {
+    if (!selectedClass.name || !selectedTutor || !selectedStudents) {
       alert("Please fill in all fields");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const originalStudentIds = classData.students?.map((student: any) => student._id) || [];
+      const originalStudentIds = selectedClass.students?.map((student: any) => student._id) || [];
 
       console.log("Original students:", originalStudentIds);
       console.log("New selected students:", selectedStudents);
 
-      const success = await updateClass(classData._id, className, selectedTutor, selectedStudents);
+      const success = await updateClass(selectedClass._id, className, selectedTutor, selectedStudents);
       if (success) {
         Toast.show({
           type: "success",
@@ -85,9 +85,6 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
     setIsSubmitting(false);
   };
 
-  const onChangeText = useCallback((text: string) => {
-    setClassName(text);
-  }, []);
 
   if (loadingUsers) {
     return (
@@ -114,7 +111,7 @@ const UpdateModal = ({ modalVisible, setModalVisible, classData }: IProps) => {
               label="Class Name"
               style={styles.input}
               value={className}
-              onChangeText={onChangeText}
+              onChangeText={setClassName}
               mode="outlined"
             />
           </View>
