@@ -12,14 +12,19 @@ import alert from "../alert";
 const BlogDetail = () => {
   const { authUser } = useAuthStore();
   const { users, getUsers } = useUserStore();
-  const { selectedBlog, setSelectedBlog, commentBlog, getAllBlogs, deleteBlog } = useBlogStore();
+  const {
+    selectedBlog,
+    setSelectedBlog,
+    commentBlog,
+    getAllBlogs,
+    deleteBlog,
+  } = useBlogStore();
   const [text, setText] = useState("");
   const [visible, setVisible] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
     getUsers();
-    getAllBlogs();
   }, []);
 
   const isAuthor = selectedBlog?.author?._id === authUser?._id;
@@ -50,17 +55,24 @@ const BlogDetail = () => {
 
   return (
     <ScrollView style={styles.container}>
+      {/* NHỚ WRAP IMAGE TRONG TEXT */}
       <Text>
         {selectedBlog?.image && (
-          <Image source={{ uri: selectedBlog.image }} style={styles.image} resizeMode="contain" />
+          <Image
+            source={{ uri: selectedBlog.image }}
+            style={styles.image}
+            resizeMode="contain"
+          />
         )}
       </Text>
 
       <View style={styles.titleContainer}>
+        {/* TITLE */}
         <Text style={styles.title} variant="titleLarge">
           {selectedBlog?.title}
         </Text>
 
+        {/* Nếu tác giả là người dùng đăng nhập thì hiện menu */}
         {isAuthor && (
           <Menu
             visible={visible}
@@ -110,12 +122,17 @@ const BlogDetail = () => {
       </View>
 
       <View>
+        {/* AUTHOR name */}
         <Text variant="bodyMedium" style={styles.author}>
-          By: {selectedBlog?.author ? selectedBlog.author.username : "Unknown author"}
+          By:{" "}
+          {selectedBlog?.author
+            ? selectedBlog.author.username
+            : "Unknown author"}
         </Text>
         <Text style={styles.date}>
           Published on:{" "}
-          {format(new Date(selectedBlog?.createdAt), "hh:mm MMMM dd, yyyy") || "Date not available"}
+          {format(new Date(selectedBlog?.createdAt), "hh:mm MMMM dd, yyyy") ||
+            "Date not available"}
         </Text>
       </View>
       <Text style={styles.content}>{selectedBlog?.content}</Text>
@@ -142,24 +159,31 @@ const BlogDetail = () => {
         />
       </View>
 
+      {/* Comments */}
       {selectedBlog?.comments && selectedBlog?.comments.length > 0 && (
         <View style={styles.commentsContainer}>
-          <Text style={styles.commentsHeader}>Comments ({selectedBlog?.comments.length}):</Text>
+          {/* hiển thị số lượng comment */}
+          <Text style={styles.commentsHeader}>
+            Comments ({selectedBlog?.comments.length}):
+          </Text>
+
+          {/* toReverse -> comment mới nhất đẩy lên trên cùng */}
           {selectedBlog?.comments.toReversed().map((comment: any) => (
             <View key={comment._id} style={styles.comment}>
               <View style={styles.commentContent}>
+                {/* tên user */}
                 <Text style={styles.commentUser}>
                   {getUserNameById(comment.user)
                     ? `${getUserNameById(comment.user)} (${getRoleById(comment.user)})`
-                    : ""}
+                    : "Unknown"}
                   :
                 </Text>
+                {/* comment */}
                 <Text style={styles.commentText}>{comment.text}</Text>
               </View>
+              {/* ngày giờ comment */}
               <Text style={styles.commentDate}>
-                {isNaN(new Date(comment.createdAt).getTime())
-                  ? ""
-                  : format(new Date(comment.createdAt), "hh:mm MMMM dd, yyyy")}
+                {format(new Date(comment.createdAt), "hh:mm MMMM dd, yyyy")}
               </Text>
             </View>
           ))}

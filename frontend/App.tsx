@@ -1,3 +1,5 @@
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import "@/global.css";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -18,6 +20,11 @@ import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
+import { Appearance, useColorScheme } from "react-native";
+
+// Set the dark mode flag to use class instead of media queries
+// StyleSheet.setFlag("darkMode", "class");
+
 SplashScreen.preventAutoHideAsync();
 
 export const App = () => {
@@ -52,6 +59,9 @@ export const App = () => {
     return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
+  // console.log(useColorScheme())
+  // Set the color scheme based on the user's preference
+
   if (!loaded && !error) {
     return null;
   }
@@ -69,12 +79,6 @@ export const App = () => {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      // background: '#A9B5DF',
-      // text: '#000',
-      // primary: "#6200ee",
-      // secondary: "#03dac4",
-      // error: "#b00020",
-      // background: "#f6f6f6",
     },
   };
 
@@ -83,7 +87,9 @@ export const App = () => {
   return (
     <>
       <PaperProvider theme={theme}>
-        <NavigationContainer>{renderAppContent()}</NavigationContainer>
+        <NavigationContainer>
+          <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
+        </NavigationContainer>
       </PaperProvider>
       <Toast />
     </>

@@ -10,7 +10,7 @@ import { BlogStack } from "./blog.navigator";
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorClass = lazy(() => import("../screens/@tutor/tutor.class"));
 const TutorDocument = lazy(() => import("../screens/@tutor/class_features/tutor.document"));
-const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/tutor.meeting"));
+const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/meeting/meeting.list"));
 const TutorMessage = lazy(() => import("../screens/@tutor/class_features/tutor.message"));
 const TutorProfile = lazy(() => import("../screens/@tutor/tutor.profile"));
 const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));

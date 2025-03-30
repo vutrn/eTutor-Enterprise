@@ -27,12 +27,15 @@ const BlogList = () => {
     navigation.navigate("blog_detail");
   };
 
+  // renderItem dùng cho FlatList tạo từng item trong mảng blogs
   const renderItem = ({ item }: any) => {
     return <BlogCard blog={item} onPress={handleSelectBlog} />;
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* icon tạo blog góc dưới */}
+      {/* thay bằng button thông thường */}
       <IconButton
         style={styles.icon}
         size={50}
@@ -48,7 +51,9 @@ const BlogList = () => {
         showsVerticalScrollIndicator={false}
         onRefresh={fetchData}
         refreshing={refreshing}
-        ListEmptyComponent={<Text style={styles.emptyText}>No blogs available</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No blogs available</Text>
+        }
       />
     </SafeAreaView>
   );

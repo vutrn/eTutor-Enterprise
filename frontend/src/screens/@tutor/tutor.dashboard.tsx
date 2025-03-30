@@ -28,18 +28,7 @@ const TutorDashboard = () => {
         {classItem.students.length}
       </Title>
     ),
-  }));
-
-  const lineData = [
-    { value: 0 },
-    { value: 20 },
-    { value: 18 },
-    { value: 40 },
-    { value: 36 },
-    { value: 60 },
-    { value: 54 },
-    { value: 85 },
-  ];
+  }));  
 
   return (
     <ScrollView style={styles.container}>
