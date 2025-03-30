@@ -164,59 +164,70 @@ export interface IBlogState {
   commentBlog: (text: string) => Promise<boolean>;
 }
 
+interface Document {
+  _id: string;
+  filename: string;
+  url: string;
+  uploadedBy: User;
+  uploadedAt: string;
+}
+
 export interface IDocumentState {
-  documents: {
-    _id: string;
-    filename: string;
-    url: string;
-    uploadedBy: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    uploadedAt: string;
-  }[];
-  selectedDocument: {
-    _id: string;
-    filename: string;
-    url: string;
-    uploadedBy: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    uploadedAt: string;
-  };
+  documents: Document[];
+  selectedDocument: Document;
   loading: boolean;
-  setSelectedDocument: (selectedDocument: any) => void;
+
+  setSelectedDocument: (selectedDocument: Document) => void;
   getDocuments: (classId: string) => Promise<void>;
   uploadDocument: (formData: FormData, classId: string) => Promise<any>;
   deleteDocument: (classId: string, documentId: string) => Promise<void>;
 }
 
-export interface IMeetingState {
-  meetings: {
+interface Meeting {
+  _id: string;
+  title: string;
+  time: Date;
+  class: {
     _id: string;
-    title: string;
-    description: string;
-    location: string;
-    time: Date;
-    class: {
-      _id: string;
-      name: string;
-    };
-    attendees: {
-      student: User;
-      attended: boolean;
-    }[];
-    createdAt: Date;
+    name: string;
+  };
+  attendees: {
+    student: User;
+    attended: boolean;
   }[];
+  createdAt: Date;
+  createdBy: string;
+}
+
+export interface OfflineMeeting extends Meeting {
+  description: string;
+  location: string;
+}
+export interface OnlineMeeting extends Meeting {
+  linkggmeet: string;
+}
+
+export interface IMeetingState {
+  meetings: Meeting[];
 
   loading: boolean;
-  getMeetingsByClass: (classId: string) => Promise<void>;
-  createOfflineMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
-  createOnlineMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
-  markAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+  getOfflineMeetings: () => Promise<void>;
+  getOnlineMeetings: () => Promise<void>;
+  createOfflineMeeting: (
+    classId: string,
+    title: string,
+    description: string,
+    location: string,
+    time: Date
+  ) => Promise<void>;
+  createOnlineMeeting: (
+    classId: string,
+    title: string,
+    linkggmeet: string,
+    time: Date
+  ) => Promise<void>;
+  markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+  markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }
 
 // router.post("/", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.createOnlMeeting);
@@ -224,7 +235,6 @@ export interface IMeetingState {
 // router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.getMeetingsByClass);
 
 // router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.markAttendance);
-
 
 // router.post("/", middlewareController.verifyTokenAndAdminAndTutor, meetingController.createMeeting);
 

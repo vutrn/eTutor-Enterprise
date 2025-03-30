@@ -12,8 +12,6 @@ import { useDocumentStore } from "../../../store/useDocumentStore";
 import { FONTS } from "../../../utils/constant";
 import { DocumentCard } from "../../../components/DocumentCard";
 
-// DocumentCard component
-
 const TutorDocument = () => {
   const { documents, getDocuments, uploadDocument, deleteDocument, loading } = useDocumentStore();
   const { selectedClass } = useClassStore();
@@ -52,30 +50,8 @@ const TutorDocument = () => {
           text2: "Please select a file smaller than 10MB",
         });
       }
-      // if (
-      //   file.mimeType !== "application/pdf" &&
-      //   file.mimeType !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      // ) {
-      //   return Toast.show({
-      //     type: "error",
-      //     text1: "Invalid file type",
-      //     text2: "Please select a PDF or Word document",
-      //   });
-      // }
-      const fileObj = {
-        uri: file.uri,
-        name: file.name,
-        type: file.mimeType,
-      };
-
-      console.log("File", file);
-      if (Platform.OS === "android") {
-        formData.append("file", fileObj as any);
-      } else {
-        formData.append("file", file.file as any);
-      }
+      formData.append("file", file.file as any);
       formData.append("userId", authUser?._id as any);
-
       await uploadDocument(formData, selectedClass._id);
       loadDocuments();
     }
@@ -112,6 +88,8 @@ const TutorDocument = () => {
     }
   };
 
+  // hàm renderItem dùng để render từng item trong mảng document
+  // DocumentCard trong folder src/components/DocumentCard.tsx
   const renderItem = ({ item }: any) => {
     return <DocumentCard document={item} onDelete={handleDeleteDocument} onOpen={openDocument} />;
   };
@@ -120,6 +98,7 @@ const TutorDocument = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Documents</Text>
+        {/* nút upload document */}
         <Button
           icon="upload"
           mode="contained"
@@ -130,12 +109,17 @@ const TutorDocument = () => {
         </Button>
       </View>
 
+      {/* Mặc định loaing == false */}
+      {/* Khi bấm nút upload document -> loading == true */}
       {loading ? (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" />
           <Text style={styles.loaderText}>Loading documents...</Text>
         </View>
       ) : (
+        // Khi upload xong -> loading == false
+        // khi loading == false thì hiển thị danh sách document bằng flatlist
+        // nếu documents.length == 0 thì hiển thị thông báo không có tài liệu nào bằng  ListEmptyComponent
         <FlatList
           data={documents}
           keyExtractor={(item) => item._id}
