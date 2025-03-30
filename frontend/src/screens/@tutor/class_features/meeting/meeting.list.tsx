@@ -36,8 +36,14 @@ const getMinutes = () => {
 
 const TutorMeeting = () => {
   const { selectedClass } = useClassStore();
-  const { getOfflineMeetings, createOfflineMeeting, createOnlineMeeting, meetings, loading } =
-    useMeetingStore();
+  const {
+    getOfflineMeetings,
+    getOnlineMeetings,
+    createOfflineMeeting,
+    createOnlineMeeting,
+    meetings,
+    loading,
+  } = useMeetingStore();
 
   // Form state
   const [title, setTitle] = useState("");
@@ -59,7 +65,9 @@ const TutorMeeting = () => {
   useEffect(() => {
     const fetchData = async () => {
       await getOfflineMeetings();
+      await getOnlineMeetings();
     };
+    fetchData();
   }, []);
 
   // Mobile time picker handlers
@@ -72,7 +80,7 @@ const TutorMeeting = () => {
       setVisible(false);
       setTime({ hours, minutes });
     },
-    [setVisible]
+    [setVisible],
   );
 
   const getMeetingDateTime = () => {
@@ -124,9 +132,20 @@ const TutorMeeting = () => {
 
     try {
       if (isOnline) {
-        await createOnlineMeeting(selectedClass._id, title, meetingLink, meetingDate);
+        await createOnlineMeeting(
+          selectedClass._id,
+          title,
+          meetingLink,
+          meetingDate,
+        );
       } else {
-        await createOfflineMeeting(selectedClass._id, title, description, location, meetingDate);
+        await createOfflineMeeting(
+          selectedClass._id,
+          title,
+          description,
+          location,
+          meetingDate,
+        );
       }
 
       // Reset form on success
