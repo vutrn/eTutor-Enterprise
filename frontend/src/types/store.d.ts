@@ -13,6 +13,15 @@ export interface User {
   email: string;
 }
 
+interface Class {
+  _id: string;
+  name: string;
+  students: User[];
+  tutor: User;
+  admin: User;
+  createdAt: string;
+}
+
 export interface IAuthState {
   authUser: {
     _id: string;
