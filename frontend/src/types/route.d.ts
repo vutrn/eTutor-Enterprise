@@ -5,6 +5,7 @@ type RootStackParamList = {
   signup: undefined;
 
   // Admin navigator
+  admin_home: undefined;
   admin_dashboard: undefined;
   student_list: undefined;
   tutor_list: undefined;

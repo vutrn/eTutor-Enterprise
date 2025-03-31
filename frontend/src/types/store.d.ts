@@ -47,6 +47,15 @@ export interface IAuthState {
   disconnectSocket: () => void;
 }
 
+interface Class {
+  _id: string;
+  name: string;
+  students: User[];
+  tutor: User;
+  admin: User;
+  createdAt: string;
+}
+
 export interface IClassState {
   classes: Class[];
   selectedClass: Class;
@@ -136,45 +145,25 @@ export interface IUserState {
   deleteUser: (userId: string) => Promise<void>;
 }
 
-export interface IBlogState {
-  blogs: {
+interface Blog {
+  _id: string;
+  title: string;
+  image?: string;
+  content: string;
+  author: User;
+  comments: {
     _id: string;
-    title: string;
-    image?: string;
-    content: string;
-    author: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    comments: {
-      _id: string;
-      text: string;
-      user: string;
-      createdAt: string;
-    }[];
+    text: string;
+    user: string;
     createdAt: string;
-    updatedAt: string;
   }[];
-  selectedBlog: {
-    _id: string;
-    title: string;
-    image?: string;
-    content: string;
-    author: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    comments: {
-      _id: string;
-      text: string;
-      user: string;
-      createdAt: string;
-    }[];
-    createdAt: string;
-    updatedAt: string;
-  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IBlogState {
+  blogs: Blog[];
+  selectedBlog: Blog;
   setSelectedBlog: (selectedBlog: any) => void;
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
@@ -184,60 +173,80 @@ export interface IBlogState {
   commentBlog: (text: string) => Promise<boolean>;
 }
 
+interface Document {
+  _id: string;
+  filename: string;
+  url: string;
+  uploadedBy: User;
+  uploadedAt: string;
+}
+
 export interface IDocumentState {
-  documents: {
-    _id: string;
-    filename: string;
-    url: string;
-    uploadedBy: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    uploadedAt: string;
-  }[];
-  selectedDocument: {
-    _id: string;
-    filename: string;
-    url: string;
-    uploadedBy: {
-      _id: string;
-      username: string;
-      email: string;
-    };
-    uploadedAt: string;
-  };
+  documents: Document[];
+  selectedDocument: Document;
   loading: boolean;
-  setSelectedDocument: (selectedDocument: any) => void;
+
+  setSelectedDocument: (selectedDocument: Document) => void;
   getDocuments: (classId: string) => Promise<void>;
   uploadDocument: (formData: FormData, classId: string) => Promise<any>;
   deleteDocument: (classId: string, documentId: string) => Promise<void>;
 }
 
-export interface IMeetingState {
-  meetings: {
+interface Meeting {
+  _id: string;
+  title: string;
+  time: Date;
+  class: {
     _id: string;
-    title: string;
-    description: string;
-    location: string;
-    time: Date;
-    class: {
-      _id: string;
-      name: string;
-    };
-    attendees: {
-      student: {
-        _id: string;
-        username: string;
-        email: string;
-      };
-      attended: boolean;
-    }[];
-    createdAt: Date;
+    name: string;
+  };
+  attendees: {
+    student: User;
+    attended: boolean;
   }[];
+  createdAt: Date;
+  createdBy: string;
+}
+
+export interface OfflineMeeting extends Meeting {
+  description: string;
+  location: string;
+}
+export interface OnlineMeeting extends Meeting {
+  linkggmeet: string;
+}
+
+export interface IMeetingState {
+  meetings: Meeting[];
 
   loading: boolean;
-  getMeetingsByClass: (classId: string) => Promise<void>;
-  createMeeting: (meetingData: Partial<Meeting>) => Promise<void>;
-  markAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+  getOfflineMeetings: () => Promise<void>;
+  getOnlineMeetings: () => Promise<void>;
+  createOfflineMeeting: (
+    classId: string,
+    title: string,
+    description: string,
+    location: string,
+    time: Date
+  ) => Promise<void>;
+  createOnlineMeeting: (
+    classId: string,
+    title: string,
+    linkggmeet: string,
+    time: Date
+  ) => Promise<void>;
+  markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+  markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }
+
+// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.createOnlMeeting);
+
+// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.getMeetingsByClass);
+
+// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.markAttendance);
+
+// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, meetingController.createMeeting);
+
+// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.getMeetingsByClass);
+
+// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.markAttendance);
