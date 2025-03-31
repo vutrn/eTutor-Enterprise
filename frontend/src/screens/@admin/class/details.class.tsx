@@ -29,7 +29,7 @@ const ClassDetails = ({
 
   const handleEditClass = (classData: any) => {
     setSelectedClass(classData);
-    setUpdateModalVisible(true);
+    setUpdateModalVisible(true);  
   };
 
   useEffect(() => {

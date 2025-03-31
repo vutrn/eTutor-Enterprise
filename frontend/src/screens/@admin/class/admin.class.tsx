@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Dimensions, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { IconButton, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -14,7 +21,7 @@ import ClassDetails from "./details.class";
 const { width } = Dimensions.get("window");
 
 const AdminClass = () => {
-  const { selectedClass, setSelectedClass } = useClassStore()
+  const { selectedClass, setSelectedClass } = useClassStore();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [detailsModalVisible, setDetailsVisible] = useState(false);
@@ -39,7 +46,7 @@ const AdminClass = () => {
       {
         text: "Cancel",
         style: "cancel",
-        onPress: () => { }
+        onPress: () => {},
       },
       {
         text: "Delete",
@@ -73,7 +80,10 @@ const AdminClass = () => {
   const renderClassItem = ({ item }: { item: any }) => (
     <View style={styles.row}>
       <Text style={styles.className}>{item.name}</Text>
-      <Text style={styles.cell}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+      <Text style={styles.cell}>{item.tutor?.username || "Unknown"}</Text>
+      <Text style={styles.cell}>
+        {new Date(item.createdAt).toLocaleDateString()}
+      </Text>
       <View style={[styles.cell, styles.actionButtons]}>
         <TouchableOpacity onPress={() => handleViewDetails(item)}>
           <Feather name="info" size={25} color="#1890ff" />
@@ -105,7 +115,10 @@ const AdminClass = () => {
         mode="contained"
         onPress={() => setCreateModalVisible(true)}
       />
-      <CreateModal modalVisible={createModalVisible} setModalVisible={setCreateModalVisible} />
+      <CreateModal
+        modalVisible={createModalVisible}
+        setModalVisible={setCreateModalVisible}
+      />
       {selectedClass && (
         <UpdateModal
           modalVisible={updateModalVisible}
@@ -119,7 +132,9 @@ const AdminClass = () => {
         />
       )}
 
-      <Text style={styles.totalClassesText}>Total Classes: {classes.length}</Text>
+      <Text style={styles.totalClassesText}>
+        Total Classes: {classes.length}
+      </Text>
 
       <TextInput
         style={styles.searchBar}
@@ -134,6 +149,7 @@ const AdminClass = () => {
             <>
               <View style={styles.tableHeader}>
                 <Text style={styles.headerCell}>Class Name</Text>
+                <Text style={styles.headerCell}>Tutor</Text>
                 <Text style={styles.headerCell}>Created At</Text>
                 <Text style={styles.headerCell}>Actions</Text>
               </View>
