@@ -12,7 +12,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import "react-native-gesture-handler";
-import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
+import {
+  MD3LightTheme as DefaultTheme,
+  PaperProvider,
+} from "react-native-paper";
 import { enGB, registerTranslation } from "react-native-paper-dates";
 import Toast from "react-native-toast-message";
 import AdminNavigator from "./src/navigation/admin.navigator";
@@ -20,10 +23,7 @@ import AuthNavigator from "./src/navigation/auth.navigator";
 import StudentNavigator from "./src/navigation/student.navigator";
 import TutorNavigator from "./src/navigation/tutor.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-import { Appearance, useColorScheme } from "react-native";
-
-// Set the dark mode flag to use class instead of media queries
-// StyleSheet.setFlag("darkMode", "class");
+import "flatpickr/dist/flatpickr.css";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -59,9 +59,6 @@ export const App = () => {
     return () => clearInterval(tokenCheckInterval);
   }, [loaded, error]);
 
-  // console.log(useColorScheme())
-  // Set the color scheme based on the user's preference
-
   if (!loaded && !error) {
     return null;
   }
@@ -79,18 +76,19 @@ export const App = () => {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
+      background: "#F9FAFB",
     },
   };
 
   registerTranslation("en", enGB);
 
-  return (
+  return (  
     <>
-      <PaperProvider theme={theme}>
+      {/* <PaperProvider theme={theme}> */}
         <NavigationContainer>
           <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
         </NavigationContainer>
-      </PaperProvider>
+      {/* </PaperProvider> */}
       <Toast />
     </>
   );

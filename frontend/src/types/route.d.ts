@@ -51,7 +51,13 @@ type RootStackParamList = {
   blog_detail: undefined;
 
   tutor_document: undefined;
+  
   tutor_meeting: undefined;
+  meeting_create: undefined;
+  offline_meeting_create: undefined;
+  online_meeting_create: undefined;
+  meeting_details: undefined;
+
   tutor_profile: undefined;
 
   // Student navigator

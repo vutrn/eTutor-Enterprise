@@ -67,9 +67,11 @@ const meetingController = {
           meeting.attendees.forEach(attendee => {
             if (studentIds.includes(attendee.student.toString())) {
               attendee.attended = true;
+            } else {
+              attendee.attended = false;
             }
           });
-    
+          console.log("Updated attendees:", meeting.attendees);
           await meeting.save();
     
           res.status(200).json({ message: "Điểm danh thành công", meeting });

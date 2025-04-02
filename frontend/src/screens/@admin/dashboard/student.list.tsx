@@ -39,6 +39,7 @@ const StudentList = () => {
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     padding: 10,
     marginVertical: 10,
     marginHorizontal: 20,

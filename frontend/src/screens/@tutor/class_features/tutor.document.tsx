@@ -2,18 +2,25 @@ import { format } from "date-fns";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useEffect, useState } from "react";
 import { FlatList, Linking, Platform, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Button, Card, IconButton, Text } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  Card,
+  IconButton,
+  Text,
+} from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useClassStore } from "../../../store/useClassStore";
 import { useDocumentStore } from "../../../store/useDocumentStore";
-import { FONTS } from "../../../utils/constant";
+import { FONTS, MIME_TYPES } from "../../../utils/constant";
 import { DocumentCard } from "../../../components/DocumentCard";
 
 const TutorDocument = () => {
-  const { documents, getDocuments, uploadDocument, deleteDocument, loading } = useDocumentStore();
+  const { documents, getDocuments, uploadDocument, deleteDocument, loading } =
+    useDocumentStore();
   const { selectedClass } = useClassStore();
   const { authUser } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
@@ -30,16 +37,16 @@ const TutorDocument = () => {
 
   const handlePickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
-      // WORD DOCX ONLY
-      // type: [
-      //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      //   "application/pdf",
-      // ],
-      type: "*/*",
+      type: Object.values(MIME_TYPES),
+      // type: "*/*",
       copyToCacheDirectory: true,
     });
 
-    if (result.canceled === false && result.assets && result.assets.length > 0) {
+    if (
+      result.canceled === false &&
+      result.assets &&
+      result.assets.length > 0
+    ) {
       const file = result.assets[0];
       const formData = new FormData();
 
@@ -91,7 +98,13 @@ const TutorDocument = () => {
   // hàm renderItem dùng để render từng item trong mảng document
   // DocumentCard trong folder src/components/DocumentCard.tsx
   const renderItem = ({ item }: any) => {
-    return <DocumentCard document={item} onDelete={handleDeleteDocument} onOpen={openDocument} />;
+    return (
+      <DocumentCard
+        document={item}
+        onDelete={handleDeleteDocument}
+        onOpen={openDocument}
+      />
+    );
   };
 
   return (

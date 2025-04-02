@@ -38,7 +38,8 @@ export const MIME_TYPES = {
 
 const DEV_API_URL = "http://localhost:8000";
 const PROD_API_URL =
-  Constants.expoGoConfig?.extra?.apiUrl || "https://etutor-backend-229b.onrender.com";
+  Constants.expoGoConfig?.extra?.apiUrl ||
+  "https://etutor-backend-229b.onrender.com";
 const isDevelopment = __DEV__;
 
 export const API_BASE_URL = isDevelopment ? DEV_API_URL : PROD_API_URL;

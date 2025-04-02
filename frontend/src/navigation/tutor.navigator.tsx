@@ -9,12 +9,27 @@ import { BlogStack } from "./blog.navigator";
 
 const TutorDashboard = lazy(() => import("../screens/@tutor/tutor.dashboard"));
 const TutorClass = lazy(() => import("../screens/@tutor/tutor.class"));
+const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));
 const TutorDocument = lazy(() => import("../screens/@tutor/class_features/tutor.document"));
-const TutorMeeting = lazy(() => import("../screens/@tutor/class_features/meeting/meeting.list"));
 const TutorMessage = lazy(() => import("../screens/@tutor/class_features/tutor.message"));
 const TutorProfile = lazy(() => import("../screens/@tutor/tutor.profile"));
-const ClassDetail = lazy(() => import("../screens/@tutor/class_features/tutor.class.detail"));
+
+const MeetingList = lazy(() => import("../screens/@tutor/class_features/meeting.list"));
 const MessageDetail = lazy(() => import("../screens/@tutor/class_features/message.detail"));
+
+const MeetingStack = () => {
+  const Stack = createNativeStackNavigator<RootStackParamList>();
+
+  return (
+    <Stack.Navigator >
+      <Stack.Screen
+        name="tutor_meeting"
+        component={MeetingList}
+        options={{ title: "Meeting", headerShown: false }}
+      />
+    </Stack.Navigator>
+  )
+}
 
 const ClassFeaturesTab = () => {
   const Tab = createBottomTabNavigator();
@@ -46,7 +61,7 @@ const ClassFeaturesTab = () => {
         options={{ title: "Class Detail" }}
       />
       <Tab.Screen name="tutor_message" component={TutorMessage} options={{ title: "Message" }} />
-      <Tab.Screen name="tutor_meeting" component={TutorMeeting} options={{ title: "Meeting" }} />
+      <Tab.Screen name="tutor_meeting_stack" component={MeetingStack} options={{ }} />
       <Tab.Screen name="tutor_document" component={TutorDocument} options={{ title: "Document" }} />
     </Tab.Navigator>
   );
@@ -105,6 +120,7 @@ const TutorNavigator = () => {
         component={MessageDetail}
         options={{ title: selectedUser?.username || "Messages" }}
       />
+
     </Stack.Navigator>
   );
 };

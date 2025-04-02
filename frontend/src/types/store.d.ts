@@ -217,24 +217,21 @@ export interface OnlineMeeting extends Meeting {
 }
 
 export interface IMeetingState {
-  meetings: Meeting[];
-
+  offlineMeetings: OfflineMeeting[];
+  onlineMeetings: OnlineMeeting[];
   loading: boolean;
+  selectedMeeting: OfflineMeeting | OnlineMeeting;
+  
+  setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting) => void;
   getOfflineMeetings: () => Promise<void>;
   getOnlineMeetings: () => Promise<void>;
   createOfflineMeeting: (
-    classId: string,
     title: string,
     description: string,
     location: string,
     time: Date
   ) => Promise<void>;
-  createOnlineMeeting: (
-    classId: string,
-    title: string,
-    linkggmeet: string,
-    time: Date
-  ) => Promise<void>;
+  createOnlineMeeting: (title: string, linkggmeet: string, time: Date) => Promise<void>;
   markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
   markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }

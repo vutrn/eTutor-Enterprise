@@ -65,7 +65,7 @@ const AdminNavigator = () => {
       screenLayout={({ children }) => <Suspense fallback={<Loading />}>{children}</Suspense>}
     >
       <Stack.Screen name="admin_home" component={HomeTab} options={{ headerShown: false }} />
-      <Stack.Screen name="view_class" component={ViewClass} options={{ title: "Class Detail" }} />
+      {/* <Stack.Screen name="view_class" component={ViewClass} options={{ title: "Class Detail" }} /> */}
     </Stack.Navigator>
   );
 };
