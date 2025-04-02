@@ -67,7 +67,7 @@ export const useAuthStore = create<IAuthState>()(
           Toast.show({
             type: "error",
             text1: "Login failed",
-            text2: error?.message,
+            text2: error?.response?.data?.message,
           });
           return false;
         } finally {

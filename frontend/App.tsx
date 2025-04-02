@@ -82,13 +82,13 @@ export const App = () => {
 
   registerTranslation("en", enGB);
 
-  return (  
+  return (
     <>
-      {/* <PaperProvider theme={theme}> */}
+      <PaperProvider theme={theme}>
         <NavigationContainer>
           <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
         </NavigationContainer>
-      {/* </PaperProvider> */}
+      </PaperProvider>
       <Toast />
     </>
   );

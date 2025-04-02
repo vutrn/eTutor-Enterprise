@@ -1,4 +1,3 @@
-import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
 import {
   FormControl,
@@ -13,7 +12,6 @@ import { HStack } from "@/components/ui/hstack";
 import { AlertCircleIcon, CircleIcon } from "@/components/ui/icon";
 import { Input, InputField } from "@/components/ui/input";
 import { Link, LinkText } from "@/components/ui/link";
-import { Menu, MenuItem } from "@/components/ui/menu";
 import {
   Modal,
   ModalBackdrop,
@@ -30,7 +28,6 @@ import {
   RadioIndicator,
   RadioLabel,
 } from "@/components/ui/radio";
-import { Text } from "@/components/ui/text";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
 import { VStack } from "@/components/ui/vstack";
 import { useMeetingStore } from "@/src/store/useMeetingStore";
@@ -38,7 +35,7 @@ import { isWeb } from "@gluestack-ui/nativewind-utils/IsWeb";
 import React, { useState } from "react";
 import { ActivityIndicator, ScrollView } from "react-native";
 import Toast from "react-native-toast-message";
-import DateTimePicker, { useDefaultStyles } from "react-native-ui-datepicker";
+import { useDefaultStyles } from "react-native-ui-datepicker";
 import { DatetimePicker } from "../DatetimePicker";
 
 interface Props {
@@ -73,6 +70,8 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
     location: false,
     linkggmeet: false,
     linkggmeetFormat: false,
+    datetime: false,
+    datetimePast: false,
   });
 
   const resetForm = () => {
@@ -87,6 +86,8 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
       location: false,
       linkggmeet: false,
       linkggmeetFormat: false,
+      datetime: false,
+      datetimePast: false,
     });
   };
 
@@ -102,11 +103,30 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
       location: false,
       linkggmeet: false,
       linkggmeetFormat: false,
+      datetime: false,
+      datetimePast: false,
     };
 
     if (!title.trim()) {
       newErrors.title = true;
       isValid = false;
+    }
+
+    // Validate the meeting date
+    if (!meetingDate) {
+      newErrors.datetime = true;
+      isValid = false;
+    } else {
+      // Check if the meeting date is in the past (allowing meetings for today)
+      const now = new Date();
+      now.setHours(0, 0, 0, 0); // Reset time part to start of day for comparison
+      const meetingDay = new Date(meetingDate);
+      meetingDay.setHours(0, 0, 0, 0); // Reset time part to start of day for comparison
+
+      if (meetingDay < now) {
+        newErrors.datetimePast = true;
+        isValid = false;
+      }
     }
 
     if (meetingType === "offline" && !location.trim()) {
@@ -115,22 +135,24 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
     }
 
     if (meetingType === "online") {
-      newErrors.linkggmeet = true;
-      isValid = false;
-    } else if (!googleMeetRegex.test(linkggmeet.trim())) {
-      newErrors.linkggmeetFormat = true;
-      isValid = false;
+      if (!linkggmeet.trim()) {
+        newErrors.linkggmeet = true;
+        isValid = false;
+      } else if (!googleMeetRegex.test(linkggmeet.trim())) {
+        newErrors.linkggmeetFormat = true;
+        isValid = false;
+      }
     }
 
     setErrors(newErrors);
 
-    // if (!isValid) {
-    //   Toast.show({
-    //     type: "error",
-    //     text1: "Error",
-    //     text2: "Please fill in all required fields",
-    //   });
-    // }
+    if (!isValid) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill in all required fields correctly",
+      });
+    }
 
     return isValid;
   };
@@ -212,6 +234,8 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
                     </HStack>
                   </RadioGroup>
                 </FormControlLabel>
+
+                {/* ! TITLE */}
                 <FormControl isRequired isInvalid={errors.title}>
                   <FormControlLabel>
                     <FormControlLabelText className="font-medium">
@@ -240,28 +264,61 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
                   )}
                 </FormControl>
 
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>Title is required</FormControlErrorText>
-                </FormControlError>
+                {/* ! DATE & TIME */}
+                <FormControl
+                  isRequired
+                  isInvalid={errors.datetime || errors.datetimePast}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText className="font-medium">
+                      Date & Time
+                    </FormControlLabelText>
+                  </FormControlLabel>
 
-                <FormControlLabel>
-                  <FormControlLabelText className="font-medium">
-                    Date & Time
-                  </FormControlLabelText>
-                </FormControlLabel>
-
-                <Box>
                   <DatetimePicker
                     value={meetingDate}
                     onChange={(dateStr: string) => {
-                      setMeetingDate(new Date(dateStr));
+                      const newDate = new Date(dateStr);
+                      setMeetingDate(newDate);
+
+                      // Clear date-related errors when a valid date is selected
+                      if (newDate) {
+                        const now = new Date();
+                        now.setHours(0, 0, 0, 0);
+                        const meetingDay = new Date(newDate);
+                        meetingDay.setHours(0, 0, 0, 0);
+
+                        setErrors((prev) => ({
+                          ...prev,
+                          datetime: false,
+                          datetimePast: meetingDay < now,
+                        }));
+                      }
                     }}
                   />
-                </Box>
+
+                  {errors.datetime && (
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Meeting date and time is required
+                      </FormControlErrorText>
+                    </FormControlError>
+                  )}
+
+                  {errors.datetimePast && (
+                    <FormControlError>
+                      <FormControlErrorIcon as={AlertCircleIcon} />
+                      <FormControlErrorText>
+                        Meeting date cannot be in the past
+                      </FormControlErrorText>
+                    </FormControlError>
+                  )}
+                </FormControl>
+
                 {meetingType === "offline" ? (
                   <>
-                    {/* OFFLINE TYPE */}
+                    {/* ! OFFLINE TYPE */}
                     <FormControl isRequired isInvalid={errors.location}>
                       <FormControlLabel>
                         <FormControlLabelText className="font-medium">
@@ -310,8 +367,11 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
                   </>
                 ) : (
                   <>
-                    {/* ONLINE TYPE */}
-                    <FormControl isRequired isInvalid={errors.linkggmeet}>
+                    {/* ! ONLINE TYPE */}
+                    <FormControl
+                      isRequired
+                      isInvalid={errors.linkggmeet || errors.linkggmeetFormat}
+                    >
                       <FormControlLabel className="gap-2">
                         <FormControlLabelText>
                           Google Meet Link
