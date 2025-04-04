@@ -5,7 +5,7 @@ import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
 import { useClassStore } from "../store/useClassStore";
 import { useMessageStore } from "../store/useMessageStore";
-import { BlogStack } from "./blog.navigator";
+import { BlogStack } from "./features.navigator";
 
 const StudentDashboard = lazy(() => import("../screens/@student/student.dashboard"));
 const StudentClass = lazy(() => import("../screens/@student/student.class"));

@@ -1,7 +1,7 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View, TextInput } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { FlatList, StyleSheet, View } from "react-native";
+import { Button, Card, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useClassStore } from "../../store/useClassStore";
 import { useUserStore } from "../../store/useUserStore";
@@ -11,7 +11,6 @@ const StudentClass = () => {
   const { classes, getClasses, setSelectedClass } = useClassStore();
   const { tutors, getUsers } = useUserStore();
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
@@ -31,58 +30,44 @@ const StudentClass = () => {
     navigation.navigate("student_feature_stack");
   };
 
-  const filteredClasses = classes.filter((cls: any) =>
-    cls.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const renderItem = ({ item }: any) => {
+    return (
+      <Card style={styles.card} onPress={() => handleClassSelect(item)}>
+        <Card.Content>
+          <Text style={styles.className}>{item.name}</Text>
+          <Text style={styles.tutorName}>Teacher: {item.tutor.username}</Text>
+          <Text style={styles.studentCount}>Students: {item.students.length}</Text>
+          <Text style={styles.classDate}>
+            Created: {new Date(item.createdAt).toLocaleDateString()}
+          </Text>
+        </Card.Content>
+        <Card.Actions>
+          <Button mode="contained" onPress={() => handleClassSelect(item)}>
+            Enter Class
+          </Button>
+        </Card.Actions>
+      </Card>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <TextInput
-          style={styles.searchBar}
-          placeholder="Search by class name"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <View style={styles.tableHeader}>
-          <Text style={styles.headerCell}>Class Name</Text>
-          <Text style={styles.headerCell}>Tutor</Text>
-          <Text style={styles.headerCell}>Students</Text>
-          <Text style={styles.headerCell}>Created Date</Text>
-          <Text style={styles.headerCell}>Action</Text>
-        </View>
-
-        {filteredClasses.length > 0 ? (
-          filteredClasses.map((item) => (
-            <TouchableOpacity
-              key={item._id}
-              style={styles.tableRow}
-              onPress={() => handleClassSelect(item)}
-            >
-              <Text style={styles.cell}>{item.name}</Text>
-              <Text style={styles.cell}>{item.tutor.username}</Text>
-              <Text style={styles.cell}>{item.students.length}</Text>
-              <Text style={styles.cell}>
-                {new Date(item.createdAt).toLocaleDateString()}
-              </Text>
-              <Button
-                mode="contained"
-                onPress={() => handleClassSelect(item)}
-                style={styles.enterButton}
-              >
-                Enter Class
-              </Button>
-            </TouchableOpacity>
-          ))
-        ) : (
+      <FlatList
+        data={classes}
+        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        refreshing={refreshing}
+        onRefresh={fetchData}
+        contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No classes available</Text>
             <Button mode="contained" onPress={fetchData} style={styles.refreshButton}>
               Refresh
             </Button>
           </View>
-        )}
-      </ScrollView>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -93,47 +78,31 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#f5f5f5",
   },
-  scrollContainer: {
+  listContainer: {
     paddingBottom: 20,
   },
-  searchBar: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff",
+  card: {
+    marginBottom: 16,
+    elevation: 2,
   },
-  tableHeader: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
-    backgroundColor: "#e0e0e0",
-  },
-  tableRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
-  },
-  headerCell: {
-    flex: 1,
+  className: {
+    fontSize: 18,
     fontFamily: FONTS.bold,
-    fontSize: 16,
-    textAlign: "center",
+    marginBottom: 4,
   },
-  cell: {
-    flex: 1,
+  tutorName: {
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+  },
+  studentCount: {
     fontFamily: FONTS.regular,
     fontSize: 14,
-    textAlign: "center",
   },
-  enterButton: {
-    marginHorizontal: 4,
-    flex: 1,
+  classDate: {
+    fontFamily: FONTS.light,
+    fontSize: 12,
+    color: "#666",
+    marginTop: 4,
   },
   emptyContainer: {
     alignItems: "center",

@@ -10,6 +10,7 @@ import {
 } from "@expo-google-fonts/inter";
 import { NavigationContainer } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
+import "flatpickr/dist/flatpickr.css";
 import React, { useEffect } from "react";
 import "react-native-gesture-handler";
 import {
@@ -18,12 +19,10 @@ import {
 } from "react-native-paper";
 import { enGB, registerTranslation } from "react-native-paper-dates";
 import Toast from "react-native-toast-message";
-import AdminNavigator from "./src/navigation/admin.navigator";
-import AuthNavigator from "./src/navigation/auth.navigator";
-import StudentNavigator from "./src/navigation/student.navigator";
-import TutorNavigator from "./src/navigation/tutor.navigator";
+import AppNavigator from "./src/navigation/app.navigator";
 import { useAuthStore } from "./src/store/useAuthStore";
-import "flatpickr/dist/flatpickr.css";
+import LoginScreen from "./src/screens/auth/login";
+import AuthNavigator from "./src/navigation/auth.navigator";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -67,9 +66,7 @@ export const App = () => {
     if (!authUser || !authUser.role) {
       return <AuthNavigator />;
     }
-    if (authUser.role === "admin") return <AdminNavigator />;
-    if (authUser.role === "tutor") return <TutorNavigator />;
-    if (authUser.role === "student") return <StudentNavigator />;
+    return <AppNavigator />;
   };
 
   const theme = {
@@ -82,13 +79,13 @@ export const App = () => {
 
   registerTranslation("en", enGB);
 
-  return (  
+  return (
     <>
-      {/* <PaperProvider theme={theme}> */}
+      <PaperProvider theme={theme}>
         <NavigationContainer>
           <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
         </NavigationContainer>
-      {/* </PaperProvider> */}
+      </PaperProvider>
       <Toast />
     </>
   );

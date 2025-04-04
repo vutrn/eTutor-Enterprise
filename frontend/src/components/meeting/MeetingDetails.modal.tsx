@@ -54,7 +54,7 @@ const MeetingDetailsModal = ({ isOpen, onClose, meeting }: Props) => {
     if (meeting) {
       const attendedStudents = meeting.attendees
         ?.filter((attendee) => attendee.attended)
-        .map((attendee) => attendee.student._id);
+        .map((attendee) => attendee.student?._id);
 
       setSelectedStudents(attendedStudents || []);
     }
@@ -224,8 +224,8 @@ const MeetingDetailsModal = ({ isOpen, onClose, meeting }: Props) => {
               {meeting.attendees && meeting.attendees.length > 0 ? (
                 <Box className="max-h-[300px]">
                   <FlatList
-                    data={meeting.attendees}
-                    keyExtractor={(item) => item.student._id}
+                    data={meeting?.attendees}
+                    keyExtractor={(item) => item?.student?._id}
                     renderItem={renderAttendeeItem}
                     nestedScrollEnabled
                   />

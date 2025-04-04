@@ -109,7 +109,7 @@ const LoginScreen = () => {
             </Button>
           )}
 
-          <Divider />
+          {/* <Divider />
 
           <View style={styles.linkContainer}>
             <Text variant="titleMedium">Don't have an account?{"  "}</Text>
@@ -123,7 +123,7 @@ const LoginScreen = () => {
             >
               Sign up
             </Button>
-          </View>
+          </View> */}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
