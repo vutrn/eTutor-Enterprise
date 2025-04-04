@@ -34,7 +34,7 @@ const TutorClass = () => {
         style={styles.classCard}
         onPress={() => {
           setSelectedClass(item);
-          navigation.navigate("tutor_navigator", );
+          navigation.navigate("tutor_navigator");
         }}
       >
         <Card.Title
