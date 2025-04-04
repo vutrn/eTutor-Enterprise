@@ -16,7 +16,6 @@ const StudentClassDetail = () => {
       await getUsers();
     };
     loadData();
-    console.log("selectedClass", selectedClass);
   }, []);
 
   return (

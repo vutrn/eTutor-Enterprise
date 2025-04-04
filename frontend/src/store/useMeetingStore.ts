@@ -7,20 +7,19 @@ import { useClassStore } from "./useClassStore";
 export const useMeetingStore = create<IMeetingState>((set) => ({
   offlineMeetings: [] as OfflineMeeting[],
   onlineMeetings: [] as OnlineMeeting[],
-  selectedMeeting: {} as OfflineMeeting | OnlineMeeting,
+  selectedMeeting: {} as OfflineMeeting | OnlineMeeting | null,
   loading: false,
 
   setSelectedMeeting: (selectedMeeting) => set({ selectedMeeting }),
 
-  getOfflineMeetings: async () => {
+  getOfflineMeetings: async (selectedClassId: string) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
 
-      const { selectedClass } = useClassStore.getState();
 
       set({ loading: true });
-      const res = await axiosInstance.get(`v1/meeting/${selectedClass._id}`, {
+      const res = await axiosInstance.get(`v1/meeting/${selectedClassId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -31,16 +30,14 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
     }
   },
 
-  getOnlineMeetings: async () => {
+  getOnlineMeetings: async (selectedClassId: string) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
 
-      const { selectedClass } = useClassStore.getState();
-
       set({ loading: true });
       const res = await axiosInstance.get(
-        `v1/onlmeeting/${selectedClass._id}`,
+        `v1/onlmeeting/${selectedClassId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -70,7 +67,7 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      
+
       // Fetch updated offline meetings list
       const refreshRes = await axiosInstance.get(
         `v1/meeting/${selectedClass._id}`,
@@ -78,10 +75,10 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      
+
       // Update the state with the refreshed list
       set({ offlineMeetings: refreshRes.data.meetings || [], loading: false });
-      
+
       return res.data.meeting;
     } catch (error: any) {
       console.error(
@@ -97,7 +94,7 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
-      
+
       const { selectedClass } = useClassStore.getState();
 
       set({ loading: true });
@@ -108,7 +105,7 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      
+
       // Fetch updated online meetings list
       const refreshRes = await axiosInstance.get(
         `v1/onlmeeting/${selectedClass._id}`,
@@ -116,10 +113,13 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      
+
       // Update the state with the refreshed list
-      set({ onlineMeetings: refreshRes.data.onlmeetings || [], loading: false });
-      
+      set({
+        onlineMeetings: refreshRes.data.onlmeetings || [],
+        loading: false,
+      });
+
       return res.data.meeting;
     } catch (error: any) {
       console.error(

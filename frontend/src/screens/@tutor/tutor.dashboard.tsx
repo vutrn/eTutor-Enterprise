@@ -70,11 +70,7 @@ const TutorDashboard = () => {
         </Card.Content>
       </Card>
 
-      <Card style={styles.chartCard}>
-        <Card.Content>
-          <Title>Student Distribution by Subject</Title>
-        </Card.Content>
-      </Card>
+     
     </ScrollView>
   );
 };

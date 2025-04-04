@@ -2,7 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { Badge, Text, TextInput } from "react-native-paper";
-import MessageItem from "../../../components/MessageItem";
+import MessageItem from "../../../components/message/MessageItem";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useMessageStore } from "../../../store/useMessageStore";
 import { useUserStore } from "../../../store/useUserStore";

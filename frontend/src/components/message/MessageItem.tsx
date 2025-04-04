@@ -1,8 +1,8 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 import { Avatar, Text } from "react-native-paper";
-import { FONTS } from "../utils/constant";
-import { IMeetingState, IMessageState, Message } from "../types/store";
+import { IMessageState, Message } from "../../types/store";
+import { FONTS } from "../../utils/constant";
 
 interface MessageItemProps {
   message: Message;

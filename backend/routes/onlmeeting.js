@@ -4,7 +4,7 @@ const middlewareController = require("../controllers/middlewareController");
 
 router.post("/", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.createOnlMeeting);
 
-router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.getMeetingsByClass);
+router.get("/:classId", middlewareController.verifyToken, onlMeetingController.getMeetingsByClass);
 
 router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.markAttendance);
 

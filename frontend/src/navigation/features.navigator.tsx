@@ -1,15 +1,20 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { lazy, Suspense } from "react";
 import Loading from "../components/loading";
-import { useClassStore } from "../store/useClassStore";
+import MessageDetail from "../components/message/MessageDetail";
+import MessageList from "../components/message/MessageList";
 import { useMessageStore } from "../store/useMessageStore";
-import MessageDetail from "../screens/@tutor/class_features/message.detail";
-import TutorMessage from "../screens/@tutor/class_features/tutor.message";
 
 const BlogCreate = lazy(() => import("../components/blog/BlogCreate"));
 const BlogDetail = lazy(() => import("../components/blog/BlogDetail"));
 const BlogUpdate = lazy(() => import("../components/blog/BlogUpdate"));
 const BlogList = lazy(() => import("../components/blog/BlogList"));
+
+// Define proper components instead of using inline functions
+const TutorMessageListScreen = () => <MessageList userRole="tutor" />;
+const TutorMessageDetailScreen = () => <MessageDetail userRole="tutor" />;
+const StudentMessageListScreen = () => <MessageList userRole="student" />;
+const StudentMessageDetailScreen = () => <MessageDetail userRole="student" />;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,23 +50,48 @@ export const BlogStack = () => {
   );
 };
 
-export const MessageStack = () => {
-  const { selectedClass } = useClassStore();
+// Tutor message stack using the reusable components
+export const TutorMessageStack = () => {
   const { selectedUser } = useMessageStore();
 
   return (
     <Stack.Navigator screenOptions={{}}>
       <Stack.Screen
         name="tutor_message"
-        component={TutorMessage}
+        component={TutorMessageListScreen}
         options={{
           headerShown: false,
-          title: selectedUser?.username || "Message Detail",
+          title: "Messages",
         }}
       />
       <Stack.Screen
         name="tutor_message_detail"
-        component={MessageDetail}
+        component={TutorMessageDetailScreen}
+        options={{
+          title: selectedUser?.username || "Message Detail",
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+// Student message stack using the reusable components
+export const StudentMessageStack = () => {
+  const { selectedUser } = useMessageStore();
+
+  return (
+    <Stack.Navigator screenOptions={{}}>
+      <Stack.Screen
+        name="student_message"
+        component={StudentMessageListScreen}
+        options={{
+          headerShown: false,
+          title: "Messages",
+        }}
+      />
+      <Stack.Screen
+        name="student_message_detail"
+        component={StudentMessageDetailScreen}
         options={{
           title: selectedUser?.username || "Message Detail",
         }}

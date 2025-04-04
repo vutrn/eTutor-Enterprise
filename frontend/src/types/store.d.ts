@@ -111,12 +111,14 @@ export interface IMessageState {
 export interface IDashboardState {
   dashboard: {
     role?: "admin" | "tutor" | "student";
-    totalClasses?: number;
-    totalStudents?: number;
+    totalClasses: number;
+    totalStudents: number;
     classes?: {
       _id: string;
       name: string;
-      tutor: string;
+      tutor: {
+        _id: string;   
+      };
       students: {
         _id: string;
         username: string;
@@ -220,11 +222,11 @@ export interface IMeetingState {
   offlineMeetings: OfflineMeeting[];
   onlineMeetings: OnlineMeeting[];
   loading: boolean;
-  selectedMeeting: OfflineMeeting | OnlineMeeting;
+  selectedMeeting: OfflineMeeting | OnlineMeeting | null;
   
   setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting | null) => void;
-  getOfflineMeetings: () => Promise<void>;
-  getOnlineMeetings: () => Promise<void>;
+  getOfflineMeetings: (selectedClassId: string) => Promise<void>;
+  getOnlineMeetings: (selectedClassId: string) => Promise<void>;
   createOfflineMeeting: (
     title: string,
     description: string,
