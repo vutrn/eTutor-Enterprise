@@ -62,7 +62,7 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [linkggmeet, setLinkggmeet] = useState("");
-  const [meetingDate, setMeetingDate] = useState<Date>(new Date());
+  const [meetingDate, setMeetingDate] = useState<Date | null>(new Date());
   const [isCreating, setIsCreating] = useState(false);
 
   const [errors, setErrors] = useState({
@@ -117,11 +117,10 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
       newErrors.datetime = true;
       isValid = false;
     } else {
-      // Check if the meeting date is in the past (allowing meetings for today)
       const now = new Date();
-      now.setHours(0, 0, 0, 0); // Reset time part to start of day for comparison
+      now.setHours(0, 0, 0, 0);
       const meetingDay = new Date(meetingDate);
-      meetingDay.setHours(0, 0, 0, 0); // Reset time part to start of day for comparison
+      meetingDay.setHours(0, 0, 0, 0);
 
       if (meetingDay < now) {
         newErrors.datetimePast = true;
@@ -278,10 +277,10 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
                   <DatetimePicker
                     value={meetingDate}
                     onChange={(dateStr: string) => {
-                      const newDate = new Date(dateStr);
+                      const newDate = dateStr ? new Date(dateStr) : null;
                       setMeetingDate(newDate);
 
-                      // Clear date-related errors when a valid date is selected
+                      // Clear or set date-related errors based on the new date
                       if (newDate) {
                         const now = new Date();
                         now.setHours(0, 0, 0, 0);
@@ -292,6 +291,12 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
                           ...prev,
                           datetime: false,
                           datetimePast: meetingDay < now,
+                        }));
+                      } else {
+                        setErrors((prev) => ({
+                          ...prev,
+                          datetime: true,
+                          datetimePast: false,
                         }));
                       }
                     }}

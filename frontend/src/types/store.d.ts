@@ -222,16 +222,16 @@ export interface IMeetingState {
   loading: boolean;
   selectedMeeting: OfflineMeeting | OnlineMeeting;
   
-  setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting) => void;
+  setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting | null) => void;
   getOfflineMeetings: () => Promise<void>;
   getOnlineMeetings: () => Promise<void>;
   createOfflineMeeting: (
     title: string,
     description: string,
     location: string,
-    time: Date
+    time: Date | null
   ) => Promise<void>;
-  createOnlineMeeting: (title: string, linkggmeet: string, time: Date) => Promise<void>;
+  createOnlineMeeting: (title: string, linkggmeet: string, time: Date | null) => Promise<void>;
   markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
   markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }

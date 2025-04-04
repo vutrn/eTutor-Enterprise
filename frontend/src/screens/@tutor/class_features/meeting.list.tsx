@@ -4,7 +4,7 @@ import MeetingDetailsModal from "@/src/components/meeting/MeetingDetails.modal";
 import MeetingList from "@/src/components/meeting/MeetingList";
 import { useMeetingStore } from "@/src/store/useMeetingStore";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const TutorMeetingList = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -16,6 +16,17 @@ const TutorMeetingList = () => {
   } = useMeetingStore();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  useEffect(() => {
+    const loadAllMeetings = async () => {
+      await Promise.all([getOfflineMeetings(), getOnlineMeetings()]);
+    };
+    loadAllMeetings();
+    return () => {
+      // Cleanup function to avoid memory leaks or unwanted state updates
+      setSelectedMeeting(null); // Reset selected meeting when component unmounts
+    };
+  }, []);
 
   const handleViewDetails = (meeting: any) => {
     setSelectedMeeting(meeting);
@@ -29,12 +40,12 @@ const TutorMeetingList = () => {
   // Load meetings when modal is closed
   const handleCloseDetailsModal = () => {
     setIsDetailsModalOpen(false);
-    loadAllMeetings();
+    // loadAllMeetings();
   };
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
-    loadAllMeetings();
+    // loadAllMeetings();
   };
 
   const loadAllMeetings = async () => {

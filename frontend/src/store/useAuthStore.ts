@@ -79,7 +79,19 @@ export const useAuthStore = create<IAuthState>()(
         try {
           await axiosInstance.post("v1/auth/logout");
           await AsyncStorage.removeItem("access-token");
-          set({ authUser: null, accessToken: null, isTokenExpired: false });
+          // Set to empty user object instead of null to prevent navigation errors
+          set({ 
+            authUser: {
+              _id: "",
+              username: "",
+              email: "",
+              role: "",
+              accessToken: "",
+              refreshToken: "",
+            }, 
+            accessToken: null, 
+            isTokenExpired: false 
+          });
           get().disconnectSocket();
         } catch (error: any) {
           console.log(error.message);
