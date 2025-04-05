@@ -1,18 +1,19 @@
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { FlatList, Linking, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Button, Card, Text } from "react-native-paper";
+import { FlatList, Linking, View, Dimensions } from "react-native";
+import { ActivityIndicator, Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useClassStore } from "../../../store/useClassStore";
 import { useDocumentStore } from "../../../store/useDocumentStore";
-import { FONTS } from "../../../utils/constant";
-import { DocumentCard } from "../../../components/DocumentCard";
 
 const StudentDocument = () => {
   const { documents, getDocuments, loading } = useDocumentStore();
   const { selectedClass } = useClassStore();
   const [refreshing, setRefreshing] = useState(false);
+
+  const screenWidth = Dimensions.get("window").width;
+  const itemWidth = (screenWidth - 64) / 3;
 
   useEffect(() => {
     loadDocuments();
@@ -25,7 +26,7 @@ const StudentDocument = () => {
   };
 
   const openDocument = (url: string) => {
-    Linking.openURL(url).catch((err) => {
+    Linking.openURL(url).catch(() => {
       Toast.show({
         type: "error",
         text1: "Error opening document",
@@ -35,36 +36,53 @@ const StudentDocument = () => {
   };
 
   const renderItem = ({ item }: any) => {
-    return <DocumentCard document={item} onDelete={() => {}} onOpen={openDocument} />;
+    return (
+      <View
+        className="bg-white rounded-lg shadow p-4 m-2"
+        style={{ width: itemWidth }}
+      >
+        <Text className="text-lg font-bold text-gray-800 mb-2">
+          {item.filename}
+        </Text>
+        <Text className="text-sm text-gray-600 mb-4">
+          Uploaded: {format(new Date(item.uploadedAt), "dd/MM/yyyy")}
+        </Text>
+        <Button mode="contained" onPress={() => openDocument(item.url)}>
+          Open
+        </Button>
+      </View>
+    );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Class Documents</Text>
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <View className="border-b border-gray-300 bg-gray-200 p-4">
+        <Text className="text-2xl font-bold text-gray-800">Class Documents</Text>
       </View>
 
       {loading ? (
-        <View style={styles.loaderContainer}>
+        <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" />
-          <Text style={styles.loaderText}>Loading documents...</Text>
+          <Text className="mt-3 text-gray-600">Loading documents...</Text>
         </View>
       ) : (
         <FlatList
           data={documents}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ padding: 16 }}
+          numColumns={3}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
           onRefresh={loadDocuments}
           refreshing={refreshing}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No documents available</Text>
+            <View className="flex-1 items-center justify-center py-10">
+              <Text className="mb-4 text-gray-600">No documents available</Text>
               <Button
                 icon="refresh"
                 mode="outlined"
                 onPress={loadDocuments}
-                style={styles.refreshButton}
+                className="mt-2"
               >
                 Refresh
               </Button>
@@ -75,68 +93,5 @@ const StudentDocument = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  header: {
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontFamily: FONTS.bold,
-  },
-  card: {
-    marginVertical: 8,
-    borderRadius: 8,
-    elevation: 4,
-  },
-  listContent: {
-    padding: 16,
-  },
-  filename: {
-    fontSize: 18,
-    fontFamily: FONTS.bold,
-  },
-  uploadInfo: {
-    fontSize: 14,
-    fontFamily: FONTS.regular,
-    marginBottom: 4,
-  },
-  uploadText: {
-    fontFamily: FONTS.semiBold,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loaderText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: "#757575",
-    fontFamily: FONTS.regular,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#757575",
-    marginBottom: 16,
-    fontFamily: FONTS.regular,
-  },
-  refreshButton: {
-    marginTop: 8,
-  },
-});
 
 export default StudentDocument;
