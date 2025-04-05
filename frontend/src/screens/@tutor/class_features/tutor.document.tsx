@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useEffect, useState } from "react";
-import { FlatList, Linking, View } from "react-native";
+import { Dimensions, FlatList, Linking, View } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -9,7 +9,6 @@ import alert from "../../../components/alert";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useClassStore } from "../../../store/useClassStore";
 import { useDocumentStore } from "../../../store/useDocumentStore";
-import { Dimensions } from "react-native";
 
 const TutorDocument = () => {
   const { documents, getDocuments, uploadDocument, deleteDocument, loading } =
@@ -22,13 +21,25 @@ const TutorDocument = () => {
   const itemWidth = (screenWidth - 64) / 3;
 
   useEffect(() => {
-    loadDocuments();
-  }, []);
+    if (selectedClass && selectedClass._id) {
+      loadDocuments();
+    }
+  }, [selectedClass]);
 
   const loadDocuments = async () => {
-    setRefreshing(true);
-    await getDocuments(selectedClass._id);
-    setRefreshing(false);
+    try {
+      setRefreshing(true);
+      await getDocuments(selectedClass._id);
+    } catch (error) {
+      console.error("Failed to load documents:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to load documents",
+        text2: "Please try again",
+      });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handlePickDocument = async () => {

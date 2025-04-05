@@ -44,18 +44,28 @@ const TutorDashboard = () => {
     useCallback(() => {
       // Your data fetching code
       const fetchData = async () => {
-        await getAllOfflineMeetings();
-        await getAllOnlineMeetings();
-        await getAllBlogs();
-        await getDashboard();
-
-        // Fetch documents for each class
-        if (dashboard?.classes) {
-          for (const cls of dashboard?.classes) {
-            await getClassDocuments(cls._id);
+        try {
+          // First fetch the dashboard data
+          await getDashboard();
+          
+          // Then fetch meetings and blogs in parallel
+          await Promise.all([
+            getAllOfflineMeetings(),
+            getAllOnlineMeetings(),
+            getAllBlogs()
+          ]);
+          
+          // Only after dashboard data is available, fetch documents for each class
+          if (dashboard?.classes && dashboard.classes.length > 0) {
+            for (const cls of dashboard.classes) {
+              await getClassDocuments(cls._id);
+            }
           }
+        } catch (error) {
+          console.error("Error fetching dashboard data:", error);
         }
       };
+      
       fetchData();
 
       // Return a cleanup function
@@ -63,7 +73,7 @@ const TutorDashboard = () => {
         setDocumentData({ labels: [], counts: [], classNames: {} });
         setAttendanceData({ attended: 0, absent: 0 });
       };
-    }, []),
+    }, [getDashboard]),
   );
 
   useEffect(() => {
@@ -84,7 +94,7 @@ const TutorDashboard = () => {
 
       setDocumentData({ labels, counts, classNames });
     }
-  }, [dashboard.classes, classDocuments]);
+  }, [dashboard.classes]);
 
   useEffect(() => {
     const allMeetings = [...allOfflineMeetings, ...allOnlineMeetings];

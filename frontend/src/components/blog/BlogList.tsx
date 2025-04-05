@@ -1,11 +1,11 @@
+import { useDashboardStore } from "@/src/store/useDashboadStore";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useBlogStore } from "../../store/useBlogStore";
-import BlogCard from "../BlogCard";
-import { useDashboardStore } from "@/src/store/useDashboadStore";
+import BlogCard from "./BlogCard";
 
 const BlogList = () => {
   const { blogs, getAllBlogs, setSelectedBlog } = useBlogStore();

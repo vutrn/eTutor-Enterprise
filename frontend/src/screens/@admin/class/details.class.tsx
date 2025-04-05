@@ -1,196 +1,116 @@
-import React, { useState, useEffect } from "react";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { Feather } from "@expo/vector-icons";
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
-import { Button, Modal, Portal, Text } from "react-native-paper";
+import React from "react";
+import { Modal } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { useClassStore } from "../../../store/useClassStore";
-import UpdateModal from "./update.class.modal";
+import { User, X } from "lucide-react-native";
 
 interface Props {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
 }
 
-const ClassDetails = ({ modalVisible, setModalVisible }: Props | any) => {
-  const { setSelectedClass, getClasses, selectedClass, loading } =
-    useClassStore();
-  const [updateModalVisible, setUpdateModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+const ClassDetails = ({ modalVisible, setModalVisible }: Props) => {
+  const { selectedClass } = useClassStore();
 
-  console.log("selectedClass", selectedClass);
-
-  const handleEditClass = (classData: any) => {
-    setSelectedClass(classData);
-    setUpdateModalVisible(true);
-  };
-
-  useEffect(() => {
-    if (!updateModalVisible && refreshing) {
-      getClasses();
-      setRefreshing(false);
-    }
-  }, [updateModalVisible, refreshing, getClasses]);
+  if (!selectedClass) return null;
 
   return (
-    <Portal>
-      <Modal visible={modalVisible} onDismiss={() => setModalVisible(false)}>
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#1890ff" />
-            ) : (
-              <>
-                <TouchableOpacity
-                  onPress={() => handleEditClass(selectedClass)}
-                  style={styles.editButton}
-                >
-                  <Feather name="edit" size={25} color="#1890ff" />
-                </TouchableOpacity>
-                {selectedClass && (
-                  <UpdateModal
-                    modalVisible={updateModalVisible}
-                    setModalVisible={(visible) => {
-                      setUpdateModalVisible(visible);
-                      if (!visible) {
-                        setRefreshing(true);
-                      }
-                    }}
-                  />
-                )}
+    <Modal
+    
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={() => setModalVisible(false)}
+    >
+      <Box className="flex-1 items-center justify-center bg-black/50 p-4">
+        <Box className="w-full max-w-md rounded-xl bg-white p-5 shadow-lg">
+          <HStack className="mb-4 items-center justify-between">
+            <Heading size="lg">Class Details</Heading>
+            <Button
+              size="sm"
+              variant="link"
+              onPress={() => setModalVisible(false)}
+            >
+              <Icon as={X} size="md" color="$gray500" />
+            </Button>
+          </HStack>
 
-                <Text style={styles.title}>Class Details</Text>
-                <Text style={styles.detailsText}>
-                  <Text style={styles.label}>Class Name:</Text>{" "}
-                  {selectedClass?.name || "Unknown"}
-                </Text>
-                <Text style={styles.detailsText}>
-                  <Text style={styles.label}>Tutor:</Text>{" "}
-                  {selectedClass?.tutor?.username || "Unknown"}
-                </Text>
-                <Text style={styles.detailsText}>
-                  <Text style={styles.label}>Number of Students:</Text>{" "}
-                  {selectedClass?.students?.length || 0}
-                </Text>
+          <Divider className="mb-4" />
 
-                <Text style={styles.subTitle}>Students:</Text>
-                {selectedClass?.students?.length > 0 ? (
-                  <FlatList
-                    data={selectedClass.students}
-                    keyExtractor={(item) => item._id}
-                    renderItem={({ item }) => (
-                      <Text style={styles.studentItem}>
-                        {item.username} ({item.email || "No email"})
-                      </Text>
-                    )}
-                  />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            <VStack className="space-y-4">
+              <Box>
+                <Text className="mb-1 text-gray-500">Class Name</Text>
+                <Text className="text-lg font-semibold">
+                  {selectedClass.name}
+                </Text>
+              </Box>
+
+              <Box>
+                <Text className="mb-1 text-gray-500">Tutor</Text>
+                <HStack className="items-center space-x-2">
+                  <Icon as={User} size="sm" className="text-blue-500" />
+                  <Text className="font-medium">
+                    {selectedClass.tutor?.username || "Not assigned"}
+                  </Text>
+                </HStack>
+              </Box>
+
+              <Box>
+                <Text className="mb-1 text-gray-500">Students</Text>
+                {selectedClass.students && selectedClass.students.length > 0 ? (
+                  <VStack className="space-y-2">
+                    {selectedClass.students.map((student: any) => (
+                      <HStack
+                        key={student._id}
+                        className="items-center space-x-2"
+                      >
+                        <Icon as={User} size="sm" />
+                        <Text>{student.username}</Text>
+                      </HStack>
+                    ))}
+                  </VStack>
                 ) : (
-                  <Text style={styles.emptyText}>No students available</Text>
+                  <Text className="italic">No students enrolled</Text>
                 )}
+              </Box>
 
-                <View style={styles.buttonContainer}>
-                  <Button
-                    mode="contained"
-                    onPress={() => setModalVisible(false)}
-                    style={styles.closeButton}
-                    labelStyle={styles.buttonText}
-                  >
-                    Close
-                  </Button>
-                </View>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
-    </Portal>
+              <HStack className="flex-wrap space-x-2">
+                <Badge variant="outline" className="px-2 py-1">
+                  <BadgeText>
+                    Created:{" "}
+                    {new Date(selectedClass.createdAt).toLocaleDateString()}
+                  </BadgeText>
+                </Badge>
+              </HStack>
+            </VStack>
+          </ScrollView>
+
+          <Divider className="my-4" />
+
+          <Button
+            onPress={() => setModalVisible(false)}
+            className="mt-2"
+            variant="outline"
+          >
+            <ButtonText>Close</ButtonText>
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    // backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black background
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    backgroundColor: "white",
-    padding: 20,
-    margin: 20,
-    borderRadius: 8,
-    width: "90%",
-    maxWidth: 500,
-    alignSelf: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  editButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#333",
-    textAlign: "center",
-  },
-  subTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-    color: "#333",
-  },
-  detailsText: {
-    fontSize: 18,
-    marginBottom: 8,
-    color: "#555",
-  },
-  label: {
-    fontWeight: "bold",
-    color: "#333",
-  },
-  studentItem: {
-    fontSize: 16,
-    marginBottom: 5,
-    padding: 8,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  emptyText: {
-    fontSize: 16,
-    color: "#888",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  closeButton: {
-    backgroundColor: "#1890ff",
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
 
 export default ClassDetails;

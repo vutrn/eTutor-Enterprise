@@ -1,24 +1,32 @@
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { IconButton, Text } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Badge } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { Feather } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { ScrollView } from "react-native-gesture-handler";
+import React, { useEffect, useMemo, useState } from "react";
+import { FlatList, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import alert from "../../../components/alert";
 import { useClassStore } from "../../../store/useClassStore";
 import CreateModal from "./create.class.modal";
-import UpdateModal from "./update.class.modal";
 import ClassDetails from "./details.class";
-
-const { width } = Dimensions.get("window");
+import UpdateModal from "./update.class.modal";
+import {
+  BookOpen,
+  Edit2,
+  InfoIcon,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react-native";
 
 const AdminClass = () => {
   const { selectedClass, setSelectedClass } = useClassStore();
@@ -33,6 +41,7 @@ const AdminClass = () => {
 
   useEffect(() => {
     loadClasses();
+    console.log("Classes loaded:", classes);
   }, []);
 
   const loadClasses = async () => {
@@ -72,193 +81,123 @@ const AdminClass = () => {
   const filteredClasses = useMemo(
     () =>
       classes.filter((cls: any) =>
-        cls.name.toLowerCase().includes(searchQuery.toLowerCase())
+        cls.name.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
-    [classes, searchQuery]
+    [classes, searchQuery],
   );
 
   const renderClassItem = ({ item }: { item: any }) => (
-    <View style={styles.row}>
-      <Text style={styles.className}>{item.name}</Text>
-      <Text style={styles.cell}>{item.tutor?.username || "Unknown"}</Text>
-      <Text style={styles.cell}>
-        {new Date(item.createdAt).toLocaleDateString()}
-      </Text>
-      <View style={[styles.cell, styles.actionButtons]}>
-        <TouchableOpacity onPress={() => handleViewDetails(item)}>
-          <Feather name="info" size={25} color="#1890ff" />
-        </TouchableOpacity>
+    <Box className="mb-3 rounded-md bg-white p-4 shadow">
+      <HStack className="items-center justify-between">
+        <VStack className="flex-1 space-y-1">
+          <Text className="text-lg font-semibold">{item.name}</Text>
+          <HStack className="space-x-2">
+            <Badge variant="outline" className="px-2">
+              <Text className="text-xs">
+                Tutor: {item.tutor?.username || "Unknown"}
+              </Text>
+            </Badge>
+            <Badge variant="outline" className="px-2">
+              <Text className="text-xs">
+                Created: {new Date(item.createdAt).toLocaleDateString()}
+              </Text>
+            </Badge>
+          </HStack>
+        </VStack>
 
-        <TouchableOpacity
-          onPress={() => handleEditClass(item)}
-          style={styles.actionMargin}
-        >
-          <Feather name="edit" size={25} color="#1890ff" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handleDeleteClass(item._id, item.name)}
-          style={styles.actionMargin}
-        >
-          <Feather name="trash-2" size={25} color="#ff4d4f" />
-        </TouchableOpacity>
-      </View>
-    </View>
+        <HStack className="space-x-2">
+          <Pressable onPress={() => handleViewDetails(item)} hitSlop={8}>
+            <Icon as={InfoIcon} size="lg" className="text-blue-500" />
+          </Pressable>
+          <Pressable onPress={() => handleEditClass(item)} hitSlop={8}>
+            <Icon as={Edit2} size="lg" className="text-blue-500" />
+          </Pressable>
+          <Pressable onPress={() => handleDeleteClass(item._id, item.name)}>
+            <Icon as={Trash2} size="lg" className="text-red-500" />
+          </Pressable>
+        </HStack>
+      </HStack>
+    </Box>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <IconButton
-        style={styles.icon}
-        size={50}
-        icon="plus"
-        mode="contained"
-        onPress={() => setCreateModalVisible(true)}
-      />
-      <CreateModal
-        modalVisible={createModalVisible}
-        setModalVisible={setCreateModalVisible}
-      />
-      {selectedClass && (
-        <UpdateModal
-          modalVisible={updateModalVisible}
-          setModalVisible={setUpdateModalVisible}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f5f5" }}>
+      <Box className="flex-1 bg-background-50 p-4">
+        <CreateModal
+          modalVisible={createModalVisible}
+          setModalVisible={setCreateModalVisible}
         />
-      )}
-      {selectedClass && (
-        <ClassDetails
-          modalVisible={detailsModalVisible}
-          setModalVisible={setDetailsVisible}
-        />
-      )}
+        {selectedClass && (
+          <UpdateModal
+            modalVisible={updateModalVisible}
+            setModalVisible={setUpdateModalVisible}
+          />
+        )}
+        {selectedClass && (
+          <ClassDetails
+            modalVisible={detailsModalVisible}
+            setModalVisible={setDetailsVisible}
+          />
+        )}
 
-      <Text style={styles.totalClassesText}>
-        Total Classes: {classes.length}
-      </Text>
+        <VStack className="space-y-4">
+          <HStack className="items-center justify-between">
+            <VStack>
+              <Heading size="2xl">Classes</Heading>
+              <Text className="text-gray-600">
+                Total Classes: {classes.length}
+              </Text>
+            </VStack>
 
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search by class name"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+            <Button
+              size="sm"
+              onPress={() => setCreateModalVisible(true)}
+              action="primary"
+            >
+              <ButtonText>Create Class</ButtonText>
+              <ButtonIcon as={Plus} />
+            </Button>
+          </HStack>
 
-      <ScrollView>
-        <View style={styles.tableContainer}>
+          <Input variant="outline" size="md" className="mb-4">
+            <InputSlot className="pl-3">
+              <InputIcon>
+                <Icon as={Search} size="sm" className="text-gray-500" />
+              </InputIcon>
+            </InputSlot>
+            <InputField
+              placeholder="Search by class name"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </Input>
+
+          <Divider />
+
           {filteredClasses.length > 0 ? (
-            <>
-              <View style={styles.tableHeader}>
-                <Text style={styles.headerCell}>Class Name</Text>
-                <Text style={styles.headerCell}>Tutor</Text>
-                <Text style={styles.headerCell}>Created At</Text>
-                <Text style={styles.headerCell}>Actions</Text>
-              </View>
-
-              <FlatList
-                data={filteredClasses}
-                keyExtractor={(item) => item._id}
-                renderItem={renderClassItem}
-                refreshing={refreshing}
-                onRefresh={loadClasses}
-              />
-            </>
+            <FlatList
+              data={filteredClasses}
+              keyExtractor={(item) => item._id}
+              renderItem={renderClassItem}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={loadClasses}
+                />
+              }
+            />
           ) : (
-            <Text>No classes available</Text>
+            <Box className="flex-1 items-center justify-center py-8">
+              <Icon as={BookOpen} size="xl" className="mb-2 text-gray-400" />
+              <Text className="text-base text-gray-500">
+                No classes available
+              </Text>
+            </Box>
           )}
-        </View>
-      </ScrollView>
+        </VStack>
+      </Box>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-  },
-  icon: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    zIndex: 10,
-    backgroundColor: "#1890ff",
-    borderRadius: 25,
-    elevation: 5,
-  },
-  totalClassesText: {
-    fontSize: 20,
-    marginBottom: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  searchBar: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff",
-    elevation: 2,
-  },
-  tableContainer: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#fff",
-    elevation: 3,
-  },
-  tableHeader: {
-    flexDirection: "row",
-    borderBottomWidth: 2,
-    borderBottomColor: "#1890ff",
-    paddingVertical: 10,
-    backgroundColor: "#e6f7ff",
-  },
-  className: {
-    flex: 1,
-    fontWeight: "bold",
-    color: "#333",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  row: {
-    flexDirection: "row",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  headerCell: {
-    flex: 1,
-    fontWeight: "bold",
-    color: "#333",
-    fontSize: 18,
-    textAlign: "center",
-  },
-  cell: {
-    flex: 1,
-    paddingHorizontal: 5,
-    fontSize: 16,
-    textAlign: "center",
-    color: "#555",
-  },
-  actionButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  actionMargin: {
-    marginLeft: 10,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-});
 
 export default AdminClass;

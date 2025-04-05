@@ -1,8 +1,8 @@
+import { format } from "date-fns";
 import React from "react";
 import { Image, View } from "react-native";
 import { Card, Text } from "react-native-paper";
-import { format } from "date-fns";
-import { IBlogState } from "../types/store";
+import { IBlogState } from "../../types/store";
 
 interface BlogCardProps {
   blog: IBlogState["blogs"][number];

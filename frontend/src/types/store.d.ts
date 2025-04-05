@@ -165,8 +165,22 @@ export interface IDashboardState {
 }
 
 export interface IUserState {
-  students: any[];
-  tutors: any[];
+  students: {
+    _id: string;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+  tutors: {
+    _id: string;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
   users: {
     _id: string;
     username: string;

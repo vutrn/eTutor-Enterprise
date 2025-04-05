@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { FlatList, Linking, View, Dimensions } from "react-native";
+import { Dimensions, FlatList, Linking, View } from "react-native";
 import { ActivityIndicator, Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -16,13 +16,25 @@ const StudentDocument = () => {
   const itemWidth = (screenWidth - 64) / 3;
 
   useEffect(() => {
-    loadDocuments();
-  }, []);
+    if (selectedClass && selectedClass._id) {
+      loadDocuments();
+    }
+  }, [selectedClass]);
 
   const loadDocuments = async () => {
-    setRefreshing(true);
-    await getDocuments(selectedClass._id);
-    setRefreshing(false);
+    try {
+      setRefreshing(true);
+      await getDocuments(selectedClass._id);
+    } catch (error) {
+      console.error("Failed to load documents:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to load documents",
+        text2: "Please try again",
+      });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const openDocument = (url: string) => {
