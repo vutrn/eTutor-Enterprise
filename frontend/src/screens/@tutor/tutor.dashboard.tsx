@@ -1,110 +1,246 @@
-import React, { useEffect, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
-import { BarChart } from "react-native-gifted-charts";
-import { Avatar, Card, IconButton, Title } from "react-native-paper";
-import { useClassStore } from "../../store/useClassStore";
-import { useDashboardStore } from "../../store/useDashboadStore";
-import { FONTS } from "../../utils/constant";
+import { Box } from "@/components/ui/box";
+import { Grid, GridItem } from "@/components/ui/grid";
+import { HStack } from "@/components/ui/hstack";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { useBlogStore } from "@/src/store/useBlogStore";
+import { useDashboardStore } from "@/src/store/useDashboadStore";
+import { useMeetingStore } from "@/src/store/useMeetingStore";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Dimensions, ScrollView, View } from "react-native";
+import { BarChart, PieChart } from "react-native-chart-kit";
 
-const { width } = Dimensions.get("window");
+const screenWidth = Dimensions.get("window").width;
 
 const TutorDashboard = () => {
-  const { dashboard, getDashboard } = useDashboardStore();
-  const { classes, getClasses } = useClassStore();
-  const ClassIcon = (props: any) => <Avatar.Icon {...props} icon="book" />;
-  const StudentIcon = (props: any) => (
-    <Avatar.Icon {...props} icon="account-group" />
+  const {
+    getAllOfflineMeetings,
+    getAllOnlineMeetings,
+    allOfflineMeetings,
+    allOnlineMeetings,
+  } = useMeetingStore();
+  const { blogs, getAllBlogs, commentBlog } = useBlogStore();
+  const { dashboard, getDashboard, getClassDocuments, classDocuments } =
+    useDashboardStore();
+  const [chartParentWidth, setChartParentWidth] = useState(0);
+  const [attendanceData, setAttendanceData] = useState({
+    attended: 0,
+    absent: 0,
+  });
+  const [documentData, setDocumentData] = useState({
+    labels: [],
+    counts: [],
+    classNames: {},
+  });
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+  useFocusEffect(
+    useCallback(() => {
+      // Your data fetching code
+      const fetchData = async () => {
+        await getAllOfflineMeetings();
+        await getAllOnlineMeetings();
+        await getAllBlogs();
+        await getDashboard();
+
+        // Fetch documents for each class
+        if (dashboard?.classes) {
+          for (const cls of dashboard?.classes) {
+            await getClassDocuments(cls._id);
+          }
+        }
+      };
+      fetchData();
+
+      // Return a cleanup function
+      return () => {
+        setDocumentData({ labels: [], counts: [], classNames: {} });
+        setAttendanceData({ attended: 0, absent: 0 });
+      };
+    }, []),
   );
-  const [selectedDate, setSelectedDate] = useState("");
+
   useEffect(() => {
-    getDashboard();
-    getClasses();
-  }, []);
+    if (dashboard?.classes && Object.keys(classDocuments).length > 0) {
+      const classNames = {} as any;
+      const labels = [] as any;
+      const counts = [] as any;
 
-  const barData = dashboard?.classes?.map((classItem) => ({
-    value: classItem.students.length,
-    label: classItem.name,
+      // Process class data for the document chart
+      dashboard.classes.forEach((cls) => {
+        const className =
+          cls.name.length > 10 ? cls.name.substring(0, 10) + "..." : cls.name;
+        classNames[cls._id] = className;
+        labels.push(className);
+        const docsCount = classDocuments[cls._id]?.length || 0;
+        counts.push(docsCount);
+      });
 
-    topLabelComponent: () => (
-      <Title style={{ fontFamily: FONTS.semiBold, marginBottom: 5 }}>
-        {classItem.students.length}
-      </Title>
-    ),
-  }));
+      setDocumentData({ labels, counts, classNames });
+    }
+  }, [dashboard.classes, classDocuments]);
+
+  useEffect(() => {
+    const allMeetings = [...allOfflineMeetings, ...allOnlineMeetings];
+    let attended = 0;
+    let absent = 0;
+
+    allMeetings.forEach((meeting) => {
+      meeting.attendees.forEach((attendee) => {
+        if (attendee.attended) {
+          attended++;
+        } else {
+          absent++;
+        }
+      });
+    });
+    setAttendanceData({ attended, absent });
+  }, [allOfflineMeetings, allOnlineMeetings]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.cardContainer}>
-        <Card style={styles.card}>
-          <Card.Title
-            title="Total Classes"
-            subtitle={`${dashboard?.totalClasses} classes`}
-            left={ClassIcon}
-            right={() => <IconButton icon="arrow-right" />}
-          />
-        </Card>
-        <Card style={styles.card}>
-          <Card.Title
-            title="You are teaching"
-            subtitle={`${dashboard?.totalStudents} students`}
-            left={StudentIcon}
-            right={() => <IconButton icon="arrow-right" />}
-          />
-        </Card>
-      </View>
+    <ScrollView className="flex-1 bg-white">
+      <View className="p-3">
+        <Box>
+          <Text className="mb-2 text-2xl font-bold">Activity Summary</Text>
+          <VStack className="mb-4 flex-row justify-between">
+            <Box className="mr-2 flex-1 rounded-lg bg-blue-100 p-3">
+              <Text className="font-semibold text-blue-800">Classes</Text>
+              <Text className="text-2xl font-bold">
+                {dashboard?.classes?.length}
+              </Text>
+            </Box>
 
-      <Card style={[styles.chartCard, { marginTop: 16 }]}>
-        <Card.Content>
-          <Title>Student Engagement</Title>
-          <View style={styles.barChartContainer}>
+            <Box className="mr-2 flex-1 rounded-lg bg-green-100 p-3">
+              <Text className="font-semibold text-green-800">Blogs</Text>
+              <Text className="text-2xl font-bold">{blogs.length}</Text>
+            </Box>
+
+            <Box className="mr-2 flex-1 rounded-lg bg-orange-100 p-3">
+              <Text className="font-semibold text-orange-800">Comments</Text>
+              <Text className="text-2xl font-bold">
+                {blogs.reduce((total, blog) => total + blog.comments.length, 0)}
+              </Text>
+            </Box>
+          </VStack>
+        </Box>
+
+        {/* Document count by class bar chart */}
+        <Box className="flex-1">
+          <Text className="mb-3 text-2xl font-bold">Documents by Class</Text>
+          <View
+            className="flex-1"
+            onLayout={({ nativeEvent }) =>
+              setChartParentWidth(nativeEvent.layout.width)
+            }
+          >
             <BarChart
-              data={barData}
-              barWidth={25}
-              spacing={15}
-              frontColor="#177AD5"
-              xAxisThickness={0}
-              yAxisThickness={0}
-              // maxValue={Math.max(...barData.map((d) => d.value)) + 1}
+              data={{
+                labels: documentData.labels,
+                datasets: [
+                  {
+                    data: documentData.counts,
+                  },
+                ],
+              }}
+              chartConfig={{
+                backgroundGradientFrom: "white",
+                backgroundGradientTo: "white",
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                color: (opacity = 1) => `rgb(45, 51, 107, ${opacity})`,
+                // labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              width={chartParentWidth}
+              height={210}
+              yAxisLabel=""
+              yAxisSuffix=""
+              fromZero
+              showValuesOnTopOfBars
             />
           </View>
-        </Card.Content>
-      </Card>
+        </Box>
+        <Box>
+          <Text className="mb-2 text-2xl font-bold">Attendance Summary</Text>
+          <HStack>
+            <View className="flex-1">
+              <Grid className="gap-3" _extra={{ className: "grid-cols-12" }}>
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="mb-2 text-lg font-semibold">
+                    Total Meetings:{" "}
+                  </Text>
+                </GridItem>
 
-      <Card style={styles.chartCard}>
-        <Card.Content>
-          <Title>Student Distribution by Subject</Title>
-        </Card.Content>
-      </Card>
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="text-2xl font-bold">
+                    {allOfflineMeetings.length + allOnlineMeetings.length}
+                  </Text>
+                </GridItem>
+
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="text-lg font-semibold">Total Attended:</Text>
+                </GridItem>
+
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="text-2xl font-bold text-green-500">
+                    {attendanceData.attended}
+                  </Text>
+                </GridItem>
+
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="text-lg font-semibold">Total Absent:</Text>
+                </GridItem>
+                <GridItem _extra={{ className: "col-span-6" }}>
+                  <Text className="text-2xl font-bold text-red-500">
+                    {attendanceData.absent}
+                  </Text>
+                </GridItem>
+              </Grid>
+            </View>
+            <View
+              className="flex-2 w-[80%]"
+              onLayout={({ nativeEvent }) =>
+                setChartParentWidth(nativeEvent.layout.width)
+              }
+            >
+              <PieChart
+                data={[
+                  {
+                    name: "Attended",
+                    population: attendanceData.attended,
+                    color: "#47CE66",
+                    legendFontColor: "#7F7F7F",
+                    legendFontSize: 15,
+                  },
+                  {
+                    name: "Absent",
+                    population: attendanceData.absent,
+                    color: "#F56F42",
+                    legendFontColor: "#7F7F7F",
+                    legendFontSize: 15,
+                  },
+                ]}
+                width={chartParentWidth}
+                height={210}
+                chartConfig={{
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                accessor={"population"}
+                backgroundColor={"transparent"}
+                center={[0, 0]}
+                paddingLeft=""
+              />
+            </View>
+          </HStack>
+        </Box>
+      </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  cardContainer: {
-    flexDirection: width > 768 ? "row" : "column",
-    justifyContent: "space-between",
-  },
-  card: {
-    flex: 1,
-    margin: 8,
-  },
-  chartContainer: {
-    height: 300,
-    marginTop: 16,
-  },
-  chartCard: {
-    margin: 8,
-    marginTop: 8,
-  },
-  barChartContainer: {
-    height: 250,
-    padding: 10,
-    alignItems: "center",
-  },
-});
 
 export default TutorDashboard;

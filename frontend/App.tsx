@@ -81,11 +81,11 @@ export const App = () => {
 
   return (
     <>
-      <PaperProvider theme={theme}>
-        <NavigationContainer>
-          <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
-        </NavigationContainer>
-      </PaperProvider>
+      {/* <PaperProvider theme={theme}> */}
+      <NavigationContainer>
+        <GluestackUIProvider>{renderAppContent()}</GluestackUIProvider>
+      </NavigationContainer>
+      {/* </PaperProvider> */}
       <Toast />
     </>
   );

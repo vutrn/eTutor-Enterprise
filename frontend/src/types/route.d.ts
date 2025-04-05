@@ -36,6 +36,7 @@ type RootStackParamList = {
       _id: string;
     };
   };
+  tutor_message_stack: undefined
   tutor_message_detail: undefined;
 
   // BLOG
@@ -55,13 +56,18 @@ type RootStackParamList = {
   tutor_profile: undefined;
 
   // Student navigator
+  student_navigator: undefined;
+  student_feature_drawer: undefined;
   student_dashboard: undefined;
   student_class: undefined;
   student_feature_stack: undefined;
   student_document: undefined;
+
+  student_message_stack: undefined;
   student_message: undefined;
   student_message_detail: undefined;
   student_meeting: undefined;
+
   student_class_detail: undefined;
 
   student_home_stack: undefined;

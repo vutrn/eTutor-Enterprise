@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
-import { IMessageState } from "../types/store";
+import { IMessageState, Message } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useAuthStore } from "./useAuthStore";
 
 export const useMessageStore = create<IMessageState>((set, get) => ({
-  messages: [],
+  messages: [] as Message[],
   users: [
     {
       _id: "",
@@ -43,7 +43,9 @@ export const useMessageStore = create<IMessageState>((set, get) => ({
       });
 
       const { authUser } = useAuthStore.getState();
-      const filteredUsers = res.data.filter((user: any) => user._id !== authUser?._id);
+      const filteredUsers = res.data.filter(
+        (user: any) => user._id !== authUser?._id,
+      );
       set({ users: filteredUsers });
     } catch (error: any) {
       Toast.show({
@@ -60,11 +62,14 @@ export const useMessageStore = create<IMessageState>((set, get) => ({
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
 
-      const res = await axiosInstance.get(`v1/message/getmessage/${receiverId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axiosInstance.get(
+        `v1/message/getmessage/${receiverId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       set({ messages: res.data });
     } catch (error: any) {
       Toast.show({
@@ -91,7 +96,7 @@ export const useMessageStore = create<IMessageState>((set, get) => ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       // Update local message list immediately for better UX

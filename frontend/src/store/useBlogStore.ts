@@ -13,7 +13,7 @@ export const useBlogStore = create<IBlogState>((set, get) => ({
   getAllBlogs: async () => {
     try {
       const res = await axiosInstance.get("v1/blog");
-      set({ blogs: res.data.blogs });
+      set({ blogs: res.data.blogs.reverse() });
     } catch (error) {
       Toast.show({ type: "error", text1: "Failed to get blogs" });
       console.log("🚀 ~ getAllBlogs: ~ error:", error);

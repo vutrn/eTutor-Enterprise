@@ -78,6 +78,20 @@ const meetingController = {
         } catch (error) {
           res.status(500).json({ message: "Lỗi server", error: error.message });
         }
+      },
+    getAllMeetings: async (req, res) => {
+        try {
+          const meetings = await Meeting.find()
+            .populate({ path: "class", select: "name" })
+            .populate({ path: "attendees.student", select: "username email" });
+    
+          res.status(200).json({ meetings });
+        } catch (error) {
+          res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
       }
+    
+
+
 }
  module.exports =  meetingController ;

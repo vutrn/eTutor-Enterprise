@@ -165,6 +165,7 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
+      
       screenOptions={{
         drawerStyle: {
           width: DRAWER_WIDTH,

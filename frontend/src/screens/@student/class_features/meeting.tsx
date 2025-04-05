@@ -22,7 +22,10 @@ const StudentMeeting = () => {
   }, [selectedClass._id]);
 
   const loadAllMeetings = async () => {
-    await Promise.all([getOfflineMeetings(), getOnlineMeetings()]);
+    await Promise.all([
+      getOfflineMeetings(selectedClass._id),
+      getOnlineMeetings(selectedClass._id),
+    ]);
   };
 
   const handleViewDetails = (meeting: any) => {

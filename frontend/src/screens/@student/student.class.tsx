@@ -25,7 +25,7 @@ const StudentClass = () => {
 
   const handleClassSelect = (item: any) => {
     setSelectedClass(item);
-    navigation.navigate("student_feature_stack");
+    navigation.navigate("student_navigator");
   };
 
   const filteredClasses = classes

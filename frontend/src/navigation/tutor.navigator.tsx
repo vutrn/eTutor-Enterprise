@@ -3,16 +3,13 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import TutorMeetingList from "../screens/@tutor/class_features/meeting.list";
-import MessageDetail from "../screens/@tutor/class_features/message.detail";
 import TuTorClassDetail from "../screens/@tutor/class_features/tutor.class.detail";
-import TutorDocument from "../screens/@tutor/class_features/tutor.document";
-import TutorMessage from "../screens/@tutor/class_features/tutor.message";
 import { useClassStore } from "../store/useClassStore";
-import { useMessageStore } from "../store/useMessageStore";
-import { MessageStack } from "./features.navigator";
+import { TutorMessageStack } from "./features.navigator";
+import TutorDocument from "../screens/@tutor/class_features/tutor.document";
 
 export const ClassFeaturesDrawer = () => {
-  const Drawer = createDrawerNavigator();
+  const Drawer = createDrawerNavigator<RootStackParamList>();
   const { selectedClass } = useClassStore();
 
   return (
@@ -25,7 +22,7 @@ export const ClassFeaturesDrawer = () => {
       }}
     >
       <Drawer.Screen
-        name="class_detail"
+        name="tutor_class_detail"
         component={TuTorClassDetail}
         options={{
           title: "Class Detail",
@@ -35,8 +32,8 @@ export const ClassFeaturesDrawer = () => {
         }}
       />
       <Drawer.Screen
-        name="message_stack"
-        component={MessageStack}
+        name="tutor_message_stack"
+        component={TutorMessageStack}
         options={{
           title: "Messages",
           drawerIcon: ({ color, size }) => (
@@ -45,7 +42,7 @@ export const ClassFeaturesDrawer = () => {
         }}
       />
       <Drawer.Screen
-        name="class_meeting"
+        name="tutor_meeting"
         component={TutorMeetingList}
         options={{
           title: "Meeting",
@@ -55,7 +52,7 @@ export const ClassFeaturesDrawer = () => {
         }}
       />
       <Drawer.Screen
-        name="class_document"
+        name="tutor_document"
         component={TutorDocument}
         options={{
           title: "Documents",
@@ -72,7 +69,6 @@ export const ClassFeaturesDrawer = () => {
 const TutorNavigator = () => {
   const Stack = createNativeStackNavigator();
   const { selectedClass } = useClassStore();
-  const { selectedUser } = useMessageStore();
 
   return (
     <Stack.Navigator screenOptions={{}}>

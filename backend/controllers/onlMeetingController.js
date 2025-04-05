@@ -2,6 +2,7 @@ const OnlMeeting = require("../models/OnlineMeet");
 const User = require("../models/User");
 const sendEmail = require("../lib/emailService");
 const PersonalClass = require("../models/PersonalClass");
+const { getAllMeetings } = require("./meetingController");
 
 const onlMeetingController = {
     createOnlMeeting: async (req, res) => {
@@ -72,6 +73,17 @@ const onlMeetingController = {
           await onlmeeting.save();
     
           res.status(200).json({ message: "Điểm danh thành công", onlmeeting });
+        } catch (error) {
+          res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+      },
+    getAllMeetings: async (req, res) => {
+        try {
+          const onlmeetings = await OnlMeeting.find()
+            .populate({ path: "class", select: "name" })
+            .populate({ path: "attendees.student", select: "username email" });
+    
+          res.status(200).json({ onlmeetings });
         } catch (error) {
           res.status(500).json({ message: "Lỗi server", error: error.message });
         }

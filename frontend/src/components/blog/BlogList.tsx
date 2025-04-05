@@ -5,19 +5,22 @@ import { Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useBlogStore } from "../../store/useBlogStore";
 import BlogCard from "../BlogCard";
+import { useDashboardStore } from "@/src/store/useDashboadStore";
 
 const BlogList = () => {
   const { blogs, getAllBlogs, setSelectedBlog } = useBlogStore();
+  const { getDashboard } = useDashboardStore();
   const [refreshing, setRefreshing] = useState(false);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [navigation]);
 
   const fetchData = async () => {
     setRefreshing(true);
     await getAllBlogs();
+    await getDashboard();
     setRefreshing(false);
   };
 
