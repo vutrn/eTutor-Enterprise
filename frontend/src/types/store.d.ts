@@ -220,7 +220,7 @@ export interface IMeetingState {
   offlineMeetings: OfflineMeeting[];
   onlineMeetings: OnlineMeeting[];
   loading: boolean;
-  selectedMeeting: OfflineMeeting | OnlineMeeting;
+  selectedMeeting: OfflineMeeting | OnlineMeeting | null;
   
   setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting | null) => void;
   getOfflineMeetings: () => Promise<void>;
