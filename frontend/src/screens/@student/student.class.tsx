@@ -10,6 +10,7 @@ const StudentClass = () => {
   const { classes, getClasses, setSelectedClass } = useClassStore();
   const { authUser } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
@@ -102,8 +103,8 @@ const StudentClass = () => {
               Refresh
             </Button>
           </View>
-        }
-      />
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
