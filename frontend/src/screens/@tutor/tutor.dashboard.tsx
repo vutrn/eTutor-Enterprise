@@ -123,7 +123,9 @@ const TutorDashboard = () => {
 
             <Box className="mr-2 flex-1 rounded-lg bg-orange-100 p-3">
               <Text className="font-semibold text-orange-800">Comments</Text>
-              <Text className="text-2xl font-bold">{commentBlog.length}</Text>
+              <Text className="text-2xl font-bold">
+                {blogs.reduce((total, blog) => total + blog.comments.length, 0)}
+              </Text>
             </Box>
           </VStack>
         </Box>
