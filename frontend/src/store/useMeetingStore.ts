@@ -7,7 +7,7 @@ import { useClassStore } from "./useClassStore";
 export const useMeetingStore = create<IMeetingState>((set) => ({
   offlineMeetings: [] as OfflineMeeting[],
   onlineMeetings: [] as OnlineMeeting[],
-  selectedMeeting: {} as OfflineMeeting | OnlineMeeting,
+  selectedMeeting: {} as OfflineMeeting | OnlineMeeting | null,
   loading: false,
 
   setSelectedMeeting: (selectedMeeting) => set({ selectedMeeting }),

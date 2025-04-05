@@ -1,6 +1,5 @@
-import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect } from "react";
-import { SafeAreaView, StyleSheet, Text } from "react-native";
+import { SafeAreaView, Text, View, FlatList } from "react-native";
 import { useDashboardStore } from "../../../store/useDashboadStore";
 import { useUserStore } from "../../../store/useUserStore";
 import { useClassStore } from "../../../store/useClassStore";
@@ -24,21 +23,35 @@ const TuTorClassDetail = () => {
   };
 
   return (
-    <SafeAreaView>
-      <Text>classname: {selectedClass.name}</Text>
-      <Text>tutor: {getTutorNameById(selectedClass.tutor)}</Text>
-      <Text>students: {selectedClass.students.length}</Text>
-      <Text>
-        createdAt:
-        {new Date(selectedClass.createdAt).toLocaleDateString("vi-VN", {
-          day: "numeric",
-          month: "numeric",
-          year: "numeric",
-        })}
-      </Text>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 justify-center items-center p-4">
+        <View className="bg-gray-100 rounded-lg shadow-md p-6 w-full max-w-md">
+          <Text className="text-lg font-bold mb-2">Class Name: {selectedClass.name}</Text>
+          <Text className="text-base mb-2">Tutor: {getTutorNameById(selectedClass.tutor)}</Text>
+          <Text className="text-base mb-2">Number of Students: {selectedClass.students.length}</Text>
+          <Text className="text-base mb-4">
+            Created At:{" "}
+            {new Date(selectedClass.createdAt).toLocaleDateString("vi-VN", {
+              day: "numeric",
+              month: "numeric",
+              year: "numeric",
+            })}
+          </Text>
+
+          <Text className="text-lg font-bold mb-2">Student List:</Text>
+          <FlatList
+            data={selectedClass.students}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View className="mb-2">
+                <Text className="text-base">- {item.username}</Text>
+              </View>
+            )}
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({});
 export default TuTorClassDetail;
