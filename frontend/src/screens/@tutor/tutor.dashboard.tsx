@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
+import { BarChart } from "react-native-gifted-charts";
 import { Avatar, Card, IconButton, Title } from "react-native-paper";
-import { useDashboardStore } from "../../store/useDashboadStore";
-import { BarChart, LineChart } from "react-native-gifted-charts";
 import { useClassStore } from "../../store/useClassStore";
-import { COLORS, FONTS } from "../../utils/constant";
+import { useDashboardStore } from "../../store/useDashboadStore";
+import { FONTS } from "../../utils/constant";
 
 const { width } = Dimensions.get("window");
 
@@ -12,14 +12,16 @@ const TutorDashboard = () => {
   const { dashboard, getDashboard } = useDashboardStore();
   const { classes, getClasses } = useClassStore();
   const ClassIcon = (props: any) => <Avatar.Icon {...props} icon="book" />;
-  const StudentIcon = (props: any) => <Avatar.Icon {...props} icon="account-group" />;
-
+  const StudentIcon = (props: any) => (
+    <Avatar.Icon {...props} icon="account-group" />
+  );
+  const [selectedDate, setSelectedDate] = useState("");
   useEffect(() => {
     getDashboard();
     getClasses();
   }, []);
 
-  const barData = classes.map((classItem) => ({
+  const barData = dashboard?.classes?.map((classItem) => ({
     value: classItem.students.length,
     label: classItem.name,
 
@@ -28,7 +30,7 @@ const TutorDashboard = () => {
         {classItem.students.length}
       </Title>
     ),
-  }));  
+  }));
 
   return (
     <ScrollView style={styles.container}>
@@ -57,7 +59,7 @@ const TutorDashboard = () => {
           <View style={styles.barChartContainer}>
             <BarChart
               data={barData}
-              barWidth={22}
+              barWidth={25}
               spacing={15}
               frontColor="#177AD5"
               xAxisThickness={0}

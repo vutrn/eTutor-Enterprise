@@ -11,15 +11,12 @@ import { Button, Modal, Portal, Text } from "react-native-paper";
 import { useClassStore } from "../../../store/useClassStore";
 import UpdateModal from "./update.class.modal";
 
-interface IClassDetailsProps {
+interface Props {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
 }
 
-const ClassDetails = ({
-  modalVisible,
-  setModalVisible,
-}: IClassDetailsProps) => {
+const ClassDetails = ({ modalVisible, setModalVisible }: Props | any) => {
   const { setSelectedClass, getClasses, selectedClass, loading } =
     useClassStore();
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -29,12 +26,12 @@ const ClassDetails = ({
 
   const handleEditClass = (classData: any) => {
     setSelectedClass(classData);
-    setUpdateModalVisible(true);  
+    setUpdateModalVisible(true);
   };
 
   useEffect(() => {
     if (!updateModalVisible && refreshing) {
-      getClasses(); 
+      getClasses();
       setRefreshing(false);
     }
   }, [updateModalVisible, refreshing, getClasses]);
@@ -56,14 +53,14 @@ const ClassDetails = ({
                 </TouchableOpacity>
                 {selectedClass && (
                   <UpdateModal
-                  modalVisible={updateModalVisible}
-                  setModalVisible={(visible) => {
-                    setUpdateModalVisible(visible);
-                    if (!visible) {
-                      setRefreshing(true);
-                    }
-                  }}
-                />
+                    modalVisible={updateModalVisible}
+                    setModalVisible={(visible) => {
+                      setUpdateModalVisible(visible);
+                      if (!visible) {
+                        setRefreshing(true);
+                      }
+                    }}
+                  />
                 )}
 
                 <Text style={styles.title}>Class Details</Text>

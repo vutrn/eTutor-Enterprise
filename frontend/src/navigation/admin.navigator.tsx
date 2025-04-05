@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
-import { BlogStack } from "./blog.navigator";
+import { BlogStack } from "./features.navigator";
 
 const AdminDashboard = lazy(() => import("../screens/@admin/dashboard/admin.dashboard"));
 const TutorList = lazy(() => import("../screens/@admin/dashboard/tutor.list"));

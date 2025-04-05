@@ -1,6 +1,7 @@
 const Blog = require("../models/Blog");
 const User = require("../models/User");
 const Cloudinary = require("../lib/cloudinary.js");
+const sendEmail = require("../lib/emailService");
 
 const blogController = {
 
@@ -98,14 +99,23 @@ const blogController = {
             const { blogId } = req.params;
             const { text } = req.body;
             const userId = req.user.id;
-
-            const blog = await Blog.findById(blogId);
+    
+            const blog = await Blog.findById(blogId).populate("author", "email username");
             if (!blog) return res.status(404).json({ message: "Bài viết không tồn tại" });
-
+    
+            // Thêm bình luận vào danh sách
             blog.comments.push({ user: userId, text });
             await blog.save();
-
-            res.status(200).json({ message: "Comment đã được thêm", blog });
+    
+            // Gửi email thông báo đến tác giả bài viết
+            const subject = "Có một bình luận mới trên bài viết của bạn!";
+            const message = `Xin chào ${blog.author.username},\n\n` +
+                            `Người dùng đã để lại bình luận trên bài viết "${blog.title}":\n\n` +
+                            `"${text}"`;
+    
+            await sendEmail(blog.author.email, subject, message);
+    
+            res.status(200).json({ message: "Comment đã được thêm và thông báo đã gửi", blog });
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }

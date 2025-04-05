@@ -14,6 +14,8 @@ import { Dimensions } from "react-native";
 const TutorDocument = () => {
   const { documents, getDocuments, uploadDocument, deleteDocument, loading } =
     useDocumentStore();
+  const { documents, getDocuments, uploadDocument, deleteDocument, loading } =
+    useDocumentStore();
   const { selectedClass } = useClassStore();
   const { authUser } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
@@ -37,6 +39,11 @@ const TutorDocument = () => {
       copyToCacheDirectory: true,
     });
 
+    if (
+      result.canceled === false &&
+      result.assets &&
+      result.assets.length > 0
+    ) {
     if (
       result.canceled === false &&
       result.assets &&
