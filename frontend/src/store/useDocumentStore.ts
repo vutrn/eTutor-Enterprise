@@ -5,6 +5,7 @@ import { IDocumentState } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useClassStore } from "./useClassStore";
 import { useAuthStore } from "./useAuthStore";
+import { useDashboardStore } from "./useDashboadStore";
 
 export const useDocumentStore = create<IDocumentState>((set, get) => ({
   documents: [],
@@ -42,12 +43,16 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
       if (!token) throw new Error("No token found");
 
       set({ loading: true });
-      const res = await axiosInstance.post(`v1/document/upload/${classId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
+      const res = await axiosInstance.post(
+        `v1/document/upload/${classId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       Toast.show({
         type: "success",
@@ -77,12 +82,16 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
           Authorization: `Bearer ${token}`,
         },
       });
-      set({ loading: false });
+      // const res = await axiosInstance.get(`v1/document/${classId}`);
+      // set({ documents: res.data.documents, loading: false });
       Toast.show({ type: "success", text1: "Document deleted successfully" });
     } catch (error: any) {
       set({ loading: false });
       console.error("Delete error:", error);
-      Toast.show({ type: "error", text1: error.response?.data?.message || "Please try again" });
+      Toast.show({
+        type: "error",
+        text1: error.response?.data?.message || "Please try again",
+      });
       throw error;
     }
   },

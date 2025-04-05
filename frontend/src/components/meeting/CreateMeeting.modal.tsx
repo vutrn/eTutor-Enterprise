@@ -37,6 +37,7 @@ import { ActivityIndicator, ScrollView } from "react-native";
 import Toast from "react-native-toast-message";
 import { useDefaultStyles } from "react-native-ui-datepicker";
 import { DatetimePicker } from "../DatetimePicker";
+import { useClassStore } from "@/src/store/useClassStore";
 
 interface Props {
   isOpen: boolean;
@@ -55,6 +56,7 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
     createOnlineMeeting,
     loading,
   } = useMeetingStore();
+  const { selectedClass } = useClassStore();
   const [meetingType, setMeetingType] = useState<"offline" | "online">(
     "offline",
   );
@@ -186,7 +188,10 @@ const CreateMeetingModal = ({ isOpen, onClose }: Props) => {
   };
 
   const loadAllMeetings = async () => {
-    await Promise.all([getOfflineMeetings(), getOnlineMeetings()]);
+    await Promise.all([
+      getOfflineMeetings(selectedClass._id),
+      getOnlineMeetings(selectedClass._id),
+    ]);
   };
 
   return (

@@ -118,6 +118,7 @@ export interface IDashboardState {
       name: string;
       tutor: {
         _id: string;   
+        username: string;
       };
       students: {
         _id: string;
@@ -127,8 +128,40 @@ export interface IDashboardState {
       createdAt: string;
     }[];
   };
+  classDocuments: {
+    [classId: string]: {
+      _id: string;
+      filename: string;
+      url: string;
+      uploadedAt: string;
+      uploadedBy: {
+        _id: string;
+        username: string;
+        email: string;
+      }
+    }[]
+  },
+  classAttendance: {
+    [classId: string]: Array<{
+      _id: string;
+      title: string;
+      time: string;
+      attendees: Array<{
+        student: {
+          _id: string;
+          username: string;
+          email: string;
+        };
+        attended: boolean;
+      }>;
+    }>;
+  };
 
   getDashboard: () => Promise<void>;
+  getClassDocuments: (classId: string) => Promise<any>;
+  getAllClassDocuments: () => Promise<void>;
+  getClassAttendance: (classId: string) => Promise<any>;
+  getAllClassesAttendance: () => Promise<void>;
 }
 
 export interface IUserState {
@@ -214,17 +247,24 @@ export interface OfflineMeeting extends Meeting {
   description: string;
   location: string;
 }
+
 export interface OnlineMeeting extends Meeting {
   linkggmeet: string;
 }
+export interface allOfflineMeetings extends OfflineMeeting {}
+export interface allOnlineMeetings extends OnlineMeeting {}
 
 export interface IMeetingState {
   offlineMeetings: OfflineMeeting[];
   onlineMeetings: OnlineMeeting[];
+  allOfflineMeetings: allOfflineMeetings[];
+  allOnlineMeetings: allOnlineMeetings[];
   loading: boolean;
   selectedMeeting: OfflineMeeting | OnlineMeeting | null;
   
   setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting | null) => void;
+  getAllOfflineMeetings: () => Promise<void>;
+  getAllOnlineMeetings: () => Promise<void>;
   getOfflineMeetings: (selectedClassId: string) => Promise<void>;
   getOnlineMeetings: (selectedClassId: string) => Promise<void>;
   createOfflineMeeting: (
@@ -237,15 +277,3 @@ export interface IMeetingState {
   markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
   markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
 }
-
-// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.createOnlMeeting);
-
-// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.getMeetingsByClass);
-
-// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, onlMeetingController.markAttendance);
-
-// router.post("/", middlewareController.verifyTokenAndAdminAndTutor, meetingController.createMeeting);
-
-// router.get("/:classId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.getMeetingsByClass);
-
-// router.put("/attendance/:meetingId", middlewareController.verifyTokenAndAdminAndTutor, meetingController.markAttendance);

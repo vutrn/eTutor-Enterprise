@@ -103,6 +103,14 @@ const documentController = {
         } catch (error) {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
+    },
+    getAllDocuments: async (req, res) => {
+        try {
+            const documents = await Document.find().populate("uploadedBy", "username email");
+            res.status(200).json({ documents });
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
     }
     
 };

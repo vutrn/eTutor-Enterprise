@@ -1,22 +1,55 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { IMeetingState, OfflineMeeting, OnlineMeeting } from "../types/store";
+import {
+  allOfflineMeetings,
+  allOnlineMeetings,
+  IMeetingState,
+  OfflineMeeting,
+  OnlineMeeting,
+} from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useClassStore } from "./useClassStore";
 
 export const useMeetingStore = create<IMeetingState>((set) => ({
   offlineMeetings: [] as OfflineMeeting[],
   onlineMeetings: [] as OnlineMeeting[],
+  allOfflineMeetings: [] as allOfflineMeetings[],
+  allOnlineMeetings: [] as allOnlineMeetings[],
   selectedMeeting: {} as OfflineMeeting | OnlineMeeting | null,
   loading: false,
 
   setSelectedMeeting: (selectedMeeting) => set({ selectedMeeting }),
 
+  getAllOfflineMeetings: async () => {
+    try {
+      const res = await axiosInstance.get("v1/meeting/all");
+      set({ allOfflineMeetings: res.data.meetings });
+    } catch (error: any) {
+      console.error(
+        "Error fetching all offline meetings:",
+        error.response?.data?.message,
+      );
+      set({ loading: false });
+    }
+  },
+
+  getAllOnlineMeetings: async () => {
+    try {
+      const res = await axiosInstance.get("v1/onlmeeting/all");
+      set({ allOnlineMeetings: res.data.onlmeetings });
+    } catch (error: any) {
+      console.error(
+        "Error fetching all online meetings:",
+        error.response?.data?.message,
+      );
+      set({ loading: false });
+    }
+  },
+
   getOfflineMeetings: async (selectedClassId: string) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       if (!token) throw new Error("No token found");
-
 
       set({ loading: true });
       const res = await axiosInstance.get(`v1/meeting/${selectedClassId}`, {
@@ -36,12 +69,9 @@ export const useMeetingStore = create<IMeetingState>((set) => ({
       if (!token) throw new Error("No token found");
 
       set({ loading: true });
-      const res = await axiosInstance.get(
-        `v1/onlmeeting/${selectedClassId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await axiosInstance.get(`v1/onlmeeting/${selectedClassId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       set({ onlineMeetings: res.data.onlmeetings, loading: false });
     } catch (error: any) {
       console.error(
