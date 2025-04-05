@@ -4,9 +4,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import TutorMeetingList from "../screens/@tutor/class_features/meeting.list";
 import TuTorClassDetail from "../screens/@tutor/class_features/tutor.class.detail";
-import TutorDocument from "../screens/@tutor/class_features/tutor.document";
 import { useClassStore } from "../store/useClassStore";
 import { TutorMessageStack } from "./features.navigator";
+import TutorDocument from "../screens/@tutor/class_features/tutor.document";
 
 export const ClassFeaturesDrawer = () => {
   const Drawer = createDrawerNavigator<RootStackParamList>();
