@@ -1,10 +1,9 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet } from "react-native";
-import { IconButton, Text } from "react-native-paper";
+import { FlatList, View } from "react-native";
+import { Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useBlogStore } from "../../store/useBlogStore";
-import { FONTS } from "../../utils/constant";
 import BlogCard from "../BlogCard";
 
 const BlogList = () => {
@@ -27,60 +26,47 @@ const BlogList = () => {
     navigation.navigate("blog_detail");
   };
 
-  // renderItem dùng cho FlatList tạo từng item trong mảng blogs
   const renderItem = ({ item }: any) => {
     return <BlogCard blog={item} onPress={handleSelectBlog} />;
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* icon tạo blog góc dưới */}
-      {/* thay bằng button thông thường */}
-      <IconButton
-        style={styles.icon}
-        size={50}
-        icon="plus"
-        mode="contained"
-        onPress={() => navigation.navigate("blog_create")}
-      />
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <View className="mt-4 flex-row items-center justify-between px-4">
+        <Text className="text-2xl font-bold text-gray-800">Blog</Text>
+        <Button
+          mode="contained"
+          buttonColor="#1d00fc"
+          onPress={() => navigation.navigate("blog_create")}
+        >
+          Post Blog
+        </Button>
+      </View>
+
       <FlatList
         data={blogs}
         keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <BlogCard blog={item} onPress={handleSelectBlog} />
+        )}
+        numColumns={2} // Display 2 cards per row
+        contentContainerStyle={{
+          paddingBottom: 20,
+          paddingHorizontal: 8,
+          paddingTop: 8,
+        }}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
         showsVerticalScrollIndicator={false}
         onRefresh={fetchData}
         refreshing={refreshing}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No blogs available</Text>
+          <Text className="font-regular mt-5 text-center text-base text-gray-500">
+            No blogs available. Create one by clicking the "+" button above.
+          </Text>
         }
       />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-  },
-  icon: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    zIndex: 10,
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  emptyText: {
-    textAlign: "center",
-    fontFamily: FONTS.regular,
-    fontSize: 16,
-    marginTop: 20,
-    color: "#666",
-  },
-});
 
 export default BlogList;
