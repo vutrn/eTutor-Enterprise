@@ -1,27 +1,81 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { Button, HelperText, TextInput } from "react-native-paper";
+import React, { useState } from "react";
+import { Image, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useBlogStore } from "../../store/useBlogStore";
-import { FONTS } from "../../utils/constant";
+
+// Import Gluestack UI components
+import { Box } from "@/components/ui/box";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlHelper,
+  FormControlHelperText,
+  FormControlLabel,
+  FormControlLabelText,
+} from "@/components/ui/form-control";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Input, InputField } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
+import { Textarea, TextareaInput } from "@/components/ui/textarea";
+import { VStack } from "@/components/ui/vstack";
+import {
+  AlertCircleIcon,
+  ImagePlus,
+  Upload,
+  XCircle,
+} from "lucide-react-native";
 
 const BlogCreate = () => {
-  const { createBlog, getAllBlogs } = useBlogStore();
+  const { createBlog } = useBlogStore();
   const [image, setImage] = useState<string | null>(null);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    title: "",
+    content: "",
+  });
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { title: "", content: "" };
+
+    if (!title.trim()) {
+      newErrors.title = "Title is required";
+      isValid = false;
+    } else if (title.length < 5) {
+      newErrors.title = "Title must be at least 5 characters";
+      isValid = false;
+    }
+
+    if (!content.trim()) {
+      newErrors.content = "Content is required";
+      isValid = false;
+    } else if (content.length < 5) {
+      newErrors.content = "Content must be at least 5 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ['images'],
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      aspect: [16, 9],
+      quality: 0.8,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -29,170 +83,181 @@ const BlogCreate = () => {
     }
   };
 
-  const handleCreateBlog = async () => {
-    if (!title.trim())
-      return Toast.show({
-        type: "error",
-        text1: "ERROR",
-        text2: "Title is required",
-      });
-    if (!content.trim())
-      return Toast.show({
-        type: "error",
-        text1: "ERROR",
-        text2: "Content is required",
-      });
-    if (title.length < 5)
-      return Toast.show({
-        type: "error",
-        text1: "ERROR",
-        text2: "Title must be at least 5 characters",
-      });
-    if (content.length < 5)
-      return Toast.show({
-        type: "error",
-        text1: "ERROR",
-        text2: "Content must be at least 5 characters",
-      });
-
-    setIsLoading(true);
-    await createBlog(title, content, image || undefined);
+  const removeImage = () => {
     setImage(null);
-    setTitle("");
-    setContent("");
-    navigation.goBack();
-    Toast.show({
-      type: "success",
-      text1: "SUCCESS",
-      text2: "Blog created successfully",
-    });
-    setIsLoading(false);
   };
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          icon="plus"
-          mode="contained"
-          style={styles.createButton}
-          onPress={handleCreateBlog}
-          disabled={isLoading}
-          loading={isLoading}
-          contentStyle={{ flexDirection: "row-reverse" }}
-        >
-          {isLoading ? "Creating..." : "Create"}
-        </Button>
-      ),
-    });
-  }, [isLoading, title, content, image]);
+  const handleCreateBlog = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      await createBlog(title, content, image || undefined);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Blog post created successfully",
+      });
+      setImage(null);
+      setTitle("");
+      setContent("");
+      navigation.navigate("blog_list");
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to create blog post",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <View>
-      <ScrollView style={styles.container}>
-        {/* IMAGE PREVIEW */}
-        <View style={styles.imageContainer}>
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          ) : (
-            <Text>No image selected</Text>
-          )}
-          <Button onPress={pickImage}>Choose image</Button>
-        </View>
-        {/* TITLE INPUTS */}
-        <TextInput
-          mode="outlined"
-          placeholder="Post Title"
-          placeholderTextColor="#8E8E93"
-          value={title}
-          onChangeText={(text) => setTitle(text)}
-          autoCapitalize="words"
-          style={styles.titleInput}
-          outlineStyle={{ borderWidth: 0 }}
-        />
-        {/* ko có title hiện helpertext  */}
-        {!title.trim() ? (
-          <HelperText type="error" visible={true}>
-            Title is required
-          </HelperText>
-        ) : null}
-        {/* title < 5 hiện helpertext  */}
-        {!title.trim() || title.length < 5 ? (
-          <HelperText type="error" visible={true}>
-            Title must be at least 5 characters
-          </HelperText>
-        ) : null}
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+        <Card
+          variant="elevated"
+          size="md"
+          className="mb-4 bg-white p-4 shadow-sm"
+        >
+          <VStack space="md">
+            {/* Featured Image Upload */}
+            <FormControl>
+              <FormControlLabel>
+                <FormControlLabelText>Featured Image</FormControlLabelText>
+              </FormControlLabel>
 
-        {/* CONTENT INPUTS */}
-        <TextInput
-          mode="outlined"
-          placeholder="Write your post..."
-          multiline
-          placeholderTextColor="#8E8E93"
-          value={content}
-          onChangeText={(text) => setContent(text)}
-          style={styles.contentInput}
-          outlineStyle={{ borderWidth: 0 }}
-        />
-        {!content.trim() ? (
-          <HelperText type="error" visible={true}>
-            Content is required
-          </HelperText>
-        ) : null}
-        {!content.trim() || content.length < 5 ? (
-          <HelperText type="error" visible={true}>
-            Content must be at least 5 characters
-          </HelperText>
-        ) : null}
+              {!image ? (
+                <Button
+                  onPress={pickImage}
+                  variant="outline"
+                  action="secondary"
+                  className="h-[200px] border-2 border-dashed border-gray-300 bg-gray-50"
+                >
+                  <VStack className="items-center">
+                    <ButtonIcon
+                      as={ImagePlus}
+                      size="xl"
+                      className="mb-2 text-gray-400"
+                    />
+                    <ButtonText>Upload an image</ButtonText>
+                    {/* <Text className="mt-1 text-xs text-gray-500">
+                      Recommended: 16:9 ratio
+                    </Text> */}
+                  </VStack>
+                </Button>
+              ) : (
+                <Box className="relative">
+                  <Image
+                    source={{ uri: image }}
+                    style={{ height: 200, width: "100%", borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
+                  <Button
+                    onPress={removeImage}
+                    variant="solid"
+                    action="negative"
+                    size="xs"
+                    className="absolute right-2 top-2 rounded-full"
+                  >
+                    <ButtonIcon as={XCircle} />
+                  </Button>
+                </Box>
+              )}
+              {/* <FormControlHelperText>
+                Adding an image will make your post more engaging
+              </FormControlHelperText> */}
+            </FormControl>
+
+            {/* Title Input */}
+            <FormControl isInvalid={!!errors.title}>
+              <FormControlLabel>
+                <FormControlLabelText>Title</FormControlLabelText>
+              </FormControlLabel>
+              <Input size="md" className="bg-gray-50">
+                <InputField
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="Title for your post"
+                />
+              </Input>
+              {errors.title ? (
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>{errors.title}</FormControlErrorText>
+                </FormControlError>
+              ) : (
+                <FormControlHelper>
+                  {/* <FormControlHelperText>
+                    Make it clear and attention-grabbing
+                  </FormControlHelperText> */}
+                </FormControlHelper>
+              )}
+            </FormControl>
+
+            {/* Content Input */}
+            <FormControl isInvalid={!!errors.content}>
+              <FormControlLabel>
+                <FormControlLabelText>Content</FormControlLabelText>
+              </FormControlLabel>
+              <Textarea size="md" className="min-h-[200px] bg-gray-50">
+                <TextareaInput
+                  value={content}
+                  onChangeText={setContent}
+                  placeholder="Write your blog post content here..."
+                  multiline
+                />
+              </Textarea>
+              {errors.content ? (
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>{errors.content}</FormControlErrorText>
+                </FormControlError>
+              ) : (
+                <FormControlHelper>
+                  {/* <FormControlHelperText>
+                    Share your thoughts, knowledge, or experiences
+                  </FormControlHelperText> */}
+                </FormControlHelper>
+              )}
+            </FormControl>
+          </VStack>
+        </Card>
+
+        {/* Action Buttons */}
+        <HStack className="justify-end space-x-3">
+          <Button
+            variant="outline"
+            action="secondary"
+            onPress={() => navigation.goBack()}
+            className="flex-1"
+          >
+            <ButtonText>Cancel</ButtonText>
+          </Button>
+          <Button
+            variant="solid"
+            action="primary"
+            onPress={handleCreateBlog}
+            isDisabled={isLoading}
+            className="flex-1"
+          >
+            {isLoading ? (
+              <HStack className="items-center space-x-2">
+                <Spinner color="white" size="small" />
+                <ButtonText>Creating...</ButtonText>
+              </HStack>
+            ) : (
+              <HStack className="items-center space-x-2">
+                <ButtonIcon as={Upload} className="mr-2" />
+                <ButtonText>Publish Post</ButtonText>
+              </HStack>
+            )}
+          </Button>
+        </HStack>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  imageContainer: {
-    borderWidth: 2,
-    borderStyle: "dashed",
-    padding: 10,
-    borderRadius: 15,
-    borderColor: "#c4c4c4",
-    backgroundColor: "#F2F2F7",
-    gap: 10,
-    marginBottom: 20,
-  },
-  image: {
-    height: 200,
-    borderRadius: 8,
-  },
-  titleInput: {
-    fontSize: 24,
-    backgroundColor: "white",
-    fontFamily: FONTS.bold,
-    fontWeight: "bold",
-  },
-  contentInput: {
-    marginTop: 20,
-    fontSize: 16,
-    lineHeight: 24,
-    minHeight: 200,
-    backgroundColor: "white",
-    fontFamily: FONTS.regular,
-    borderWidth: 0,
-    borderRadius: 8,
-  },
-  createButton: {
-    backgroundColor: "#2D336B",
-    borderRadius: 8,
-    marginRight: 15,
-  },
-});
 
 export default BlogCreate;

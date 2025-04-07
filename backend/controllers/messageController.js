@@ -68,7 +68,8 @@
           { admin: senderId, students: receiverId },
           { admin: receiverId, students: senderId },
           { tutor: senderId, admin: receiverId },
-          { tutor: receiverId, admin: senderId }
+          { tutor: receiverId, admin: senderId },
+          { students: senderId, students: receiverId }
         ],
       });
       console.log("Common class found:", commonClass);

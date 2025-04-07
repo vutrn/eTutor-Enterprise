@@ -56,7 +56,7 @@ export const App = () => {
 
     const tokenCheckInterval = setInterval(checkToken, 1000 * 60); // Check every minute
     return () => clearInterval(tokenCheckInterval);
-  }, [loaded, error]);
+  }, [loaded, error, verifyToken]);
 
   if (!loaded && !error) {
     return null;

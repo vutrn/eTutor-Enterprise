@@ -12,8 +12,9 @@ const BlogList = lazy(() => import("../components/blog/BlogList"));
 
 // Define proper components instead of using inline functions
 const TutorMessageListScreen = () => <MessageList userRole="tutor" />;
-const TutorMessageDetailScreen = () => <MessageDetail userRole="tutor" />;
 const StudentMessageListScreen = () => <MessageList userRole="student" />;
+
+const TutorMessageDetailScreen = () => <MessageDetail userRole="tutor" />;
 const StudentMessageDetailScreen = () => <MessageDetail userRole="student" />;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

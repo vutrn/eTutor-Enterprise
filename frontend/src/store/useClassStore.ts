@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
-import { IClassState } from "../types/store";
+import { IClassState, User } from "../types/store";
 
 export const useClassStore = create<IClassState>((set, get) => ({
   classes: [],
@@ -10,17 +10,9 @@ export const useClassStore = create<IClassState>((set, get) => ({
   selectedClass: {
     _id: "",
     name: "",
-    students: [],
-    tutor: {
-      _id: "",
-      username: "",
-      email: "",
-    },
-    admin: {
-      _id: "",
-      username: "",
-      email: "",
-    },
+    students: [] as User[],
+    tutor: {} as User,
+    admin: {} as User,
     createdAt: "",
   },
 
@@ -66,7 +58,7 @@ export const useClassStore = create<IClassState>((set, get) => ({
       await axiosInstance.post(
         "v1/class/createclass",
         { name, tutorId, studentIds },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       // Refresh classes after creation
@@ -112,7 +104,7 @@ export const useClassStore = create<IClassState>((set, get) => ({
           newTutorId,
           studentIds,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       // Refresh classes after update
@@ -149,7 +141,11 @@ export const useClassStore = create<IClassState>((set, get) => ({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      Toast.show({ type: "success", text1: "Success", text2: "Class deleted successfully" });
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Class deleted successfully",
+      });
 
       return true;
     } catch (error: any) {
@@ -176,9 +172,12 @@ export const useClassStore = create<IClassState>((set, get) => ({
       }
 
       // Correct the API endpoint path
-      await axiosInstance.delete(`v1/class/${classId}/deletestudent/${studentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axiosInstance.delete(
+        `v1/class/${classId}/deletestudent/${studentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
       // Refresh classes after removing student
       await get().getClasses();

@@ -1,65 +1,149 @@
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Box } from "@/components/ui/box";
+import { Divider } from "@/components/ui/divider";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Pressable } from "@/components/ui/pressable";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { Feather } from "@expo/vector-icons";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
-import { useMessageStore } from "../../../store/useMessageStore";
-import { Avatar, Button, TextInput } from "react-native-paper";
+import { FlatList, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useClassStore } from "../../../store/useClassStore";
-import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@react-navigation/native";
+import { useMessageStore } from "../../../store/useMessageStore";
+import { MessageCircle, Search, Users } from "lucide-react-native";
 
 const TutorMessage = () => {
-  const { getUsersToChat, setSelectedUser, selectedUser, users } = useMessageStore();
+  const { getUsersToChat, setSelectedUser, users } = useMessageStore();
   const { selectedClass } = useClassStore();
-
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    getUsersToChat(selectedClass._id);
+    fetchUsers();
   }, [selectedClass._id]);
+
+  const fetchUsers = async () => {
+    setRefreshing(true);
+    await getUsersToChat(selectedClass._id);
+    setRefreshing(false);
+  };
 
   const handleSelectUser = (user: any) => {
     setSelectedUser(user);
     navigation.navigate("tutor_message_detail");
   };
 
+  const filteredUsers = users.filter((user) =>
+    user.username.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const getRandomColor = (username: string) => {
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-amber-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+    ];
+    // Use a hash of the username to pick a consistent color for each user
+    const hash = username
+      .split("")
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
+  };
+
   const renderItem = ({ item }: any) => {
+    const avatarColor = getRandomColor(item.username);
+
     return (
-      <Button
-        mode="outlined"
-        style={styles.userButton}
-        contentStyle={styles.buttonContent}
-        onPress={() => handleSelectUser(item)}
-      >
-        <Avatar.Text
-          size={40}
-          color={"#fff"}
-          label={item.username.substring(0, 2).toUpperCase()}
-          style={styles.avatar}
-        />
-        <Text> {item.username}</Text>
-        <Text> {item._id} </Text>
-      </Button>
+      <Pressable onPress={() => handleSelectUser(item)} className="mx-4 my-1">
+        <Box className="rounded-lg border border-gray-200 bg-white p-3">
+          <HStack className="items-center space-x-3">
+            <Avatar size="md" className={avatarColor}>
+              <AvatarFallbackText>
+                {item.username.substring(0, 2).toUpperCase()}
+              </AvatarFallbackText>
+            </Avatar>
+            <VStack className="flex-1">
+              <Text className="font-semibold">{item.username}</Text>
+              <Text className="text-xs text-gray-500">Student</Text>
+            </VStack>
+            <Icon as={MessageCircle} size="lg" className="text-primary-600" />
+          </HStack>
+        </Box>
+      </Pressable>
     );
   };
 
   return (
-    <SafeAreaView>
-      <FlatList data={users} keyExtractor={(item) => item._id} renderItem={renderItem} />
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <Box className="flex-1 p-4">
+        <VStack space="md" className="mb-4">
+          <Heading size="xl">Messages</Heading>
+          <Text className="text-gray-600">
+            Start a conversation with students in your class
+          </Text>
+
+          <Input size="md" className="bg-white">
+            <InputSlot className="pl-2">
+              <InputIcon>
+                <Icon as={Search} size="sm" />
+              </InputIcon>
+            </InputSlot>
+            <InputField
+              placeholder="Search students..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </Input>
+        </VStack>
+
+        <Divider className="mb-4" />
+
+        {users.length === 0 && !refreshing ? (
+          <Box className="flex-1 items-center justify-center">
+            <Icon as={Users} size="xl" className="mb-2 text-gray-400" />
+            <Text className="text-center text-gray-500">
+              No students available to chat with in this class
+            </Text>
+          </Box>
+        ) : (
+          <FlatList
+            data={filteredUsers}
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={fetchUsers} />
+            }
+            ListEmptyComponent={
+              searchQuery ? (
+                <Box className="items-center justify-center py-10">
+                  <Text className="text-center text-gray-500">
+                    No students match your search
+                  </Text>
+                </Box>
+              ) : null
+            }
+          />
+        )}
+
+        {refreshing && (
+          <Box className="absolute inset-0 items-center justify-center bg-black/5">
+            <Spinner size="large" />
+          </Box>
+        )}
+      </Box>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  userButton: {
-    marginVertical: 5,
-    marginHorizontal: 10,
-  },
-  buttonContent: {
-    justifyContent: "flex-start",
-    padding: 10,
-  },
-  avatar: {
-    backgroundColor: "#7886C7",
-    // backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-  },
-});
 export default TutorMessage;

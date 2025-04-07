@@ -1,26 +1,41 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { Divider, IconButton, Menu, Text, TextInput } from "react-native-paper";
+import { Image, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useBlogStore } from "../../store/useBlogStore";
 import { useUserStore } from "../../store/useUserStore";
-import { FONTS } from "../../utils/constant";
 import alert from "../alert";
+
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { Button, ButtonIcon } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Input, InputField } from "@/components/ui/input";
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
+import { Pressable } from "@/components/ui/pressable";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+
+import {
+  Calendar,
+  Edit,
+  MessageSquare,
+  MoreVertical,
+  Send,
+  Trash2,
+} from "lucide-react-native";
 
 const BlogDetail = () => {
   const { authUser } = useAuthStore();
   const { users, getUsers } = useUserStore();
-  const {
-    selectedBlog,
-    setSelectedBlog,
-    commentBlog,
-    getAllBlogs,
-    deleteBlog,
-  } = useBlogStore();
-  const [text, setText] = useState("");
-  const [visible, setVisible] = useState(false);
+  const { selectedBlog, commentBlog, deleteBlog } = useBlogStore();
+  const [commentText, setText] = useState("");
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   useEffect(() => {
@@ -36,9 +51,22 @@ const BlogDetail = () => {
     }
   };
 
-  const handleDeleteBlog = async (selectedBlogId: string) => {
-    await deleteBlog(selectedBlogId);
-    navigation.goBack();
+  const handleDeleteBlog = async () => {
+    alert("WARNING", "This action cannot be undone", [
+      {
+        text: "Cancel",
+        style: "cancel",
+        onPress: () => {},
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          await deleteBlog(selectedBlog._id);
+          navigation.goBack();
+        },
+      },
+    ]);
   };
 
   const getUserNameById = (userId: string) => {
@@ -53,248 +81,185 @@ const BlogDetail = () => {
       : "Unknown role";
   };
 
+  const formattedDate = selectedBlog?.createdAt
+    ? format(new Date(selectedBlog.createdAt), "h:mm a · MMMM d, yyyy")
+    : "Date not available";
+
   return (
-    <ScrollView style={styles.container}>
-      {/* NHỚ WRAP IMAGE TRONG TEXT */}
-      <Text>
-        {selectedBlog?.image && (
-          <Image
-            source={{ uri: selectedBlog.image }}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        )}
-      </Text>
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        <Box className="p-4">
+          <Card variant="elevated" className="mb-4 bg-white shadow-sm">
+            <VStack space="md">
+              {/* Blog header with author info and action menu */}
+              <HStack className="items-center justify-between">
+                <HStack className="items-center space-x-3">
+                  <Avatar size="md" className="bg-primary-600">
+                    <AvatarFallbackText>
+                      {selectedBlog?.author?.username
+                        ?.charAt(0)
+                        .toUpperCase() || "?"}
+                    </AvatarFallbackText>
+                  </Avatar>
+                  <VStack>
+                    <Text className="font-bold">
+                      {selectedBlog?.author
+                        ? selectedBlog.author.username
+                        : "Unknown author"}
+                    </Text>
+                    <HStack className="items-center space-x-1">
+                      <Icon as={Calendar} size="md" className="text-gray-500" />
+                      <Text className="text-xs text-gray-500">
+                        {formattedDate}
+                      </Text>
+                    </HStack>
+                  </VStack>
+                </HStack>
 
-      <View style={styles.titleContainer}>
-        {/* TITLE */}
-        <Text style={styles.title} variant="titleLarge">
-          {selectedBlog?.title}
-        </Text>
+                {isAuthor && (
+                  <Box>
+                    <Menu
+                      trigger={({ ...triggerProps }) => (
+                        <Pressable {...triggerProps}>
+                          <Icon as={MoreVertical} size="md" />
+                        </Pressable>
+                      )}
+                    >
+                      <MenuItem
+                        onPress={() => navigation.navigate("blog_update")}
+                      >
+                        <Icon
+                          as={Edit}
+                          size="sm"
+                          className="mr-2 text-blue-500"
+                        />
+                        <MenuItemLabel>Edit</MenuItemLabel>
+                      </MenuItem>
+                      <MenuItem onPress={handleDeleteBlog}>
+                        <Icon
+                          as={Trash2}
+                          size="sm"
+                          className="mr-2 text-red-500"
+                        />
+                        <MenuItemLabel className="text-red-500">
+                          Delete
+                        </MenuItemLabel>
+                      </MenuItem>
+                    </Menu>
+                  </Box>
+                )}
+              </HStack>
 
-        {/* Nếu tác giả là người dùng đăng nhập thì hiện menu */}
-        {isAuthor && (
-          <Menu
-            visible={visible}
-            onDismiss={() => setVisible(false)}
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                onPress={() => {
-                  setVisible(true);
-                }}
-                size={20}
-              />
-            }
-          >
-            <Menu.Item
-              title="Update"
-              leadingIcon="pencil"
-              onPress={() => {
-                setVisible(false);
-                navigation.navigate("blog_update");
-              }}
-            />
-            <Menu.Item
-              titleStyle={{ color: "red" }}
-              title="DELETE"
-              leadingIcon="delete"
-              onPress={() => {
-                setVisible(false);
-                alert("WARNING", "This action cannot be undone", [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                    onPress: () => {},
-                  },
-                  {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: async () => {
-                      handleDeleteBlog(selectedBlog._id);
-                    },
-                  },
-                ]);
-              }}
-            />
-          </Menu>
-        )}
-      </View>
+              {/* Blog featured image */}
+              {selectedBlog?.image && (
+                <Box className="overflow-hidden rounded-lg">
+                  <Image
+                    source={{ uri: selectedBlog.image }}
+                    className="h-48 w-full"
+                    resizeMode="cover"
+                  />
+                </Box>
+              )}
 
-      <View>
-        {/* AUTHOR name */}
-        <Text variant="bodyMedium" style={styles.author}>
-          By:{" "}
-          {selectedBlog?.author
-            ? selectedBlog.author.username
-            : "Unknown author"}
-        </Text>
-        <Text style={styles.date}>
-          Published on:{" "}
-          {format(new Date(selectedBlog?.createdAt), "hh:mm MMMM dd, yyyy") ||
-            "Date not available"}
-        </Text>
-      </View>
-      <Text style={styles.content}>{selectedBlog?.content}</Text>
+              {/* Blog title */}
+              <Heading size="lg" className="text-gray-800">
+                {selectedBlog?.title}
+              </Heading>
 
-      <Divider />
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          value={text}
-          mode="outlined"
-          onChangeText={(text) => setText(text)}
-          style={styles.input}
-          label="Add a comment..."
-          onKeyPress={(e) => {
-            if (e.nativeEvent.key === "Enter") handleSendComment(text);
-          }}
-        />
-        <IconButton
-          icon="send"
-          size={24}
-          onPress={() => {
-            handleSendComment(text);
-          }}
-        />
-      </View>
-
-      {/* Comments */}
-      {selectedBlog?.comments && selectedBlog?.comments.length > 0 && (
-        <View style={styles.commentsContainer}>
-          {/* hiển thị số lượng comment */}
-          <Text style={styles.commentsHeader}>
-            Comments ({selectedBlog?.comments.length}):
-          </Text>
-
-          {/* toReverse -> comment mới nhất đẩy lên trên cùng */}
-          {selectedBlog?.comments.toReversed().map((comment: any) => (
-            <View key={comment._id} style={styles.comment}>
-              <View style={styles.commentContent}>
-                {/* tên user */}
-                <Text style={styles.commentUser}>
-                  {getUserNameById(comment.user)
-                    ? `${getUserNameById(comment.user)} (${getRoleById(comment.user)})`
-                    : "Unknown"}
-                  :
-                </Text>
-                {/* comment */}
-                <Text style={styles.commentText}>{comment.text}</Text>
-              </View>
-              {/* ngày giờ comment */}
-              <Text style={styles.commentDate}>
-                {format(new Date(comment.createdAt), "hh:mm MMMM dd, yyyy")}
+              {/* Blog content */}
+              <Text className="leading-relaxed text-gray-700">
+                {selectedBlog?.content}
               </Text>
-            </View>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+            </VStack>
+          </Card>
+
+          {/* Comments section */}
+          <Card variant="elevated" className="bg-white p-4 shadow-sm">
+            <VStack space="md">
+              <HStack className="items-center space-x-2">
+                <Icon
+                  as={MessageSquare}
+                  size="sm"
+                  className="text-primary-600"
+                />
+                <Heading size="sm">
+                  Comments ({selectedBlog?.comments?.length || 0})
+                </Heading>
+              </HStack>
+
+              <HStack className="space-x-2">
+                <Input size="md" className="flex-1 bg-gray-50">
+                  <InputField
+                    value={commentText}
+                    onChangeText={setText}
+                    placeholder="Add a comment..."
+                    onKeyPress={(e) => {
+                      if (e.nativeEvent.key === "Enter") {
+                        handleSendComment(commentText);
+                      }
+                    }}
+                  />
+                </Input>
+                <Button
+                  size="md"
+                  action="primary"
+                  isDisabled={commentText.trim().length === 0}
+                  onPress={() => handleSendComment(commentText)}
+                >
+                  <ButtonIcon as={Send} />
+                </Button>
+              </HStack>
+
+              {/* Comments list */}
+              {selectedBlog?.comments && selectedBlog.comments.length > 0 ? (
+                <VStack space="md" className="mt-2">
+                  {[...selectedBlog.comments].reverse().map((comment: any) => (
+                    <Box
+                      key={comment._id}
+                      className="rounded-lg bg-gray-50 p-3"
+                    >
+                      <HStack className="mb-1 items-center space-x-2">
+                        <Avatar size="xs" className="bg-gray-400">
+                          <AvatarFallbackText>
+                            {getUserNameById(comment.user)
+                              ?.charAt(0)
+                              .toUpperCase() || "?"}
+                          </AvatarFallbackText>
+                        </Avatar>
+                        <Text className="text-sm font-bold">
+                          {getUserNameById(comment.user)}
+                        </Text>
+                        <Badge className="ml-1">
+                          <Text className="text-xs">
+                            {getRoleById(comment.user)}
+                          </Text>
+                        </Badge>
+                        <Text className="ml-auto text-xs text-gray-500">
+                          {format(new Date(comment.createdAt), "MMM d, h:mm a")}
+                        </Text>
+                      </HStack>
+                      <Text className="pl-8 text-gray-700">{comment.text}</Text>
+                    </Box>
+                  ))}
+                </VStack>
+              ) : (
+                <Box className="my-6 items-center">
+                  <Icon
+                    as={MessageSquare}
+                    size="xl"
+                    className="mb-2 text-gray-300"
+                  />
+                  <Text className="text-gray-500">
+                    No comments yet. Be the first!
+                  </Text>
+                </Box>
+              )}
+            </VStack>
+          </Card>
+        </Box>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  title: {
-    flex: 1,
-    fontFamily: FONTS.bold,
-  },
-  image: {
-    width: "100%",
-    height: 200,
-    borderRadius: 4,
-    marginBottom: 12,
-  },
-  content: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 12,
-    fontFamily: FONTS.regular,
-  },
-  author: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-    fontFamily: FONTS.regular,
-  },
-  date: {
-    fontSize: 14,
-    color: "#666",
-    fontFamily: FONTS.light,
-    textAlign: "right",
-    fontStyle: "italic",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 16,
-  },
-  input: {
-    flex: 1,
-    margin: 10,
-  },
-  commentsContainer: {
-    marginTop: 16,
-    paddingTop: 8,
-  },
-  commentsHeader: {
-    fontSize: 16,
-    fontFamily: FONTS.medium,
-    marginBottom: 8,
-  },
-  comment: {
-    backgroundColor: "#f0f0f0",
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 6,
-  },
-  commentContent: {
-    flexDirection: "row",
-  },
-  commentUser: {
-    fontSize: 14,
-    fontFamily: FONTS.semiBold,
-  },
-  commentRole: {
-    fontSize: 12,
-    fontFamily: FONTS.light,
-    borderRadius: 10,
-    borderWidth: 1,
-    backgroundColor: "lightgreen",
-    borderColor: "white",
-    padding: 2,
-  },
-  commentText: {
-    fontSize: 14,
-    fontFamily: FONTS.regular,
-    marginLeft: 4,
-  },
-  commentDate: {
-    fontSize: 12,
-    fontFamily: FONTS.light,
-    color: "#777",
-    textAlign: "right",
-  },
-  emptyText: {
-    textAlign: "center",
-    fontFamily: FONTS.regular,
-    fontSize: 16,
-    marginTop: 20,
-    color: "#666",
-  },
-});
 
 export default BlogDetail;

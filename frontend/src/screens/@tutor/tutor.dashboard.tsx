@@ -42,21 +42,18 @@ const TutorDashboard = () => {
 
   useFocusEffect(
     useCallback(() => {
-      // Your data fetching code
       const fetchData = async () => {
         try {
-          // First fetch the dashboard data
           await getDashboard();
           
-          // Then fetch meetings and blogs in parallel
           await Promise.all([
             getAllOfflineMeetings(),
             getAllOnlineMeetings(),
             getAllBlogs()
           ]);
           
-          // Only after dashboard data is available, fetch documents for each class
-          if (dashboard?.classes && dashboard.classes.length > 0) {
+          if (dashboard?.classes) {
+            console.log("Dashboard Classes:", dashboard.classes);
             for (const cls of dashboard.classes) {
               await getClassDocuments(cls._id);
             }
@@ -68,12 +65,11 @@ const TutorDashboard = () => {
       
       fetchData();
 
-      // Return a cleanup function
       return () => {
         setDocumentData({ labels: [], counts: [], classNames: {} });
         setAttendanceData({ attended: 0, absent: 0 });
       };
-    }, [getDashboard]),
+    }, [getDashboard, getClassDocuments]),
   );
 
   useEffect(() => {
@@ -82,7 +78,6 @@ const TutorDashboard = () => {
       const labels = [] as any;
       const counts = [] as any;
 
-      // Process class data for the document chart
       dashboard.classes.forEach((cls) => {
         const className =
           cls.name.length > 10 ? cls.name.substring(0, 10) + "..." : cls.name;
@@ -94,7 +89,7 @@ const TutorDashboard = () => {
 
       setDocumentData({ labels, counts, classNames });
     }
-  }, [dashboard.classes]);
+  }, [dashboard.classes, getDashboard, classDocuments]);
 
   useEffect(() => {
     const allMeetings = [...allOfflineMeetings, ...allOnlineMeetings];
@@ -242,7 +237,7 @@ const TutorDashboard = () => {
                 }}
                 accessor={"population"}
                 backgroundColor={"transparent"}
-                center={[0, 0]}
+                center={[10, 0]}
                 paddingLeft=""
               />
             </View>

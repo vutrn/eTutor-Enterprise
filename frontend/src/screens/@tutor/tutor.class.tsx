@@ -23,7 +23,6 @@ const TutorClass = () => {
 
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
-  // Filter classes based on the search query
   const filteredClasses = dashboard.classes?.filter((cls: any) =>
     cls.name.toLowerCase().includes(searchQuery.toLowerCase())
   );

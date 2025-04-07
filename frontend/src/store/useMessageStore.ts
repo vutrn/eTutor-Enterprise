@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
-import { IMessageState, Message } from "../types/store";
+import { IMessageState, Message, User } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useAuthStore } from "./useAuthStore";
 
@@ -41,10 +41,10 @@ export const useMessageStore = create<IMessageState>((set, get) => ({
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log("Users to chat:", res.data);
       const { authUser } = useAuthStore.getState();
       const filteredUsers = res.data.filter(
-        (user: any) => user._id !== authUser?._id,
+        (user: User) => user._id !== authUser?._id && user.role !== "admin",
       );
       set({ users: filteredUsers });
     } catch (error: any) {

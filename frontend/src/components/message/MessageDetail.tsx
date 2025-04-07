@@ -1,15 +1,26 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
 import { Badge, Text, TextInput } from "react-native-paper";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMessageStore } from "../../store/useMessageStore";
 import { useUserStore } from "../../store/useUserStore";
 import { FONTS } from "../../utils/constant";
 import MessageItem from "./MessageItem";
+import { Box } from "@/components/ui/box";
+import { Icon } from "@/components/ui/icon";
+import { X } from "lucide-react-native";
+import { Button, ButtonIcon } from "@/components/ui/button";
 
 interface MessageDetailProps {
-  userRole: 'tutor' | 'student';
+  userRole: "tutor" | "student";
 }
 
 const MessageDetail = ({ userRole }: MessageDetailProps) => {
@@ -106,7 +117,7 @@ const MessageDetail = ({ userRole }: MessageDetailProps) => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
@@ -121,7 +132,13 @@ const MessageDetail = ({ userRole }: MessageDetailProps) => {
 
   const renderItem = ({ item }: any) => {
     const isMyMessage = item.senderId === authUser?._id;
-    return <MessageItem message={item} isMyMessage={isMyMessage} selectedUser={selectedUser} />;
+    return (
+      <MessageItem
+        message={item}
+        isMyMessage={isMyMessage}
+        selectedUser={selectedUser}
+      />
+    );
   };
 
   if (!selectedUser) {
@@ -143,9 +160,14 @@ const MessageDetail = ({ userRole }: MessageDetailProps) => {
         <View style={styles.statusContainer}>
           <Badge
             size={12}
-            style={[styles.statusDot, isUserOnline ? styles.onlineDot : styles.offlineDot]}
+            style={[
+              styles.statusDot,
+              isUserOnline ? styles.onlineDot : styles.offlineDot,
+            ]}
           />
-          <Text style={styles.statusText}>{isUserOnline ? "Online" : "Offline"}</Text>
+          <Text style={styles.statusText}>
+            {isUserOnline ? "Online" : "Offline"}
+          </Text>
         </View>
       </View>
 
@@ -171,7 +193,20 @@ const MessageDetail = ({ userRole }: MessageDetailProps) => {
       />
 
       <View style={styles.inputContainer}>
-        {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+        <Box>
+          {image && (
+            <Box className="relative">
+              <Image source={{ uri: image }} style={styles.imagePreview} />
+              <Button
+                className="hover:null absolute -top-2 right-0 h-4 rounded-full bg-red-500"
+                variant="link"
+                onPress={() => setImage(null)}
+              >
+                <ButtonIcon as={X} className="text-white" />
+              </Button>
+            </Box>
+          )}
+        </Box>
         <TextInput
           mode="outlined"
           value={text}

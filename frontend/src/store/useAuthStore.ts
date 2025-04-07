@@ -97,6 +97,7 @@ export const useAuthStore = create<IAuthState>()(
             set({ isTokenExpired: true });
             return false;
           }
+          get().connectSocket();
           return true;
         } catch (error: any) {
           console.log("Error verifying token:", error?.message);

@@ -10,14 +10,6 @@ import { View, Dimensions, ScrollView } from "react-native";
 import { PieChart, ContributionGraph, BarChart } from "react-native-chart-kit";
 
 const screenWidth = Dimensions.get("window").width;
-const chartConfig = {
-  backgroundGradientFrom: "white",
-  // backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: "white",
-  // backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgb(45, 51, 107, ${opacity})`,
-  // barPercentage: 0.5,
-};
 
 const StudentDashboard = () => {
   const { getDashboard, dashboard } = useDashboardStore();
@@ -34,19 +26,16 @@ const StudentDashboard = () => {
 
       fetchData();
 
-      // Return cleanup function that runs when screen is unfocused
-      return () => {
-        // Any cleanup code if needed
-      };
+      return () => {};
     }, []),
   );
 
   // Calculate the data for charts
   const totalClasses = dashboard.classes?.length || 0;
-  const userBlogs = blogs.filter(
+  const userBlogs = blogs?.filter(
     (blog) => blog.author._id == authUser?._id,
-  ).length;
-  const userComments = blogs.reduce(
+  ).length || 0;
+  const userComments = blogs?.reduce(
     (total, blog) =>
       total +
       blog.comments.filter((comment) => comment.user === authUser?._id).length,
@@ -160,7 +149,14 @@ const StudentDashboard = () => {
                 ]}
                 width={screenWidth / 2.5}
                 height={220}
-                chartConfig={chartConfig}
+                chartConfig={{
+                  backgroundGradientFrom: "white",
+                  // backgroundGradientFromOpacity: 0,
+                  backgroundGradientTo: "white",
+                  // backgroundGradientToOpacity: 0.5,
+                  color: (opacity = 1) => `rgb(45, 51, 107, ${opacity})`,
+                  barPercentage: 0.5,
+                }}
                 accessor={"population"}
                 backgroundColor={"transparent"}
                 paddingLeft={"15"}

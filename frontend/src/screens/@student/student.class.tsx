@@ -1,10 +1,30 @@
+import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Grid, GridItem } from "@/components/ui/grid";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { format } from "date-fns";
+import {
+  ArrowRightCircle,
+  BookOpen,
+  Calendar,
+  Search,
+  Users,
+} from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { RefreshControl, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useClassStore } from "../../store/useClassStore";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useClassStore } from "../../store/useClassStore";
 
 const StudentClass = () => {
   const { classes, getClasses, setSelectedClass } = useClassStore();
@@ -37,74 +57,138 @@ const StudentClass = () => {
     );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100 p-4">
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        <TextInput
-          className="mb-5 h-10 rounded-lg border border-gray-300 bg-white px-3"
-          placeholder="Search by class name"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+    <SafeAreaView className="flex-1 bg-gray-100">
+      <Box className="flex-1 p-4">
+        <VStack space="lg" className="mb-4">
+          <Heading size="xl">My Classes</Heading>
 
-        <View className="flex-row border-b border-gray-300 bg-gray-200 py-2">
-          <Text className="flex-1 px-2 text-center text-base font-bold">
-            Class Name
-          </Text>
-          <Text className="flex-1 px-2 text-center text-base font-bold">
-            Tutor
-          </Text>
-          <Text className="flex-1 px-2 text-center text-base font-bold">
-            Students
-          </Text>
-          <Text className="flex-1 px-2 text-center text-base font-bold">
-            Created Date
-          </Text>
-          <Text className="flex-1 px-2 text-center text-base font-bold">
-            Action
-          </Text>
-        </View>
+          <Input size="md" variant="outline" className="bg-white shadow-sm">
+            <InputField
+              placeholder="Search by class name"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <InputSlot className="pl-3">
+              <InputIcon>
+                <Icon as={Search} size="sm" />
+              </InputIcon>
+            </InputSlot>
+          </Input>
+        </VStack>
 
-        {filteredClasses.length > 0 ? (
-          filteredClasses.map((item) => (
-            <TouchableOpacity
-              key={item._id}
-              className="flex-row items-center border-b border-gray-300 py-3"
-              onPress={() => handleClassSelect(item)}
-            >
-              <Text className="flex-1 px-2 text-center text-sm">
-                {item.name}
-              </Text>
-              <Text className="flex-1 px-2 text-center text-sm">
-                {item.tutor.username}
-              </Text>
-              <Text className="flex-1 px-2 text-center text-sm">
-                {item.students.length}
-              </Text>
-              <Text className="flex-1 px-2 text-center text-sm">
-                {new Date(item.createdAt).toLocaleDateString()}
-              </Text>
-              <View className="flex-1 flex-row justify-center">
-                <Button
-                  mode="contained"
-                  onPress={() => handleClassSelect(item)}
-                  className="mx-1"
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 20 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
+          }
+        >
+          <Grid
+            className="gap-4"
+            _extra={{
+              className: "grid-cols-12",
+            }}
+          >
+            {filteredClasses.length > 0 ? (
+              filteredClasses.map((item: any) => (
+                <GridItem
+                  key={item._id}
+                  _extra={{
+                    className: "col-span-12 md:col-span-6 lg:col-span-4",
+                  }}
                 >
-                  Enter
-                </Button>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View className="items-center py-5">
-            <Text className="mb-4 text-base text-gray-600">
-              No classes available
-            </Text>
-            <Button mode="contained" onPress={fetchData} className="mt-2">
-              Refresh
-            </Button>
-          </View>
+                  <Card
+                    variant="elevated"
+                    size="md"
+                    className="bg-white shadow-md transition-shadow duration-200 hover:shadow-lg"
+                  >
+                    <VStack space="md">
+                      <HStack className="items-center justify-between">
+                        <HStack className="items-center space-x-3">
+                          <Avatar size="md" className="bg-primary-600">
+                            <AvatarFallbackText>
+                              {item.name.substring(0, 2).toUpperCase()}
+                            </AvatarFallbackText>
+                          </Avatar>
+                          <VStack>
+                            <Text className="text-lg font-bold text-gray-800">
+                              {item.name}
+                            </Text>
+                            <Text className="text-sm text-gray-500">
+                              Tutor: {item.tutor.username}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </HStack>
+
+                      <HStack className="flex-wrap gap-2">
+                        <Badge className="bg-blue-100">
+                          <HStack className="items-center space-x-1 px-2 py-0.5">
+                            <Icon
+                              as={Users}
+                              size="xs"
+                              className="text-blue-600"
+                            />
+                            <Text className="text-xs text-blue-600">
+                              {item.students.length} Students
+                            </Text>
+                          </HStack>
+                        </Badge>
+
+                        <Badge className="bg-amber-100">
+                          <HStack className="items-center space-x-1 px-2 py-0.5">
+                            <Icon
+                              as={Calendar}
+                              size="xs"
+                              className="text-amber-600"
+                            />
+                            <Text className="text-xs text-amber-600">
+                              {format(new Date(item.createdAt), "MMM d, yyyy")}
+                            </Text>
+                          </HStack>
+                        </Badge>
+                      </HStack>
+
+                      <Button
+                        size="sm"
+                        action="primary"
+                        className="w-full"
+                        onPress={() => handleClassSelect(item)}
+                      >
+                        <ButtonText>Enter Class</ButtonText>
+                        <ButtonIcon as={ArrowRightCircle} className="ml-2" />
+                      </Button>
+                    </VStack>
+                  </Card>
+                </GridItem>
+              ))
+            ) : (
+              <GridItem _extra={{ className: "col-span-12" }}>
+                <Box className="items-center justify-center rounded-lg bg-white p-8 shadow-sm">
+                  <Icon
+                    as={BookOpen}
+                    size="xl"
+                    className="mb-4 text-gray-400"
+                  />
+                  <Text className="mb-4 text-center text-base text-gray-600">
+                    {searchQuery
+                      ? "No classes match your search"
+                      : "You haven't joined any classes yet"}
+                  </Text>
+                  <Button onPress={fetchData} className="mt-2">
+                    <ButtonText>Refresh</ButtonText>
+                  </Button>
+                </Box>
+              </GridItem>
+            )}
+          </Grid>
+        </ScrollView>
+
+        {refreshing && (
+          <Box className="absolute inset-0 items-center justify-center bg-black/5">
+            <Spinner size="large" />
+          </Box>
         )}
-      </ScrollView>
+      </Box>
     </SafeAreaView>
   );
 };
