@@ -177,7 +177,7 @@ module.exports = {
       },
       fontFamily: {
         heading: undefined,
-        body: FONTS.regular,
+        body: undefined,
         mono: undefined,
         roboto: ['Roboto', 'sans-serif'],
       },

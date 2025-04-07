@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
-import { IDocumentState } from "../types/store";
+import { IDocumentState, User } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { useClassStore } from "./useClassStore";
 import { useAuthStore } from "./useAuthStore";
@@ -13,11 +13,7 @@ export const useDocumentStore = create<IDocumentState>((set, get) => ({
     _id: "",
     filename: "",
     url: "",
-    uploadedBy: {
-      _id: "",
-      username: "",
-      email: "",
-    },
+    uploadedBy: {} as User,
     uploadedAt: "",
   },
   loading: false,
