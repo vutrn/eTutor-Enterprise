@@ -65,15 +65,22 @@ export interface IClassState {
 
   setSelectedClass: (selectedClass: any) => void;
   getClasses: () => Promise<void>;
-  createClass: (name: string, tutorId: string, studentIds: string[]) => Promise<boolean>;
+  createClass: (
+    name: string,
+    tutorId: string,
+    studentIds: string[],
+  ) => Promise<boolean>;
   updateClass: (
     classId: string,
     newName: string,
     newTutorId: string,
-    studentIds: string[]
+    studentIds: string[],
   ) => Promise<boolean>;
   deleteClass: (classId: string) => Promise<boolean>;
-  removeStudentFromClass: (classId: string, studentId: string) => Promise<boolean>;
+  removeStudentFromClass: (
+    classId: string,
+    studentId: string,
+  ) => Promise<boolean>;
 }
 
 interface Message {
@@ -110,26 +117,30 @@ export interface IMessageState {
   unsubscribeFromMessages: () => void;
 }
 
+interface Dashboard {
+  role?: "admin" | "tutor" | "student";
+}
+
+interface AdminDashboard extends Dashboard {
+  studentsCount: number;
+  totalUsers: number;
+  tutorsCount: number;
+}
+
+interface TutorDashboard extends Dashboard {
+  totalClasses: number;
+  totalStudents: number;
+  classes: Class[];
+}
+
+interface StudentDashboard extends Dashboard {
+  classes: Class[];
+}
+
 export interface IDashboardState {
-  dashboard: {
-    role?: "admin" | "tutor" | "student";
-    totalClasses: number;
-    totalStudents: number;
-    classes?: {
-      _id: string;
-      name: string;
-      tutor: {
-        _id: string;   
-        username: string;
-      };
-      students: {
-        _id: string;
-        username: string;
-      }[];
-      admin: string;
-      createdAt: string;
-    }[];
-  };
+  adminDashboard: AdminDashboard;
+  tutorDashboard: TutorDashboard;
+  studentDashboard: StudentDashboard;
   classDocuments: {
     [classId: string]: {
       _id: string;
@@ -140,9 +151,9 @@ export interface IDashboardState {
         _id: string;
         username: string;
         email: string;
-      }
-    }[]
-  },
+      };
+    }[];
+  };
   classAttendance: {
     [classId: string]: Array<{
       _id: string;
@@ -219,7 +230,12 @@ export interface IBlogState {
   getAllBlogs: () => Promise<void>;
   getBlogById: (blogId: string) => Promise<void>;
   createBlog: (title: string, content: string, image?: string) => Promise<void>;
-  updateBlog: (blogId: string, title: string, content: string, image?: string) => Promise<boolean>;
+  updateBlog: (
+    blogId: string,
+    title: string,
+    content: string,
+    image?: string,
+  ) => Promise<boolean>;
   deleteBlog: (blogId: string) => Promise<void>;
   commentBlog: (text: string) => Promise<boolean>;
 }
@@ -277,8 +293,10 @@ export interface IMeetingState {
   allOnlineMeetings: allOnlineMeetings[];
   loading: boolean;
   selectedMeeting: OfflineMeeting | OnlineMeeting | null;
-  
-  setSelectedMeeting: (selectedMeeting: OfflineMeeting | OnlineMeeting | null) => void;
+
+  setSelectedMeeting: (
+    selectedMeeting: OfflineMeeting | OnlineMeeting | null,
+  ) => void;
   getAllOfflineMeetings: () => Promise<void>;
   getAllOnlineMeetings: () => Promise<void>;
   getOfflineMeetings: (selectedClassId: string) => Promise<void>;
@@ -287,9 +305,19 @@ export interface IMeetingState {
     title: string,
     description: string,
     location: string,
-    time: Date | null
+    time: Date | null,
   ) => Promise<void>;
-  createOnlineMeeting: (title: string, linkggmeet: string, time: Date | null) => Promise<void>;
-  markOfflineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
-  markOnlineAttendance: (meetingId: string, studentIds: string[]) => Promise<void>;
+  createOnlineMeeting: (
+    title: string,
+    linkggmeet: string,
+    time: Date | null,
+  ) => Promise<void>;
+  markOfflineAttendance: (
+    meetingId: string,
+    studentIds: string[],
+  ) => Promise<void>;
+  markOnlineAttendance: (
+    meetingId: string,
+    studentIds: string[],
+  ) => Promise<void>;
 }

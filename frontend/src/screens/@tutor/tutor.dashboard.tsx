@@ -25,8 +25,8 @@ const TutorDashboard = () => {
     allOfflineMeetings,
     allOnlineMeetings,
   } = useMeetingStore();
-  const { blogs, getAllBlogs, commentBlog } = useBlogStore();
-  const { dashboard, getDashboard, getClassDocuments, classDocuments } =
+  const { blogs, getAllBlogs } = useBlogStore();
+  const { tutorDashboard, getDashboard, getClassDocuments, classDocuments } =
     useDashboardStore();
   const { authUser } = useAuthStore();
   const [chartParentWidth, setChartParentWidth] = useState(0);
@@ -47,16 +47,16 @@ const TutorDashboard = () => {
       const fetchData = async () => {
         try {
           await getDashboard();
-          
+
           await Promise.all([
             getAllOfflineMeetings(),
             getAllOnlineMeetings(),
-            getAllBlogs()
+            getAllBlogs(),
           ]);
-          
-          if (dashboard?.classes) {
-            console.log("Dashboard Classes:", dashboard.classes);
-            for (const cls of dashboard.classes) {
+
+          if (tutorDashboard?.classes) {
+            console.log("Dashboard Classes:", tutorDashboard.classes);
+            for (const cls of tutorDashboard.classes) {
               await getClassDocuments(cls._id);
             }
           }
@@ -64,7 +64,7 @@ const TutorDashboard = () => {
           console.error("Error fetching dashboard data:", error);
         }
       };
-      
+
       fetchData();
 
       return () => {
@@ -75,12 +75,12 @@ const TutorDashboard = () => {
   );
 
   useEffect(() => {
-    if (dashboard?.classes && Object.keys(classDocuments).length > 0) {
+    if (tutorDashboard?.classes && Object.keys(classDocuments).length > 0) {
       const classNames = {} as any;
       const labels = [] as any;
       const counts = [] as any;
 
-      dashboard.classes.forEach((cls) => {
+      tutorDashboard?.classes.forEach((cls) => {
         const className =
           cls.name.length > 10 ? cls.name.substring(0, 10) + "..." : cls.name;
         classNames[cls._id] = className;
@@ -91,7 +91,7 @@ const TutorDashboard = () => {
 
       setDocumentData({ labels, counts, classNames });
     }
-  }, [dashboard.classes, getDashboard, classDocuments]);
+  }, [tutorDashboard?.classes, getDashboard, classDocuments]);
 
   useEffect(() => {
     const allMeetings = [...allOfflineMeetings, ...allOnlineMeetings];
@@ -110,7 +110,13 @@ const TutorDashboard = () => {
     setAttendanceData({ attended, absent });
   }, [allOfflineMeetings, allOnlineMeetings]);
 
-  const tutorBlogs = blogs.filter((blog) => blog.author._id === authUser?._id)
+  const tutorBlogs = blogs.filter((blog) => blog.author._id === authUser?._id);
+  const tutorComments = blogs.reduce(
+    (total, blog) =>
+      total +
+      blog.comments.filter((comment) => comment.user === authUser?._id).length,
+    0,
+  );
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -121,7 +127,7 @@ const TutorDashboard = () => {
             <Box className="mr-2 flex-1 rounded-lg bg-blue-100 p-3">
               <Text className="font-semibold text-blue-800">Classes</Text>
               <Text className="text-2xl font-bold">
-                {dashboard?.classes?.length}
+                {tutorDashboard?.totalClasses || 0}
               </Text>
             </Box>
 
@@ -132,9 +138,7 @@ const TutorDashboard = () => {
 
             <Box className="mr-2 flex-1 rounded-lg bg-orange-100 p-3">
               <Text className="font-semibold text-orange-800">Comments</Text>
-              <Text className="text-2xl font-bold">
-                {blogs.reduce((total, blog) => total + blog.comments.length, 0)}
-              </Text>
+              <Text className="text-2xl font-bold">{tutorComments}</Text>
             </Box>
           </VStack>
         </Box>

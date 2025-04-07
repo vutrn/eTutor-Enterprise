@@ -12,6 +12,7 @@ import TutorDashboard from "../screens/@tutor/tutor.dashboard";
 import { useAuthStore } from "../store/useAuthStore";
 import { BlogStack } from "./features.navigator";
 import UserList from "../screens/@admin/user.list";
+import AdminDashboard from "../screens/@admin/admin.dashboard";
 
 const Drawer = createDrawerNavigator();
 
@@ -22,6 +23,16 @@ const DrawerNavigator = () => {
 
   const renderAdminItems = () => (
     <>
+      <Drawer.Screen
+        name="AdminDashboard"
+        component={AdminDashboard}
+        options={({ navigation }) => ({
+          title: "Admin Dashboard",
+          drawerIcon: ({ color, size }) => (
+            <Feather name="home" size={size} color={color} />
+          ),
+        })}
+      />
       <Drawer.Screen
         name="AdminClass"
         component={AdminClass}

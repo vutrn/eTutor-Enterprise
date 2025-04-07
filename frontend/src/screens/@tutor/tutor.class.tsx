@@ -27,7 +27,7 @@ import { useClassStore } from "../../store/useClassStore";
 import { useDashboardStore } from "../../store/useDashboadStore";
 
 const TutorClass = () => {
-  const { getDashboard, dashboard } = useDashboardStore();
+  const { getDashboard, tutorDashboard } = useDashboardStore();
   const { setSelectedClass } = useClassStore();
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [refreshing, setRefreshing] = useState(false);
@@ -44,7 +44,7 @@ const TutorClass = () => {
 
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
-  const filteredClasses = dashboard.classes?.filter((cls: any) =>
+  const filteredClasses = tutorDashboard?.classes?.filter((cls: any) =>
     cls.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -132,7 +132,7 @@ const TutorClass = () => {
                           <HStack className="items-center space-x-1 px-2 py-0.5">
                             <Icon
                               as={Calendar}
-                              size="xs"
+                              size="md"
                               className="text-amber-600"
                             />
                             <Text className="text-xs text-amber-600">

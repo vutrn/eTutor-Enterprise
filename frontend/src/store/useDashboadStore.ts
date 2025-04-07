@@ -2,15 +2,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { create } from "zustand";
 import axiosInstance from "../utils/axios";
-import { IDashboardState } from "../types/store";
+import {
+  AdminDashboard,
+  IDashboardState,
+  StudentDashboard,
+  TutorDashboard,
+} from "../types/store";
 
 export const useDashboardStore = create<IDashboardState>((set, get) => ({
-  dashboard: {
-    role: undefined,
-    totalClasses: 0,
-    totalStudents: 0,
-    classes: [],
-  },
+  adminDashboard: {} as AdminDashboard,
+  tutorDashboard: {} as TutorDashboard,
+  studentDashboard: {} as StudentDashboard,
   classDocuments: {},
   classAttendance: {},
 
@@ -26,7 +28,11 @@ export const useDashboardStore = create<IDashboardState>((set, get) => ({
         },
       });
 
-      set({ dashboard: res.data });
+      set({
+        adminDashboard: res.data,
+        tutorDashboard: res.data,
+        studentDashboard: res.data,
+      });
       // console.log("🚀 ~ getDashboard: ~ res.data:", res.data);
     } catch (error) {
       console.log("🚀 ~ getDashboard: ~ error:", error);
@@ -61,10 +67,10 @@ export const useDashboardStore = create<IDashboardState>((set, get) => ({
   },
 
   getAllClassDocuments: async () => {
-    const { dashboard } = get();
-    if (!dashboard.classes || dashboard.classes.length === 0) return;
+    const { tutorDashboard } = get();
+    if (!tutorDashboard.classes || tutorDashboard.classes.length === 0) return;
 
-    for (const classItem of dashboard.classes) {
+    for (const classItem of tutorDashboard.classes) {
       await get().getClassDocuments(classItem._id);
     }
   },
@@ -97,10 +103,10 @@ export const useDashboardStore = create<IDashboardState>((set, get) => ({
   },
 
   getAllClassesAttendance: async () => {
-    const { dashboard } = get();
-    if (!dashboard.classes || dashboard.classes.length === 0) return;
+    const { tutorDashboard } = get();
+    if (!tutorDashboard.classes || tutorDashboard.classes.length === 0) return;
 
-    for (const classItem of dashboard.classes) {
+    for (const classItem of tutorDashboard.classes) {
       await get().getClassAttendance(classItem._id);
     }
   },

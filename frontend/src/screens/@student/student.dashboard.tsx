@@ -12,8 +12,8 @@ import { PieChart, ContributionGraph, BarChart } from "react-native-chart-kit";
 const screenWidth = Dimensions.get("window").width;
 
 const StudentDashboard = () => {
-  const { getDashboard, dashboard } = useDashboardStore();
-  const { blogs, getAllBlogs, commentBlog } = useBlogStore();
+  const { getDashboard, studentDashboard } = useDashboardStore();
+  const { blogs, getAllBlogs } = useBlogStore();
   const { authUser } = useAuthStore();
   const [chartParentWidth, setChartParentWidth] = useState(0);
 
@@ -31,7 +31,7 @@ const StudentDashboard = () => {
   );
 
   // Calculate the data for charts
-  const totalClasses = dashboard.classes?.length || 0;
+  const totalClasses = studentDashboard.classes?.length || 0;
   const userBlogs =
     blogs?.filter((blog) => blog.author._id == authUser?._id).length || 0;
   const userComments = blogs?.reduce(

@@ -99,7 +99,7 @@ const UserList = () => {
         </HStack>
 
         <Box className="mb-4 overflow-hidden rounded-md border border-gray-200 bg-white">
-          <ScrollView horizontal className="w-full">
+          <ScrollView className="w-full">
             <Table className="min-w-full">
               <TableHeader className="bg-gray-50">
                 <TableRow>

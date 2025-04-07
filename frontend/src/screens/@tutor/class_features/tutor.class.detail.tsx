@@ -5,7 +5,7 @@ import { useUserStore } from "../../../store/useUserStore";
 import { useClassStore } from "../../../store/useClassStore";
 
 const TuTorClassDetail = () => {
-  const { getDashboard, dashboard } = useDashboardStore();
+  const { getDashboard, tutorDashboard } = useDashboardStore();
   const { tutors, getUsers } = useUserStore();
   const { selectedClass } = useClassStore();
 
