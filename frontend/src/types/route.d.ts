@@ -3,6 +3,7 @@ type RootStackParamList = {
 
   // Auth
   auth: undefined;
+  landing: undefined;
   login: undefined;
   signup: undefined;
 

@@ -1,19 +1,19 @@
+import { Box } from "@/components/ui/box";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Icon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { VStack } from "@/components/ui/vstack";
 import { useDashboardStore } from "@/src/store/useDashboadStore";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { PlusCircle, Search } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useBlogStore } from "../../store/useBlogStore";
 import BlogCard from "./BlogCard";
-import { HStack } from "@/components/ui/hstack";
-import { Heading } from "@/components/ui/heading";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react-native";
-import { Box } from "@/components/ui/box";
-import { VStack } from "@/components/ui/vstack";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { Icon } from "@/components/ui/icon";
 
 const BlogList = () => {
   const { blogs, getAllBlogs, setSelectedBlog } = useBlogStore();
@@ -44,9 +44,9 @@ const BlogList = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-      <Box className="flex-1 p-4">
+      <Box className="flex-1 p-3">
         <VStack space="md">
-          <HStack className="mb-2 items-center justify-between">
+          <HStack className="items-center justify-between p-4">
             <Heading size="xl">Blog Posts</Heading>
             <Button
               size="md"
@@ -62,7 +62,7 @@ const BlogList = () => {
           <Input
             size="md"
             variant="outline"
-            className="mb-2 bg-white shadow-sm"
+            className="my-3 bg-white shadow-sm"
           >
             <InputField
               placeholder="Search blogs..."

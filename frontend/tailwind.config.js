@@ -1,4 +1,5 @@
 import gluestackPlugin from '@gluestack-ui/nativewind-utils/tailwind-plugin';
+import { FONTS } from './src/utils/constant';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -176,7 +177,7 @@ module.exports = {
       },
       fontFamily: {
         heading: undefined,
-        body: undefined,
+        body: FONTS.regular,
         mono: undefined,
         roboto: ['Roboto', 'sans-serif'],
       },
