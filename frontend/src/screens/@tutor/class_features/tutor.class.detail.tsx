@@ -24,12 +24,18 @@ const TuTorClassDetail = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 justify-center items-center p-4">
-        <View className="bg-gray-100 rounded-lg shadow-md p-6 w-full max-w-md">
-          <Text className="text-lg font-bold mb-2">Class Name: {selectedClass.name}</Text>
-          <Text className="text-base mb-2">Tutor: {getTutorNameById(selectedClass.tutor)}</Text>
-          <Text className="text-base mb-2">Number of Students: {selectedClass.students.length}</Text>
-          <Text className="text-base mb-4">
+      <View className="flex-1 items-center justify-center p-4">
+        <View className="w-full max-w-md rounded-lg bg-gray-100 p-6 shadow-md">
+          <Text className="mb-2 text-lg font-bold">
+            Class Name: {selectedClass.name}
+          </Text>
+          <Text className="mb-2 text-base">
+            Tutor: {getTutorNameById(selectedClass.tutor)}
+          </Text>
+          <Text className="mb-2 text-base">
+            Number of Students: {selectedClass.students.length}
+          </Text>
+          <Text className="mb-4 text-base">
             Created At:{" "}
             {new Date(selectedClass.createdAt).toLocaleDateString("vi-VN", {
               day: "numeric",
@@ -38,7 +44,7 @@ const TuTorClassDetail = () => {
             })}
           </Text>
 
-          <Text className="text-lg font-bold mb-2">Student List:</Text>
+          <Text className="mb-2 text-lg font-bold">Student List:</Text>
           <FlatList
             data={selectedClass.students}
             keyExtractor={(item) => item._id}

@@ -32,9 +32,8 @@ const StudentDashboard = () => {
 
   // Calculate the data for charts
   const totalClasses = dashboard.classes?.length || 0;
-  const userBlogs = blogs?.filter(
-    (blog) => blog.author._id == authUser?._id,
-  ).length || 0;
+  const userBlogs =
+    blogs?.filter((blog) => blog.author._id == authUser?._id).length || 0;
   const userComments = blogs?.reduce(
     (total, blog) =>
       total +
@@ -57,7 +56,7 @@ const StudentDashboard = () => {
             </Box>
 
             <Box className="mr-2 flex-1 rounded-lg bg-green-100 p-3">
-              <Text className="font-semibold text-green-800">Blogs</Text>
+              <Text className="font-semibold text-green-800">Blogs posted</Text>
               <Text className="text-2xl font-bold">{userBlogs}</Text>
             </Box>
 

@@ -9,9 +9,11 @@ import { format } from "date-fns";
 import { Clock, MessageSquare, ThumbsUp } from "lucide-react-native";
 import React from "react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { Blog } from "@/src/types/store";
+import { Image } from "@/components/ui/image";
 
 interface BlogCardProps {
-  blog: any;
+  blog: Blog;
   onPress: (blog: any) => void;
 }
 

@@ -5,17 +5,13 @@ import React from "react";
 import { Dimensions } from "react-native";
 import CustomDrawerContent from "../components/CustomDrawerContent";
 import AdminClass from "../screens/@admin/class/admin.class";
-import AdminDashboard from "../screens/@admin/dashboard/admin.dashboard";
-import StudentList from "../screens/@admin/dashboard/student.list";
-import TutorList from "../screens/@admin/dashboard/tutor.list";
 import StudentClass from "../screens/@student/student.class";
 import StudentDashboard from "../screens/@student/student.dashboard";
 import TutorClass from "../screens/@tutor/tutor.class";
 import TutorDashboard from "../screens/@tutor/tutor.dashboard";
 import { useAuthStore } from "../store/useAuthStore";
 import { BlogStack } from "./features.navigator";
-import LoginScreen from "../screens/auth/login";
-import AuthNavigator from "./auth.navigator";
+import UserList from "../screens/@admin/user.list";
 
 const Drawer = createDrawerNavigator();
 
@@ -27,16 +23,6 @@ const DrawerNavigator = () => {
   const renderAdminItems = () => (
     <>
       <Drawer.Screen
-        name="AdminHome"
-        component={AdminDashboard}
-        options={({ navigation }) => ({
-          title: "Dashboard",
-          drawerIcon: ({ color, size }) => (
-            <Feather name="home" size={size} color={color} />
-          ),
-        })}
-      />
-      <Drawer.Screen
         name="AdminClass"
         component={AdminClass}
         options={({ navigation }) => ({
@@ -47,20 +33,10 @@ const DrawerNavigator = () => {
         })}
       />
       <Drawer.Screen
-        name="TutorList"
-        component={TutorList}
+        name="UserList"
+        component={UserList}
         options={({ navigation }) => ({
-          title: "Tutors",
-          drawerIcon: ({ color, size }) => (
-            <Feather name="user-check" size={size} color={color} />
-          ),
-        })}
-      />
-      <Drawer.Screen
-        name="StudentList"
-        component={StudentList}
-        options={({ navigation }) => ({
-          title: "Students",
+          title: "Users management",
           drawerIcon: ({ color, size }) => (
             <Feather name="users" size={size} color={color} />
           ),
@@ -97,7 +73,6 @@ const DrawerNavigator = () => {
         component={TutorClass}
         options={{
           title: "Tutor Class",
-          headerShown: false,
           drawerIcon: ({ color, size }) => (
             <Feather name="book" size={size} color={color} />
           ),
@@ -108,7 +83,6 @@ const DrawerNavigator = () => {
         component={BlogStack}
         options={{
           title: "Tutor Blog",
-          headerShown: false,
           drawerIcon: ({ color, size }) => (
             <Feather name="globe" size={size} color={color} />
           ),
@@ -165,7 +139,6 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      
       screenOptions={{
         drawerStyle: {
           width: DRAWER_WIDTH,

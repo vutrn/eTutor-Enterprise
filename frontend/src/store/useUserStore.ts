@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { create } from "zustand";
-import { IUserState } from "../types/store";
+import { IUserState, User } from "../types/store";
 import axiosInstance from "../utils/axios";
 
 export const useUserStore = create<IUserState>(
@@ -26,9 +26,11 @@ export const useUserStore = create<IUserState>(
             Authorization: `Bearer ${token}`,
           },
         });
-        const students = res.data.filter((user: any) => user.role === "student");
-        const tutors = res.data.filter((user: any) => user.role === "tutor");
-        set({ students, tutors, users: res.data, loading: false });
+        const students = res.data.filter((user: User) => user.role === "student");
+        const tutors = res.data.filter((user: User) => user.role === "tutor");
+        const filteredUsers = res.data.filter((user: User) => user.role !== "admin");
+        set({ students, tutors, users: filteredUsers, loading: false });
+        // set({ students, tutors, users: res.data, loading: false });
       } catch (error: any) {
         set({ loading: false });
         console.log("🚀 ~ fetchUsers: ~ error:", error.response?.data?.message);

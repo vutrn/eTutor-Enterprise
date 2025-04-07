@@ -4,10 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { lazy, Suspense } from "react";
 import Loading from "../components/loading";
 import { BlogStack } from "./features.navigator";
+import UserList from "../screens/@admin/user.list";
 
-const AdminDashboard = lazy(() => import("../screens/@admin/dashboard/admin.dashboard"));
-const TutorList = lazy(() => import("../screens/@admin/dashboard/tutor.list"));
-const StudentList = lazy(() => import("../screens/@admin/dashboard/student.list"));
 const AdminClass = lazy(() => import("../screens/@admin/class/admin.class"));
 const AdminProfile = lazy(() => import("../screens/@admin/admin.profile"));
 
@@ -16,9 +14,7 @@ const DashboardStack = () => {
 
   return (
     <Stack.Navigator screenOptions={{ presentation: "card", animation: "slide_from_right" }}>
-      <Stack.Screen name="admin_dashboard" component={AdminDashboard} />
-      <Stack.Screen name="tutor_list" component={TutorList} />
-      <Stack.Screen name="student_list" component={StudentList} />
+      <Stack.Screen name="tutor_list" component={UserList} />
     </Stack.Navigator>
   );
 };

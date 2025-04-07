@@ -3,6 +3,7 @@ import { Grid, GridItem } from "@/components/ui/grid";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useAuthStore } from "@/src/store/useAuthStore";
 import { useBlogStore } from "@/src/store/useBlogStore";
 import { useDashboardStore } from "@/src/store/useDashboadStore";
 import { useMeetingStore } from "@/src/store/useMeetingStore";
@@ -27,6 +28,7 @@ const TutorDashboard = () => {
   const { blogs, getAllBlogs, commentBlog } = useBlogStore();
   const { dashboard, getDashboard, getClassDocuments, classDocuments } =
     useDashboardStore();
+  const { authUser } = useAuthStore();
   const [chartParentWidth, setChartParentWidth] = useState(0);
   const [attendanceData, setAttendanceData] = useState({
     attended: 0,
@@ -108,6 +110,8 @@ const TutorDashboard = () => {
     setAttendanceData({ attended, absent });
   }, [allOfflineMeetings, allOnlineMeetings]);
 
+  const tutorBlogs = blogs.filter((blog) => blog.author._id === authUser?._id)
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View className="p-3">
@@ -123,7 +127,7 @@ const TutorDashboard = () => {
 
             <Box className="mr-2 flex-1 rounded-lg bg-green-100 p-3">
               <Text className="font-semibold text-green-800">Blogs</Text>
-              <Text className="text-2xl font-bold">{blogs.length}</Text>
+              <Text className="text-2xl font-bold">{tutorBlogs.length}</Text>
             </Box>
 
             <Box className="mr-2 flex-1 rounded-lg bg-orange-100 p-3">
