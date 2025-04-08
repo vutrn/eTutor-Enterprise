@@ -41,7 +41,7 @@ export const useMessageStore = create<IMessageState>((set, get) => ({
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Users to chat:", res.data);
+      // console.log("Users to chat:", res.data);
       const { authUser } = useAuthStore.getState();
       const filteredUsers = res.data.filter(
         (user: User) => user._id !== authUser?._id && user.role !== "admin",

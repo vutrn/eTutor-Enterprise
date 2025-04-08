@@ -1,10 +1,12 @@
 import { Box } from "@/components/ui/box";
+import { Divider } from "@/components/ui/divider";
 import { Grid, GridItem } from "@/components/ui/grid";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useAuthStore } from "@/src/store/useAuthStore";
 import { useBlogStore } from "@/src/store/useBlogStore";
+import { useClassStore } from "@/src/store/useClassStore";
 import { useDashboardStore } from "@/src/store/useDashboadStore";
 import { useMeetingStore } from "@/src/store/useMeetingStore";
 import {
@@ -12,6 +14,7 @@ import {
   useIsFocused,
   useNavigation,
 } from "@react-navigation/native";
+import { get } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
 import { Dimensions, ScrollView, View } from "react-native";
 import { BarChart, PieChart } from "react-native-chart-kit";
@@ -47,15 +50,12 @@ const TutorDashboard = () => {
       const fetchData = async () => {
         try {
           await getDashboard();
-
           await Promise.all([
             getAllOfflineMeetings(),
             getAllOnlineMeetings(),
             getAllBlogs(),
           ]);
-
           if (tutorDashboard?.classes) {
-            console.log("Dashboard Classes:", tutorDashboard.classes);
             for (const cls of tutorDashboard.classes) {
               await getClassDocuments(cls._id);
             }
@@ -93,8 +93,15 @@ const TutorDashboard = () => {
     }
   }, [tutorDashboard?.classes, getDashboard, classDocuments]);
 
+  const filteredOfflineMeetings = allOfflineMeetings.filter(
+    (meeting) => meeting.createdBy === authUser?._id,
+  );
+  const filteredOnlineMeetings = allOnlineMeetings.filter(
+    (meeting) => meeting.createdBy === authUser?._id,
+  );
   useEffect(() => {
-    const allMeetings = [...allOfflineMeetings, ...allOnlineMeetings];
+    const allMeetings = [...filteredOfflineMeetings, ...filteredOnlineMeetings];
+
     let attended = 0;
     let absent = 0;
 
@@ -181,16 +188,33 @@ const TutorDashboard = () => {
           <Text className="mb-2 text-2xl font-bold">Attendance Summary</Text>
           <HStack>
             <View className="flex-1">
-              <Grid className="gap-3" _extra={{ className: "grid-cols-12" }}>
+              <Grid className="gap-4" _extra={{ className: "grid-cols-12" }}>
                 <GridItem _extra={{ className: "col-span-6" }}>
                   <Text className="mb-2 text-lg font-semibold">
-                    Total Meetings:{" "}
+                    Total Meetings:
                   </Text>
+                  <HStack space="md" className="rounded-md bg-slate-100 p-2">
+                    <HStack space="xs" className="text-sm font-medium">
+                      <Text className="text-gray-600">Offline: </Text>
+                      <Text>{filteredOfflineMeetings.length}</Text>
+                    </HStack>
+                    <Divider
+                      orientation="vertical"
+                      className="h-6 bg-emerald-500"
+                    />
+                    <HStack space="xs" className="text-sm font-medium">
+                      <Text className="text-blue-600">Online: </Text>
+                      <Text className="text-blue-600">
+                        {filteredOnlineMeetings.length}
+                      </Text>
+                    </HStack>
+                  </HStack>
                 </GridItem>
 
                 <GridItem _extra={{ className: "col-span-6" }}>
                   <Text className="text-2xl font-bold">
-                    {allOfflineMeetings.length + allOnlineMeetings.length}
+                    {filteredOfflineMeetings.length +
+                      filteredOnlineMeetings.length}
                   </Text>
                 </GridItem>
 
@@ -215,7 +239,7 @@ const TutorDashboard = () => {
               </Grid>
             </View>
             <View
-              className="flex-2 w-[80%]"
+              className="flex-2 w-[70%]"
               onLayout={({ nativeEvent }) =>
                 setChartParentWidth(nativeEvent.layout.width)
               }
