@@ -71,7 +71,7 @@ const AdminDashboard = () => {
           >
             {/* Total Classes Card */}
             <GridItem _extra={{ className: "col-span-12 md:col-span-4" }}>
-              <Card variant="elevated" className="bg-orange-200 p-4">
+              <Card variant="elevated" className="bg-orange-100 p-4">
                 <HStack className="items-center justify-between">
                   <VStack>
                     <Text className="text-gray-600">Total Classes</Text>
@@ -79,8 +79,8 @@ const AdminDashboard = () => {
                       {classes.length || 0}
                     </Text>
                   </VStack>
-                  <Box className="rounded-full bg-primary-100 p-3">
-                    <Icon as={Book} size="lg" className="text-primary-600" />
+                  <Box className="rounded-full bg-orange-200 p-3">
+                    <Icon as={Book} size="lg" className="text-orange-600" />
                   </Box>
                 </HStack>
               </Card>
