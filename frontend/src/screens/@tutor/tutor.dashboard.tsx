@@ -45,33 +45,48 @@ const TutorDashboard = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
 
-  useFocusEffect(
+   useFocusEffect(
     useCallback(() => {
+      let isMounted = true;
+      
       const fetchData = async () => {
         try {
+          // First fetch the dashboard data
           await getDashboard();
-          await Promise.all([
-            getAllOfflineMeetings(),
-            getAllOnlineMeetings(),
-            getAllBlogs(),
-          ]);
-          if (tutorDashboard?.classes) {
-            for (const cls of tutorDashboard.classes) {
-              await getClassDocuments(cls._id);
-            }
+          
+          // Check if component is still mounted and we have classes
+          if (!isMounted) return;
+        
+          console.log("clasdocument", classDocuments);
+          if (tutorDashboard?.classes && tutorDashboard.classes.length > 0) {
+            // Fetch documents for each class in parallel
+            await Promise.all(
+              tutorDashboard.classes.map((cls) => getClassDocuments(cls._id))
+            );
+          }
+          
+          // Fetch other data in parallel
+          if (isMounted) {
+            await Promise.all([
+              getAllOfflineMeetings(),
+              getAllOnlineMeetings(),
+              getAllBlogs(),
+            ]);
           }
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
         }
       };
-
+  
       fetchData();
-
+  
+      // Cleanup function
       return () => {
+        isMounted = false;
         setDocumentData({ labels: [], counts: [], classNames: {} });
         setAttendanceData({ attended: 0, absent: 0 });
       };
-    }, [getDashboard, getClassDocuments]),
+    }, [isFocused, getDashboard, getClassDocuments]), // Remove tutorDashboard dependency
   );
 
   useEffect(() => {

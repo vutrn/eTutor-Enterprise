@@ -72,7 +72,7 @@ const BlogCard = ({ blog, onPress }: BlogCardProps) => {
           </Text>
 
           {/* Blog preview */}
-          <Text className="line-clamp-2 text-xs text-gray-600">
+          <Text className="line-clamp-1 text-xs text-gray-600">
             {previewContent}
           </Text>
 
