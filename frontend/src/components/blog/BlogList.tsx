@@ -38,7 +38,7 @@ const BlogList = () => {
     navigation.navigate("blog_detail");
   };
 
-  const filteredBlogs = blogs.filter((blog) =>
+  const filteredBlogs = blogs?.filter((blog) =>
     blog.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 

@@ -117,13 +117,13 @@ const TutorDashboard = () => {
     setAttendanceData({ attended, absent });
   }, [allOfflineMeetings, allOnlineMeetings]);
 
-  const tutorBlogs = blogs.filter((blog) => blog.author._id === authUser?._id);
-  const tutorComments = blogs.reduce(
+  const tutorBlogs = blogs?.filter((blog) => blog.author._id === authUser?._id) || [];
+  const tutorComments = blogs?.reduce(
     (total, blog) =>
       total +
       blog.comments.filter((comment) => comment.user === authUser?._id).length,
     0,
-  );
+  ) || 0;
 
   return (
     <ScrollView className="flex-1 bg-white">
