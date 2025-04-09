@@ -155,8 +155,8 @@ const BlogDetail = () => {
                 <Box className="overflow-hidden rounded-lg">
                   <Image
                     source={{ uri: selectedBlog.image }}
-                    className="h-48 w-full"
-                    resizeMode="cover"
+                    className="h-60 w-full"
+                    resizeMode="contain"
                   />
                 </Box>
               )}
