@@ -41,7 +41,6 @@ const AdminClass = () => {
 
   useEffect(() => {
     loadClasses();
-    console.log("Classes loaded:", classes);
   }, []);
 
   const loadClasses = async () => {

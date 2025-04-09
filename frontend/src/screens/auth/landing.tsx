@@ -171,8 +171,8 @@ const LandingScreen = () => {
         </Box>
       </ScrollView>
     </SafeAreaView>
-  );
-};
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {

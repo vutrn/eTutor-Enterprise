@@ -32,6 +32,7 @@ import { ActivityIndicator, ScrollView } from "react-native";
 import Toast from "react-native-toast-message";
 import { useClassStore } from "../../../store/useClassStore";
 import { useUserStore } from "../../../store/useUserStore";
+import { set } from "lodash";
 
 interface IProps {
   modalVisible: boolean;
@@ -172,7 +173,7 @@ const UpdateModal = ({ modalVisible, setModalVisible }: IProps) => {
       students: false,
     });
     setModalVisible(false);
-  };
+  };  
 
   if (!selectedClass) return null;
 
@@ -193,7 +194,7 @@ const UpdateModal = ({ modalVisible, setModalVisible }: IProps) => {
         <ModalBody>
           <ScrollView showsVerticalScrollIndicator={false}>
             <VStack space="md">
-              {/* CLASS NAME INPUT */}
+              {/* ! CLASS NAME INPUT */}
               <FormControl isRequired isInvalid={errors.className}>
                 <FormControlLabel>
                   <FormControlLabelText className="font-medium">
@@ -222,7 +223,7 @@ const UpdateModal = ({ modalVisible, setModalVisible }: IProps) => {
                 )}
               </FormControl>
 
-              {/* TUTOR SELECTION */}
+              {/* ! TUTOR SELECTION */}
               <FormControl isRequired isInvalid={errors.tutor}>
                 <FormControlLabel>
                   <FormControlLabelText className="font-medium">
@@ -291,7 +292,7 @@ const UpdateModal = ({ modalVisible, setModalVisible }: IProps) => {
 
               <Divider className="my-2" />
 
-              {/* STUDENT SELECTION */}
+              {/* ! STUDENT SELECTION */}
               <FormControl isRequired isInvalid={errors.students}>
                 <FormControlLabel>
                   <HStack className="items-center justify-between">

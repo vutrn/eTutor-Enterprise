@@ -51,21 +51,17 @@ const TutorDashboard = () => {
       
       const fetchData = async () => {
         try {
-          // First fetch the dashboard data
           await getDashboard();
           
-          // Check if component is still mounted and we have classes
           if (!isMounted) return;
         
           console.log("clasdocument", classDocuments);
           if (tutorDashboard?.classes && tutorDashboard.classes.length > 0) {
-            // Fetch documents for each class in parallel
             await Promise.all(
               tutorDashboard.classes.map((cls) => getClassDocuments(cls._id))
             );
           }
           
-          // Fetch other data in parallel
           if (isMounted) {
             await Promise.all([
               getAllOfflineMeetings(),
@@ -80,13 +76,12 @@ const TutorDashboard = () => {
   
       fetchData();
   
-      // Cleanup function
       return () => {
         isMounted = false;
         setDocumentData({ labels: [], counts: [], classNames: {} });
         setAttendanceData({ attended: 0, absent: 0 });
       };
-    }, [isFocused, getDashboard, getClassDocuments]), // Remove tutorDashboard dependency
+    }, [isFocused, getDashboard, getClassDocuments]),
   );
 
   useEffect(() => {

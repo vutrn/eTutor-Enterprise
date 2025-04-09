@@ -16,13 +16,11 @@ const SignUpScreen = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    role: "student", // Default role
+    role: "student", 
     password: "",
   });
 
-  // Handle form submission
   const handleSignUp = async () => {
-    // Validation
     if (!formData.username.trim())
       return Toast.show({
         type: "error",

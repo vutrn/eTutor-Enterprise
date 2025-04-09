@@ -41,7 +41,6 @@ const LoginScreen = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  // Form validation states
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 

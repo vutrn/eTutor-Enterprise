@@ -15,13 +15,12 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
     // console.log(
     //   `Making ${config.method?.toUpperCase()} request to: ${config.baseURL}${config.url}`
-    // );
+    // ); 
     return config;
   },
   function (error) {
@@ -30,7 +29,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor
 axiosInstance.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger

@@ -110,7 +110,7 @@ const StudentClass = () => {
                             </AvatarFallbackText>
                           </Avatar>
                           <VStack>
-                            <Text className="text-lg font-bold text-gray-800">
+                            <Text className="text-lg font-bold text-gray-800 line-clamp-1">
                               {item.name}
                             </Text>
                             <Text className="text-sm text-gray-500">

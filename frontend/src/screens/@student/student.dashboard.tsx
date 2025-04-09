@@ -106,7 +106,7 @@ const StudentDashboard = () => {
                   // backgroundGradientToOpacity: 0.5,
                   color: (opacity = 1) => `rgb(45, 51, 107, ${opacity})`,
                 }}
-                width={chartParentWidth - 10}
+                width={chartParentWidth }
                 height={220}
                 fromZero
                 showBarTops

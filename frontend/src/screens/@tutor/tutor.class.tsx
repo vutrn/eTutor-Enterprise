@@ -29,7 +29,7 @@ import { useDashboardStore } from "../../store/useDashboadStore";
 const TutorClass = () => {
   const { getDashboard, tutorDashboard } = useDashboardStore();
   const { setSelectedClass } = useClassStore();
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [searchQuery, setSearchQuery] = useState(""); 
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {

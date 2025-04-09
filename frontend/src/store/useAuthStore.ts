@@ -7,7 +7,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { IAuthState } from "../types/store";
 import axiosInstance from "../utils/axios";
 import { API_BASE_URL } from "../utils/constant";
-
+  
 export const useAuthStore = create<IAuthState>()(
   persist(
     (set, get) => ({
