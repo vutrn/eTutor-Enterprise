@@ -46,6 +46,29 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
   const [className, setClassName] = useState("");
   const [selectedTutor, setSelectedTutor] = useState("");
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2;
+
+  const indexOfLastStudent = currentPage * itemsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - itemsPerPage;
+  const currentStudents = students.slice(
+    indexOfFirstStudent,
+    indexOfLastStudent,
+  );
+  const totalPages = Math.ceil(students.length / itemsPerPage);
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [errors, setErrors] = useState({
@@ -285,7 +308,7 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
 
                 {students.length > 0 ? (
                   <VStack className="mt-2 space-y-2">
-                    {students.map((student) => (
+                    {currentStudents.map((student) => (
                       <Pressable
                         key={student._id}
                         onPress={() => toggleStudentSelection(student._id)}
@@ -315,6 +338,27 @@ const CreateModal = ({ modalVisible, setModalVisible }: IProps) => {
                         </Box>
                       </Pressable>
                     ))}
+                    <HStack className="items-center justify-center" space="md">
+                      <Button
+                        variant="outline"
+                        onPress={goToPreviousPage}
+                        disabled={currentPage === 1}
+                      >
+                        <ButtonText>Previous</ButtonText>
+                      </Button>
+
+                      <Text>
+                        {currentPage} of {totalPages}
+                      </Text>
+
+                      <Button
+                        variant="outline"
+                        onPress={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      >
+                        <ButtonText>Next</ButtonText>
+                      </Button>
+                    </HStack>
                   </VStack>
                 ) : loadingUsers ? (
                   <HStack className="items-center justify-center p-4">
