@@ -28,8 +28,8 @@ export const useUserStore = create<IUserState>(
         });
         const students = res.data.filter((user: User) => user.role === "student");
         const tutors = res.data.filter((user: User) => user.role === "tutor");
-        const filteredUsers = res.data.filter((user: User) => user.role !== "admin");
-        set({ students, tutors, users: filteredUsers, loading: false });
+        // const filteredUsers = res.data.filter((user: User) => user.role !== "admin");
+        set({ students, tutors, users: res.data, loading: false });
         // set({ students, tutors, users: res.data, loading: false });
       } catch (error: any) {
         set({ loading: false });
